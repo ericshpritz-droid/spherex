@@ -203,9 +203,10 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
   }
 
   return (
-    <div className="h-full bg-ink text-white overflow-auto relative pb-[120px]">
+    <div ref={pullRef} className="h-full bg-ink text-white overflow-auto relative pb-[120px]" style={{ overscrollBehaviorY: 'contain' }}>
       <Aura accent={accent} intensity={0.5}/>
-      <div className="relative z-[1]">
+      <PullIndicator pull={pull} refreshing={refreshing} accent={accent}/>
+      <div className="relative z-[1]" style={{ transform: `translateY(${refreshing ? 56 : pull}px)`, transition: pull === 0 && !refreshing ? 'transform 180ms ease' : 'none' }}>
         <HomeHeader accent={accent} matchCount={matches.length}/>
         <div style={{ padding: '16px 24px 0' }}>
           <div className="text-[15px] font-semibold mb-3">Matched</div>
