@@ -27,6 +27,9 @@ type Ctx = {
   unreadByHash: Record<string, boolean>;
   markThreadRead: (otherHash: string) => void;
   myHash: string;
+  // New-match awareness (separate from unread messages)
+  newMatchCount: number;
+  markMatchesSeen: () => void;
   // OTP flow
   pendingPhone: string;
   startOtp: (digits: string) => Promise<void>;
