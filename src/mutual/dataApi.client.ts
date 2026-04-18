@@ -6,6 +6,7 @@ import {
   addPhonesServer,
   loadAddsAndMatchesServer,
   getMyPhoneHash,
+  hashPhonesServer,
   backfillPhoneHashes,
 } from "./dataApi.functions";
 
@@ -30,6 +31,13 @@ export async function callGetMyPhoneHash(): Promise<string> {
   const headers = await bearerHeaders();
   const { hash } = await getMyPhoneHash({ headers });
   return hash;
+}
+
+export async function callHashPhones(phones: string[]): Promise<string[]> {
+  if (phones.length === 0) return [];
+  const headers = await bearerHeaders();
+  const { hashes } = await hashPhonesServer({ data: { phones }, headers });
+  return hashes;
 }
 
 export async function callBackfillPhoneHashes(): Promise<{ updated: number }> {
