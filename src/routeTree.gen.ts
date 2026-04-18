@@ -9,38 +9,165 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppWelcomeRouteImport } from './routes/_app.welcome'
+import { Route as AppSentRouteImport } from './routes/_app.sent'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppPhoneRouteImport } from './routes/_app.phone'
+import { Route as AppMatchRouteImport } from './routes/_app.match'
+import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppContactsRouteImport } from './routes/_app.contacts'
+import { Route as AppCodeRouteImport } from './routes/_app.code'
+import { Route as AppAddRouteImport } from './routes/_app.add'
 
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppWelcomeRoute = AppWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSentRoute = AppSentRouteImport.update({
+  id: '/sent',
+  path: '/sent',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPhoneRoute = AppPhoneRouteImport.update({
+  id: '/phone',
+  path: '/phone',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMatchRoute = AppMatchRouteImport.update({
+  id: '/match',
+  path: '/match',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContactsRoute = AppContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCodeRoute = AppCodeRouteImport.update({
+  id: '/code',
+  path: '/code',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAddRoute = AppAddRouteImport.update({
+  id: '/add',
+  path: '/add',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/add': typeof AppAddRoute
+  '/code': typeof AppCodeRoute
+  '/contacts': typeof AppContactsRoute
+  '/home': typeof AppHomeRoute
+  '/match': typeof AppMatchRoute
+  '/phone': typeof AppPhoneRoute
+  '/profile': typeof AppProfileRoute
+  '/sent': typeof AppSentRoute
+  '/welcome': typeof AppWelcomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/add': typeof AppAddRoute
+  '/code': typeof AppCodeRoute
+  '/contacts': typeof AppContactsRoute
+  '/home': typeof AppHomeRoute
+  '/match': typeof AppMatchRoute
+  '/phone': typeof AppPhoneRoute
+  '/profile': typeof AppProfileRoute
+  '/sent': typeof AppSentRoute
+  '/welcome': typeof AppWelcomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_app/add': typeof AppAddRoute
+  '/_app/code': typeof AppCodeRoute
+  '/_app/contacts': typeof AppContactsRoute
+  '/_app/home': typeof AppHomeRoute
+  '/_app/match': typeof AppMatchRoute
+  '/_app/phone': typeof AppPhoneRoute
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/sent': typeof AppSentRoute
+  '/_app/welcome': typeof AppWelcomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/add'
+    | '/code'
+    | '/contacts'
+    | '/home'
+    | '/match'
+    | '/phone'
+    | '/profile'
+    | '/sent'
+    | '/welcome'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/add'
+    | '/code'
+    | '/contacts'
+    | '/home'
+    | '/match'
+    | '/phone'
+    | '/profile'
+    | '/sent'
+    | '/welcome'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/_app/add'
+    | '/_app/code'
+    | '/_app/contacts'
+    | '/_app/home'
+    | '/_app/match'
+    | '/_app/phone'
+    | '/_app/profile'
+    | '/_app/sent'
+    | '/_app/welcome'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +175,111 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/welcome': {
+      id: '/_app/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof AppWelcomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sent': {
+      id: '/_app/sent'
+      path: '/sent'
+      fullPath: '/sent'
+      preLoaderRoute: typeof AppSentRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/phone': {
+      id: '/_app/phone'
+      path: '/phone'
+      fullPath: '/phone'
+      preLoaderRoute: typeof AppPhoneRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/match': {
+      id: '/_app/match'
+      path: '/match'
+      fullPath: '/match'
+      preLoaderRoute: typeof AppMatchRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/home': {
+      id: '/_app/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/contacts': {
+      id: '/_app/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof AppContactsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/code': {
+      id: '/_app/code'
+      path: '/code'
+      fullPath: '/code'
+      preLoaderRoute: typeof AppCodeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/add': {
+      id: '/_app/add'
+      path: '/add'
+      fullPath: '/add'
+      preLoaderRoute: typeof AppAddRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppAddRoute: typeof AppAddRoute
+  AppCodeRoute: typeof AppCodeRoute
+  AppContactsRoute: typeof AppContactsRoute
+  AppHomeRoute: typeof AppHomeRoute
+  AppMatchRoute: typeof AppMatchRoute
+  AppPhoneRoute: typeof AppPhoneRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppSentRoute: typeof AppSentRoute
+  AppWelcomeRoute: typeof AppWelcomeRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAddRoute: AppAddRoute,
+  AppCodeRoute: AppCodeRoute,
+  AppContactsRoute: AppContactsRoute,
+  AppHomeRoute: AppHomeRoute,
+  AppMatchRoute: AppMatchRoute,
+  AppPhoneRoute: AppPhoneRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppSentRoute: AppSentRoute,
+  AppWelcomeRoute: AppWelcomeRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
