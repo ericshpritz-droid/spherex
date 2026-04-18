@@ -199,6 +199,8 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
     </div>
   );
 }
+
+export function ScreenCode({ accent, phoneFormatted, onVerify, onBack }) {
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
