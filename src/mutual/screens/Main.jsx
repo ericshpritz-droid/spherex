@@ -244,7 +244,11 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
         <div style={{ padding: '16px 24px 0' }}>
           <div className="text-[15px] font-semibold mb-3">Matched</div>
           <div className="flex gap-3 overflow-x-auto" style={{ margin: '0 -24px', padding: '0 24px 12px' }}>
-            {matches.map((m, i) => (
+            {matches.map((m, i) => {
+              const last = lastByHash[m.id];
+              const unread = !!unreadByHash[m.id];
+              const fromMe = last && myHash && last.sender_phone_hash === myHash;
+              return (
               <div
                 key={i}
                 onClick={() => onOpenMatch(m)}
@@ -263,8 +267,40 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
                 <PhoneAvatar phone={m.phone} size={56} accent={m.avatar} style={{ marginBottom: 20, position: 'relative' }}/>
                 <div className="font-bold tracking-sora-tighter relative" style={{ fontSize: 20 }}>{m.name}</div>
                 <div className="text-sm text-fg-75 relative">{m.phone}</div>
+                {last && (
+                  <div className="relative flex items-center gap-2 mt-3" style={{ minHeight: 24 }}>
+                    <div
+                      className="rounded-full flex items-center"
+                      style={{
+                        padding: '4px 10px', fontSize: 16, lineHeight: 1,
+                        background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)',
+                        maxWidth: '85%',
+                      }}
+                      title={fromMe ? 'You sent' : 'They sent'}
+                    >
+                      <span style={{ fontSize: 11, opacity: 0.85, marginRight: 6, fontWeight: 600 }}>
+                        {fromMe ? 'You' : '→'}
+                      </span>
+                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {last.body}
+                      </span>
+                    </div>
+                    {unread && (
+                      <span
+                        aria-label="New message"
+                        className="rounded-full"
+                        style={{
+                          width: 10, height: 10, background: '#ffffff',
+                          boxShadow: '0 0 0 2px rgba(0,0,0,0.18)',
+                          animation: 'mutualPulse 1.8s ease-in-out infinite',
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
         <div style={{ padding: '28px 24px 0' }}>
