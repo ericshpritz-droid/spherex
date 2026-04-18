@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { ScreenHome } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
