@@ -1,7 +1,23 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
 import { ScreenHome } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
+import { ACCENT_PRESETS } from "../mutual/brand.js";
+
+function celebrateMutual(accent: string) {
+  const p = (ACCENT_PRESETS as any)[accent] || ACCENT_PRESETS.pink;
+  const colors = [p.a, p.b, p.c, "#ffffff"];
+  const defaults = { origin: { y: 0.35 }, colors, disableForReducedMotion: true };
+  confetti({ ...defaults, particleCount: 80, spread: 70, startVelocity: 45, scalar: 1 });
+  setTimeout(() => {
+    confetti({ ...defaults, particleCount: 50, spread: 100, startVelocity: 35, scalar: 0.9, origin: { x: 0.2, y: 0.4 } });
+    confetti({ ...defaults, particleCount: 50, spread: 100, startVelocity: 35, scalar: 0.9, origin: { x: 0.8, y: 0.4 } });
+  }, 180);
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    try { navigator.vibrate?.([12, 40, 18]); } catch {}
+  }
+}
 
 export const Route = createFileRoute("/_app/home")({
   head: () => ({
@@ -23,6 +39,24 @@ function HomeRoute() {
   const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh } = useApp();
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
+
+  // Track known mutuals to detect newly-arrived ones (via Realtime or refresh)
+  const knownIdsRef = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    // Wait until first successful load before tracking
+    if (dataLoading) return;
+    const ids = new Set(matches.map((m: any) => String(m.id ?? m.phone ?? m.other_phone)));
+    if (knownIdsRef.current === null) {
+      knownIdsRef.current = ids;
+      return;
+    }
+    let isNew = false;
+    for (const id of ids) {
+      if (!knownIdsRef.current.has(id)) { isNew = true; break; }
+    }
+    if (isNew) celebrateMutual(accent);
+    knownIdsRef.current = ids;
+  }, [matches, dataLoading, accent]);
 
   // Auto-refresh on tab visibility return
   const hiddenSince = useRef<number | null>(null);
