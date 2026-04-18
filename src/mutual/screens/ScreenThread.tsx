@@ -21,7 +21,11 @@ type Msg = {
   recipient_phone_hash: string;
   body: string;
   created_at: string;
+  /** When set, render as a transient "unsent" tombstone instead of the body. */
+  tomb?: boolean;
 };
+
+const TOMB_MS = 5_000;
 
 type Props = {
   accent: "pink" | "lavender" | "blue";
@@ -90,12 +94,41 @@ export function ScreenThread({ accent, match, onBack }: Props) {
         (payload) => {
           const old = payload.old as Partial<Msg>;
           if (!old?.id) return;
-          setMessages((prev) => prev.filter((x) => x.id !== old.id));
+          markTombstone(old.id);
         },
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [myHash, match.id]);
+
+  // Flip a message into a tombstone, then auto-remove it after TOMB_MS.
+  // Idempotent — if it's already a tomb (e.g. sender unsent + realtime DELETE
+  // both fire), we don't reset the timer.
+  const tombTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const markTombstone = (id: string) => {
+    setMessages((prev) => {
+      const idx = prev.findIndex((x) => x.id === id);
+      if (idx === -1) return prev;
+      if (prev[idx].tomb) return prev;
+      const next = prev.slice();
+      next[idx] = { ...next[idx], tomb: true };
+      return next;
+    });
+    if (tombTimers.current.has(id)) return;
+    const t = setTimeout(() => {
+      setMessages((prev) => prev.filter((x) => x.id !== id));
+      tombTimers.current.delete(id);
+    }, TOMB_MS);
+    tombTimers.current.set(id, t);
+  };
+
+  // Clean up any pending tombstone timers on unmount.
+  useEffect(() => {
+    return () => {
+      tombTimers.current.forEach((t) => clearTimeout(t));
+      tombTimers.current.clear();
+    };
+  }, []);
 
   // Tick every second so the unsend countdown stays fresh.
   useEffect(() => {
@@ -137,18 +170,23 @@ export function ScreenThread({ accent, match, onBack }: Props) {
 
   const UNSEND_WINDOW_MS = 60_000;
   const canUnsend = (m: Msg) =>
+    !m.tomb &&
     m.sender_phone_hash === myHash &&
     now - new Date(m.created_at).getTime() < UNSEND_WINDOW_MS;
 
   const doUnsend = async (id: string) => {
     setConfirmId(null);
-    // Optimistic remove
-    const prev = messages;
-    setMessages((cur) => cur.filter((x) => x.id !== id));
+    // Optimistic: flip to tombstone immediately so the sender sees the same
+    // "unsent" state the recipient will see via realtime DELETE.
+    const before = messages;
+    markTombstone(id);
     try {
       await unsend({ data: { id } });
     } catch (e: any) {
-      setMessages(prev);
+      // Revert: cancel the auto-removal timer and restore the original row.
+      const t = tombTimers.current.get(id);
+      if (t) { clearTimeout(t); tombTimers.current.delete(id); }
+      setMessages(before);
       toast.error(e?.message || "Couldn't unsend");
     }
   };
@@ -212,6 +250,31 @@ export function ScreenThread({ accent, match, onBack }: Props) {
             {messages.map((m) => {
               const mine = m.sender_phone_hash === myHash;
               const unsendable = mine && canUnsend(m);
+              if (m.tomb) {
+                return (
+                  <div
+                    key={m.id}
+                    className="flex"
+                    style={{ justifyContent: mine ? "flex-end" : "flex-start" }}
+                  >
+                    <div
+                      className="rounded-full flex items-center gap-1.5"
+                      style={{
+                        padding: "6px 12px",
+                        fontSize: 12,
+                        lineHeight: 1,
+                        color: "rgba(255,255,255,0.55)",
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px dashed rgba(255,255,255,0.15)",
+                        animation: "mutualFadeIn 180ms ease-out",
+                      }}
+                    >
+                      <span style={{ fontSize: 11 }}>↩︎</span>
+                      <span>{mine ? "You unsent" : "Unsent"}</span>
+                    </div>
+                  </div>
+                );
+              }
               return (
                 <div
                   key={m.id}
