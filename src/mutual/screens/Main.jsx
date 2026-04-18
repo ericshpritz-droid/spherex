@@ -594,25 +594,107 @@ export function ScreenContacts({ accent, onBack, onPick }) {
           </div>
         </div>
 
-        <div className="flex gap-2 mb-3">
+        <div className="flex flex-wrap gap-2 mb-3">
           {pickerSupported && (
             <button
               onClick={openDevicePicker}
               disabled={pickerBusy}
               className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-08 text-white text-[14px] font-semibold cursor-pointer"
-              style={{ padding: '12px 14px', opacity: pickerBusy ? 0.6 : 1 }}
+              style={{ padding: '12px 14px', opacity: pickerBusy ? 0.6 : 1, minWidth: '46%' }}
             >
               {pickerBusy ? 'Opening…' : '📇 Pick from device'}
             </button>
           )}
+          {!pickerSupported && (
+            <>
+              <button
+                onClick={() => setShowPaste(v => !v)}
+                className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-08 text-white text-[14px] font-semibold cursor-pointer"
+                style={{ padding: '12px 14px', minWidth: '46%' }}
+              >
+                {showPaste ? 'Hide paste' : '📋 Paste a list'}
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-08 text-white text-[14px] font-semibold cursor-pointer"
+                style={{ padding: '12px 14px', minWidth: '46%' }}
+              >
+                📎 Upload .vcf
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".vcf,text/vcard,text/x-vcard"
+                style={{ display: 'none' }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = '';
+                  if (!file) return;
+                  try {
+                    const text = await file.text();
+                    const items = parseVCardEntries(text);
+                    if (items.length === 0) {
+                      // Fallback: scan raw text for phone-shaped runs.
+                      const phones = extractPhones(text);
+                      if (phones.length === 0) return;
+                      setConfirmList(phones.map((p) => ({ name: '', phone: p })));
+                      return;
+                    }
+                    setConfirmList(items);
+                  } catch {
+                    /* ignore unreadable files */
+                  }
+                }}
+              />
+            </>
+          )}
           <button
             onClick={() => setShowManual(v => !v)}
             className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-06 text-white text-[14px] font-semibold cursor-pointer"
-            style={{ padding: '12px 14px' }}
+            style={{ padding: '12px 14px', minWidth: '46%' }}
           >
             {showManual ? 'Hide manual' : '✍️ Enter manually'}
           </button>
         </div>
+
+        {showPaste && !pickerSupported && (
+          <div className="rounded-[14px] bg-glass-06 border border-hairline-08 mb-3" style={{ padding: 12 }}>
+            <div className="text-[12px] text-fg-55 mb-2" style={{ lineHeight: 1.4 }}>
+              Paste names + numbers from anywhere. We'll grab the US phone numbers.
+            </div>
+            <textarea
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value.slice(0, 20000))}
+              placeholder={'Alex Kim 555-123-4567\nSam Lee (415) 555 9876'}
+              rows={5}
+              className="w-full bg-transparent border-0 outline-none text-white text-[14px] resize-y"
+              style={{ padding: '6px 4px', lineHeight: 1.4, fontFamily: 'inherit' }}
+            />
+            {(() => {
+              const found = extractPhones(pasteText);
+              return (
+                <>
+                  <div className="mt-2 text-[12px] text-fg-55 px-1">
+                    {found.length === 0 ? 'No phone numbers found yet.' : `Found ${found.length} number${found.length === 1 ? '' : 's'}.`}
+                  </div>
+                  <div className="mt-3">
+                    <Button
+                      accent={accent}
+                      disabled={found.length === 0}
+                      onClick={() => {
+                        setConfirmList(found.map((p) => ({ name: '', phone: p })));
+                        setPasteText('');
+                        setShowPaste(false);
+                      }}
+                    >
+                      {found.length === 0 ? 'Paste at least one number' : `Review ${found.length}`}
+                    </Button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
 
         {showManual && (
           <div className="rounded-[14px] bg-glass-06 border border-hairline-08 mb-3" style={{ padding: 12 }}>
