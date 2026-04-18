@@ -7,25 +7,7 @@
 // from client-bundled code.
 
 import { createServerFn } from "@tanstack/react-start";
-
-// Lazy proxy so the server-only middleware module isn't statically reached
-// from client-bundled code. The actual `requireSupabaseAuth` is loaded the
-// first time a server fn runs (which only happens on the server).
-const requireSupabaseAuth = (() => {
-  let resolved: any = null;
-  return new Proxy(function () {}, {
-    apply: () => resolved,
-    get: (_t, prop) => {
-      if (!resolved) {
-        // Synchronous require via a server-only path. Bundled into the SSR
-        // worker only — client bundles never execute server fn handlers.
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        resolved = require("@/integrations/supabase/auth-middleware").requireSupabaseAuth;
-      }
-      return resolved[prop as keyof typeof resolved];
-    },
-  });
-})() as any;
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 function toE164Server(input: string): string {
   const s = String(input ?? "").trim();
