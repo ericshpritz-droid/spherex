@@ -192,7 +192,7 @@ function RefreshingPill({ accent }) {
   );
 }
 
-export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '' }) {
+export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInvite, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '' }) {
   const { ref: pullRef, pull, refreshing } = usePullToRefresh(onRetry);
   // Only show the background pill when not already pulling-to-refresh
   const showPill = bgRefreshing && !refreshing && pull === 0;
@@ -239,9 +239,30 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
             </div>
             <div className="font-bold text-[22px]">Nothing mutual yet</div>
             <div className="mt-2 text-sm text-fg-60" style={{ lineHeight: 1.4 }}>
-              Add a number. If they've added yours,<br/>it'll light up here.
+              Sphere lights up when someone you've added<br/>adds you back. Invite a few friends to start.
             </div>
-            <div className="mt-5"><Button accent={accent} onClick={onAdd} full={false}>+ Add first number</Button></div>
+            <div className="mt-5 flex flex-col gap-2 items-stretch">
+              {onInvite && (
+                <div
+                  onClick={onInvite}
+                  className="rounded-[16px] text-white font-semibold cursor-pointer"
+                  style={{
+                    padding: '14px 16px', fontSize: 15,
+                    background: gradient(accent, '135deg'),
+                    boxShadow: `0 10px 28px ${ACCENT_PRESETS[accent].a}40`,
+                  }}
+                >
+                  ✨ Invite friends
+                </div>
+              )}
+              <button
+                onClick={onAdd}
+                className="rounded-[14px] bg-glass-08 border border-hairline-10 text-white text-[14px] font-semibold cursor-pointer"
+                style={{ padding: '12px 14px' }}
+              >
+                + Add a number
+              </button>
+            </div>
           </div>
         </div>
       </div>
