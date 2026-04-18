@@ -7,7 +7,7 @@ import { ACCENT_PRESETS, gradient } from "../brand.js";
 import { Aura } from "../components/index.jsx";
 import { PhoneAvatar } from "../components/PhoneAvatar.jsx";
 import { Spinner } from "../components/Spinner.jsx";
-import { sendMessageServer, loadThreadServer } from "../messages.functions";
+import { sendMessageServer, loadThreadServer, unsendMessageServer } from "../messages.functions";
 import { toast } from "../toast";
 
 const QUICK_EMOJIS = ["🔥", "💀", "👀", "❤️", "🤝", "😂", "🫡", "🥹", "🤔", "🙌", "✨", "💯"];
