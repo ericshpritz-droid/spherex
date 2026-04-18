@@ -364,6 +364,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     lastAddedPhone, addOne, addMany,
     activeMatch, setActiveMatch,
     lastByHash, unreadByHash, markThreadRead, myHash,
+    newMatchCount, markMatchesSeen,
     doSignOut,
   };
 
