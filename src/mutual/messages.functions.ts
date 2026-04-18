@@ -95,3 +95,26 @@ export const loadThreadServer = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { messages: rows ?? [], myHash };
   });
+
+/** Unsend a message you sent within the last 60 seconds. RLS enforces both. */
+export const unsendMessageServer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => {
+    if (typeof input.id !== "string" || input.id.length < 10) {
+      throw new Error("Invalid message id");
+    }
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase } = context as { supabase: any };
+    const { error, count } = await supabase
+      .from("messages")
+      .delete({ count: "exact" })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    if (!count) {
+      // Either not yours or older than 60s — RLS filtered the row out.
+      throw new Error("Too late to unsend this message");
+    }
+    return { unsent: true };
+  });

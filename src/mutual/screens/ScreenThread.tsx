@@ -7,7 +7,7 @@ import { ACCENT_PRESETS, gradient } from "../brand.js";
 import { Aura } from "../components/index.jsx";
 import { PhoneAvatar } from "../components/PhoneAvatar.jsx";
 import { Spinner } from "../components/Spinner.jsx";
-import { sendMessageServer, loadThreadServer } from "../messages.functions";
+import { sendMessageServer, loadThreadServer, unsendMessageServer } from "../messages.functions";
 import { toast } from "../toast";
 
 const QUICK_EMOJIS = ["🔥", "💀", "👀", "❤️", "🤝", "😂", "🫡", "🥹", "🤔", "🙌", "✨", "💯"];
@@ -37,13 +37,18 @@ type Props = {
 export function ScreenThread({ accent, match, onBack }: Props) {
   const send = useServerFn(sendMessageServer);
   const load = useServerFn(loadThreadServer);
+  const unsend = useServerFn(unsendMessageServer);
 
   const [messages, setMessages] = useState<Msg[]>([]);
   const [myHash, setMyHash] = useState("");
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  // Re-render every second so the "X seconds left" hint stays accurate.
+  const [now, setNow] = useState(() => Date.now());
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Initial load
   useEffect(() => {
@@ -62,7 +67,7 @@ export function ScreenThread({ accent, match, onBack }: Props) {
     return () => { cancelled = true; };
   }, [match.id, load]);
 
-  // Realtime: append new messages between us and them
+  // Realtime: append new messages, drop unsent ones
   useEffect(() => {
     if (!myHash) return;
     const channel = supabase
@@ -79,9 +84,24 @@ export function ScreenThread({ accent, match, onBack }: Props) {
           setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
         },
       )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "messages" },
+        (payload) => {
+          const old = payload.old as Partial<Msg>;
+          if (!old?.id) return;
+          setMessages((prev) => prev.filter((x) => x.id !== old.id));
+        },
+      )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [myHash, match.id]);
+
+  // Tick every second so the unsend countdown stays fresh.
+  useEffect(() => {
+    const i = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(i);
+  }, []);
 
   // Auto-scroll to newest
   useEffect(() => {
@@ -114,6 +134,40 @@ export function ScreenThread({ accent, match, onBack }: Props) {
       setSending(false);
     }
   };
+
+  const UNSEND_WINDOW_MS = 60_000;
+  const canUnsend = (m: Msg) =>
+    m.sender_phone_hash === myHash &&
+    now - new Date(m.created_at).getTime() < UNSEND_WINDOW_MS;
+
+  const doUnsend = async (id: string) => {
+    setConfirmId(null);
+    // Optimistic remove
+    const prev = messages;
+    setMessages((cur) => cur.filter((x) => x.id !== id));
+    try {
+      await unsend({ data: { id } });
+    } catch (e: any) {
+      setMessages(prev);
+      toast.error(e?.message || "Couldn't unsend");
+    }
+  };
+
+  const startLongPress = (id: string) => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    longPressTimer.current = setTimeout(() => setConfirmId(id), 450);
+  };
+  const cancelLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const confirmMsg = confirmId ? messages.find((x) => x.id === confirmId) : null;
+  const confirmSecsLeft = confirmMsg
+    ? Math.max(0, Math.ceil((UNSEND_WINDOW_MS - (now - new Date(confirmMsg.created_at).getTime())) / 1000))
+    : 0;
 
   const p = ACCENT_PRESETS[accent];
 
@@ -157,6 +211,7 @@ export function ScreenThread({ accent, match, onBack }: Props) {
           <div className="flex flex-col gap-2">
             {messages.map((m) => {
               const mine = m.sender_phone_hash === myHash;
+              const unsendable = mine && canUnsend(m);
               return (
                 <div
                   key={m.id}
@@ -164,18 +219,30 @@ export function ScreenThread({ accent, match, onBack }: Props) {
                   style={{ justifyContent: mine ? "flex-end" : "flex-start" }}
                 >
                   <div
-                    className="rounded-[20px]"
+                    onContextMenu={(e) => {
+                      if (!unsendable) return;
+                      e.preventDefault();
+                      setConfirmId(m.id);
+                    }}
+                    onPointerDown={() => unsendable && startLongPress(m.id)}
+                    onPointerUp={cancelLongPress}
+                    onPointerLeave={cancelLongPress}
+                    onPointerCancel={cancelLongPress}
+                    className="rounded-[20px] select-none"
                     style={{
                       padding: "10px 14px",
                       fontSize: 28,
                       lineHeight: 1.1,
                       maxWidth: "75%",
+                      cursor: unsendable ? "pointer" : "default",
+                      WebkitTouchCallout: "none",
                       background: mine
                         ? gradient(accent, "135deg")
                         : "rgba(255,255,255,0.08)",
                       border: mine ? "none" : "1px solid rgba(255,255,255,0.10)",
                       boxShadow: mine ? `0 6px 16px ${p.a}33` : "none",
                     }}
+                    title={unsendable ? "Long-press to unsend" : undefined}
                   >
                     {m.body}
                   </div>
@@ -242,6 +309,61 @@ export function ScreenThread({ accent, match, onBack }: Props) {
           Send
         </button>
       </div>
+
+      {/* Unsend confirm sheet */}
+      {confirmMsg && (
+        <div
+          className="absolute inset-0 z-[10] flex items-end justify-center"
+          style={{ background: "rgba(0,0,0,0.55)" }}
+          onClick={() => setConfirmId(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full bg-ink rounded-t-3xl border-t border-hairline-12"
+            style={{ padding: "20px 22px 28px" }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="rounded-2xl flex items-center justify-center"
+                style={{
+                  width: 56, height: 56, fontSize: 28,
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                }}
+              >
+                {confirmMsg.body}
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold text-[16px]">Unsend this?</div>
+                <div className="text-[12px] text-fg-55">
+                  {confirmSecsLeft > 0
+                    ? `${confirmSecsLeft}s left to take it back`
+                    : "Too late — this message is permanent now"}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => doUnsend(confirmMsg.id)}
+              disabled={confirmSecsLeft === 0}
+              className="w-full rounded-full text-white font-semibold cursor-pointer disabled:opacity-40 mb-2"
+              style={{
+                padding: "14px 18px",
+                border: 0,
+                background: "rgba(241,63,94,0.85)",
+              }}
+            >
+              Unsend
+            </button>
+            <button
+              onClick={() => setConfirmId(null)}
+              className="w-full rounded-full bg-glass-06 text-white font-semibold cursor-pointer border border-hairline-12"
+              style={{ padding: "14px 18px" }}
+            >
+              Keep it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
