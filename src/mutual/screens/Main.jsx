@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ACCENT_PRESETS, formatPhone, gradient } from '../brand.js';
 import { Button } from '../components/Button.jsx';
 import { PhoneAvatar } from '../components/PhoneAvatar.jsx';
@@ -63,7 +63,94 @@ function Spinner({ accent = 'pink', size = 36 }) {
   );
 }
 
+function usePullToRefresh(onRefresh, { threshold = 70, max = 110 } = {}) {
+  const ref = useRef(null);
+  const startY = useRef(null);
+  const pulling = useRef(false);
+  const [pull, setPull] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof onRefresh !== 'function') return;
+
+    const onStart = (e) => {
+      if (refreshing) return;
+      if (el.scrollTop > 0) return;
+      startY.current = e.touches[0].clientY;
+      pulling.current = true;
+    };
+    const onMove = (e) => {
+      if (!pulling.current || startY.current == null) return;
+      const dy = e.touches[0].clientY - startY.current;
+      if (dy <= 0) { setPull(0); return; }
+      // Resistance curve
+      const eased = Math.min(max, dy * 0.5);
+      setPull(eased);
+      if (dy > 6 && el.scrollTop <= 0) e.preventDefault();
+    };
+    const onEnd = async () => {
+      if (!pulling.current) return;
+      pulling.current = false;
+      const reached = pull >= threshold;
+      startY.current = null;
+      if (reached) {
+        setRefreshing(true);
+        setPull(threshold);
+        try { await onRefresh(); } catch { /* handled upstream */ }
+        setRefreshing(false);
+      }
+      setPull(0);
+    };
+
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchmove', onMove, { passive: false });
+    el.addEventListener('touchend', onEnd);
+    el.addEventListener('touchcancel', onEnd);
+    return () => {
+      el.removeEventListener('touchstart', onStart);
+      el.removeEventListener('touchmove', onMove);
+      el.removeEventListener('touchend', onEnd);
+      el.removeEventListener('touchcancel', onEnd);
+    };
+  }, [onRefresh, pull, refreshing, threshold, max]);
+
+  return { ref, pull, refreshing };
+}
+
+function PullIndicator({ pull, refreshing, accent, threshold = 70 }) {
+  const visible = pull > 0 || refreshing;
+  if (!visible) return null;
+  const progress = Math.min(1, pull / threshold);
+  return (
+    <div
+      style={{
+        position: 'absolute', top: 0, left: 0, right: 0,
+        display: 'flex', justifyContent: 'center', alignItems: 'center',
+        height: refreshing ? 56 : Math.max(0, pull),
+        pointerEvents: 'none', zIndex: 5,
+        transition: refreshing ? 'height 180ms ease' : 'none',
+      }}
+    >
+      {refreshing ? (
+        <Spinner accent={accent} size={24}/>
+      ) : (
+        <div
+          style={{
+            width: 24, height: 24, borderRadius: '50%',
+            border: '2px solid rgba(255,255,255,0.15)',
+            borderTopColor: ACCENT_PRESETS[accent]?.a || '#F13F5E',
+            transform: `rotate(${progress * 360}deg)`,
+            opacity: 0.4 + progress * 0.6,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loading = false, error = null, onRetry, variant = 'cards' }) {
+  const { ref: pullRef, pull, refreshing } = usePullToRefresh(onRetry);
   if (loading) {
     return (
       <div className="h-full bg-ink text-white relative overflow-hidden">
@@ -95,9 +182,10 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
   }
   if (matches.length === 0 && pending.length === 0) {
     return (
-      <div className="h-full bg-ink text-white relative overflow-auto pb-[120px]">
+      <div ref={pullRef} className="h-full bg-ink text-white relative overflow-auto pb-[120px]" style={{ overscrollBehaviorY: 'contain' }}>
         <Aura accent={accent} intensity={0.5}/>
-        <div className="relative z-[1]">
+        <PullIndicator pull={pull} refreshing={refreshing} accent={accent}/>
+        <div className="relative z-[1]" style={{ transform: `translateY(${refreshing ? 56 : pull}px)`, transition: pull === 0 && !refreshing ? 'transform 180ms ease' : 'none' }}>
           <HomeHeader accent={accent} matchCount={0}/>
           <div className="rounded-[28px] bg-glass-04 text-center" style={{ margin: '40px 24px', padding: 32, border: '1px dashed rgba(255,255,255,0.12)' }}>
             <div className="flex justify-center mb-5">
@@ -115,9 +203,10 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
   }
 
   return (
-    <div className="h-full bg-ink text-white overflow-auto relative pb-[120px]">
+    <div ref={pullRef} className="h-full bg-ink text-white overflow-auto relative pb-[120px]" style={{ overscrollBehaviorY: 'contain' }}>
       <Aura accent={accent} intensity={0.5}/>
-      <div className="relative z-[1]">
+      <PullIndicator pull={pull} refreshing={refreshing} accent={accent}/>
+      <div className="relative z-[1]" style={{ transform: `translateY(${refreshing ? 56 : pull}px)`, transition: pull === 0 && !refreshing ? 'transform 180ms ease' : 'none' }}>
         <HomeHeader accent={accent} matchCount={matches.length}/>
         <div style={{ padding: '16px 24px 0' }}>
           <div className="text-[15px] font-semibold mb-3">Matched</div>
