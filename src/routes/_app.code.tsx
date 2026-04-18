@@ -6,9 +6,9 @@ import { formatE164 } from "../mutual/auth";
 export const Route = createFileRoute("/_app/code")({
   head: () => ({
     meta: [
-      { title: "Verify your code — Mutual" },
+      { title: "Verify your code — Sphere" },
       { name: "description", content: "Enter the 6-digit code we just texted you." },
-      { property: "og:title", content: "Verify your code — Mutual" },
+      { property: "og:title", content: "Verify your code — Sphere" },
       { property: "og:description", content: "Enter the 6-digit code we just texted you." },
     ],
   }),

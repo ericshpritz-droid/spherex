@@ -5,7 +5,7 @@ import { useApp } from "../mutual/AppContext";
 export const Route = createFileRoute("/_app/match")({
   head: () => ({
     meta: [
-      { title: "It's mutual — Mutual" },
+      { title: "It's mutual — Sphere" },
       { name: "description", content: "You both picked each other." },
     ],
   }),

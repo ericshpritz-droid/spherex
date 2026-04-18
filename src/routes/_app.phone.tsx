@@ -5,9 +5,9 @@ import { useApp } from "../mutual/AppContext";
 export const Route = createFileRoute("/_app/phone")({
   head: () => ({
     meta: [
-      { title: "Enter your number — Mutual" },
+      { title: "Enter your number — Sphere" },
       { name: "description", content: "Sign in with your phone number. We'll text you a 6-digit code." },
-      { property: "og:title", content: "Enter your number — Mutual" },
+      { property: "og:title", content: "Enter your number — Sphere" },
       { property: "og:description", content: "Sign in with your phone number." },
     ],
   }),

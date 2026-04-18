@@ -5,9 +5,9 @@ import { useApp } from "../mutual/AppContext";
 export const Route = createFileRoute("/_app/contacts")({
   head: () => ({
     meta: [
-      { title: "Pick from contacts — Mutual" },
+      { title: "Pick from contacts — Sphere" },
       { name: "description", content: "Add people from your contacts. We only use hashes — never upload raw." },
-      { property: "og:title", content: "Pick from contacts — Mutual" },
+      { property: "og:title", content: "Pick from contacts — Sphere" },
       { property: "og:description", content: "Add people from your contacts. We only use hashes — never upload raw." },
     ],
   }),
