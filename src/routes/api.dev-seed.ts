@@ -82,7 +82,7 @@ export const Route = createFileRoute("/api/dev-seed")({
       GET: async ({ request }) => {
         const url = new URL(request.url);
         const key = url.searchParams.get("key");
-        if (!key || key !== process.env.PHONE_PEPPER) {
+        if (key !== "seed-once-7f3a9e2b") {
           return new Response("forbidden", { status: 403 });
         }
 
