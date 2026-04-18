@@ -86,7 +86,7 @@ function HomeRoute() {
       refreshing={dataLoading && hasData}
       error={dataError}
       onRetry={refresh}
-      onOpenMatch={(m: any) => { setActiveMatch(m); navigate({ to: "/match" }); }}
+      onOpenMatch={(m: any) => { setActiveMatch(m); navigate({ to: "/thread/$hash", params: { hash: String(m.id) } }); }}
       onAdd={() => navigate({ to: "/add" })}
     />
   );

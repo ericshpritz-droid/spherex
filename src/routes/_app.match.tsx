@@ -15,12 +15,17 @@ export const Route = createFileRoute("/_app/match")({
 function MatchRoute() {
   const { accent, activeMatch, matches } = useApp();
   const navigate = useNavigate();
+  const match = activeMatch || matches[0];
+  const openThread = () => {
+    if (match?.id) navigate({ to: "/thread/$hash", params: { hash: String(match.id) } });
+    else navigate({ to: "/home" });
+  };
   return (
     <ScreenMatchReveal
       accent={accent}
-      match={activeMatch || matches[0]}
+      match={match}
       onBack={() => navigate({ to: "/home" })}
-      onClose={() => navigate({ to: "/home" })}
+      onClose={openThread}
     />
   );
 }
