@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_app/home")({
 const MIN_HIDDEN_MS = 10_000;
 
 function HomeRoute() {
-  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash, markMatchesSeen } = useApp();
+  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash, markMatchesSeen, invitedByHash } = useApp();
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
 
@@ -129,14 +129,23 @@ function HomeRoute() {
     }
   }, []);
 
+  const sortedPending = invitedByHash
+    ? [...pending].sort((a: any, b: any) => {
+        const ai = String(a.id) === invitedByHash ? 1 : 0;
+        const bi = String(b.id) === invitedByHash ? 1 : 0;
+        return bi - ai;
+      })
+    : pending;
+
   return (
     <ScreenHome
       accent={accent}
       matches={sortedMatches}
-      pending={pending}
+      pending={sortedPending}
       lastByHash={lastByHash}
       unreadByHash={unreadByHash}
       myHash={myHash}
+      invitedByHash={invitedByHash}
       loading={dataLoading && !hasData}
       refreshing={dataLoading && hasData}
       error={dataError}

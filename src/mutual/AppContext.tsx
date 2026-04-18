@@ -44,6 +44,8 @@ type Ctx = {
   setActiveMatch: (m: Person | null) => void;
   // Sign out
   doSignOut: () => Promise<void>;
+  // Invite attribution: hash of the user who invited me, only fresh for 24h.
+  invitedByHash: string;
 };
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -154,7 +156,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // ---- Invite-link consumption ------------------------------------------
   // /i/<hash> stashes the inviter's hash in sessionStorage. After the user
   // is signed in, redeem it once (one-sided: inviter is added to my list).
+  // We also remember "I was invited by <hash> at <ts>" in localStorage so
+  // /home can badge that pending row for 24h.
   const consumeInvite = useServerFn(consumeInviteServer);
+  const invitedByKey = (uid: string | undefined) => `mutual.invitedBy.${uid ?? "anon"}`;
+  const [invitedBy, setInvitedBy] = useState<{ hash: string; at: number } | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined" || !user?.id) { setInvitedBy(null); return; }
+    try {
+      const raw = localStorage.getItem(invitedByKey(user.id));
+      if (!raw) { setInvitedBy(null); return; }
+      const parsed = JSON.parse(raw) as { hash: string; at: number };
+      if (!parsed?.hash || !parsed?.at) { setInvitedBy(null); return; }
+      setInvitedBy(parsed);
+    } catch { setInvitedBy(null); }
+  }, [user?.id]);
+
   useEffect(() => {
     if (!session || typeof window === "undefined") return;
     const KEY = "mutual.pendingInviteHash";
@@ -163,13 +180,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     sessionStorage.removeItem(KEY);
     (async () => {
       try {
-        await consumeInvite({ data: { inviterHash: inviterHash.toLowerCase() } });
+        const res: any = await consumeInvite({ data: { inviterHash: inviterHash.toLowerCase() } });
+        if (res?.applied && res?.inviterHash) {
+          const stamp = { hash: String(res.inviterHash), at: Date.now() };
+          setInvitedBy(stamp);
+          if (user?.id) {
+            try { localStorage.setItem(invitedByKey(user.id), JSON.stringify(stamp)); } catch {}
+          }
+        }
         refresh();
       } catch (e) {
         console.warn("consumeInvite failed", e);
       }
     })();
-  }, [session, consumeInvite, refresh]);
+  }, [session, consumeInvite, refresh, user?.id]);
+
+  // Expose the inviter hash only while the badge is still fresh (24h).
+  const INVITE_BADGE_TTL = 24 * 60 * 60 * 1000;
+  const invitedByHash =
+    invitedBy && Date.now() - invitedBy.at < INVITE_BADGE_TTL ? invitedBy.hash : "";
 
   // Realtime: when someone adds *me* a new mutual may have just been created.
   // Filter on my hashed phone (the column the DB now stores).
@@ -440,6 +469,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     lastByHash, unreadByHash, markThreadRead, myHash,
     newMatchCount, markMatchesSeen,
     doSignOut,
+    invitedByHash,
   };
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;
