@@ -129,11 +129,19 @@ function HomeRoute() {
     }
   }, []);
 
+  const sortedPending = invitedByHash
+    ? [...pending].sort((a: any, b: any) => {
+        const ai = String(a.id) === invitedByHash ? 1 : 0;
+        const bi = String(b.id) === invitedByHash ? 1 : 0;
+        return bi - ai;
+      })
+    : pending;
+
   return (
     <ScreenHome
       accent={accent}
       matches={sortedMatches}
-      pending={pending}
+      pending={sortedPending}
       lastByHash={lastByHash}
       unreadByHash={unreadByHash}
       myHash={myHash}
