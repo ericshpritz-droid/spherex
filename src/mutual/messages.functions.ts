@@ -96,6 +96,42 @@ export const loadThreadServer = createServerFn({ method: "POST" })
     return { messages: rows ?? [], myHash };
   });
 
+/**
+ * For each of my matched counterparts (by phone hash), return the most recent
+ * message between us — body, who sent it, and when. Used to surface activity
+ * on the home cards without opening every thread.
+ */
+export const loadLastMessagesServer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { hashPhone } = await import("@/integrations/phone/hash.server");
+    const { supabase, claims } = context as {
+      supabase: any;
+      claims: { phone?: string };
+    };
+    const myPhone = claims?.phone ? `+${String(claims.phone).replace(/\D/g, "")}` : "";
+    if (!myPhone) return { lastByHash: {} as Record<string, { body: string; sender_phone_hash: string; created_at: string }> };
+    const myHash = hashPhone(myPhone);
+
+    // Pull the last 500 messages I'm part of, then reduce to one-per-counterpart
+    // in app code. RLS already filters to messages I sent or received.
+    const { data: rows, error } = await supabase
+      .from("messages")
+      .select("body, sender_phone_hash, recipient_phone_hash, created_at")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+
+    const lastByHash: Record<string, { body: string; sender_phone_hash: string; created_at: string }> = {};
+    for (const r of rows ?? []) {
+      const other = r.sender_phone_hash === myHash ? r.recipient_phone_hash : r.sender_phone_hash;
+      if (!lastByHash[other]) {
+        lastByHash[other] = { body: r.body, sender_phone_hash: r.sender_phone_hash, created_at: r.created_at };
+      }
+    }
+    return { lastByHash, myHash };
+  });
+
 /** Unsend a message you sent within the last 60 seconds. RLS enforces both. */
 export const unsendMessageServer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
