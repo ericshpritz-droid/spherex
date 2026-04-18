@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
 import { toE164, formatE164 } from "./auth";
+import { callAddPhones, callLoadAddsAndMatches } from "./dataApi.client";
 
 export type Person = {
   phone: string; // formatted "(555) 123-4567"
@@ -8,11 +8,14 @@ export type Person = {
   matchedAt?: string;
   avatar: "pink" | "lavender" | "blue";
   unknown?: boolean;
+  /** Stable per-person identifier (the server-side hash). */
+  id: string;
 };
 
 const AVATARS: Person["avatar"][] = ["pink", "lavender", "blue"];
-function avatarFor(phone: string): Person["avatar"] {
-  const h = phone.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+function avatarForId(id: string): Person["avatar"] {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h + id.charCodeAt(i)) >>> 0;
   return AVATARS[h % 3];
 }
 
@@ -26,77 +29,55 @@ function timeAgo(iso: string): string {
   return "now";
 }
 
-/** Load matches + still-pending adds for the current user. */
-export async function loadAddsAndMatches(myPhoneE164: string): Promise<{
-  matches: Person[];
-  pending: Person[];
-}> {
-  const [addsRes, matchesRes] = await Promise.all([
-    supabase
-      .from("adds")
-      .select("added_phone, created_at")
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("matches")
-      .select("other_phone, matched_at")
-      .order("matched_at", { ascending: false }),
-  ]);
+/**
+ * Load matches + still-pending adds for the current user.
+ *
+ * `hashToRaw` is a *local* lookup of phones the current device has previously
+ * uploaded. We only know readable numbers for people *we* added. Hashes that
+ * aren't in this map render as a generic "Hidden contact" placeholder.
+ */
+export async function loadAddsAndMatches(
+  _myPhoneE164: string,
+  hashToRaw?: Map<string, string>,
+): Promise<{ matches: Person[]; pending: Person[] }> {
+  const { adds, matches } = await callLoadAddsAndMatches();
+  const matchedHashes = new Set(matches.map((m) => m.other_phone_hash));
 
-  if (addsRes.error) throw addsRes.error;
-  if (matchesRes.error) throw matchesRes.error;
-
-  const matchedSet = new Set(
-    (matchesRes.data ?? []).map((m: any) => m.other_phone as string),
-  );
-
-  const matches: Person[] = (matchesRes.data ?? []).map((m: any) => {
-    const formatted = formatE164(m.other_phone);
+  function makePerson(hash: string, status: "matched" | "pending", matchedAt?: string): Person {
+    const raw = hashToRaw?.get(hash);
+    const formatted = raw ? formatE164(raw) : "Hidden contact";
     return {
+      id: hash,
       phone: formatted,
       name: formatted,
-      status: "matched",
-      matchedAt: timeAgo(m.matched_at),
-      avatar: avatarFor(m.other_phone),
+      status,
+      matchedAt,
+      avatar: avatarForId(hash),
       unknown: true,
     };
-  });
+  }
 
-  const pending: Person[] = (addsRes.data ?? [])
-    .filter((a: any) => !matchedSet.has(a.added_phone))
-    .map((a: any) => {
-      const formatted = formatE164(a.added_phone);
-      return {
-        phone: formatted,
-        name: formatted,
-        status: "pending",
-        avatar: avatarFor(a.added_phone),
-        unknown: true,
-      };
-    });
-
-  return { matches, pending };
+  return {
+    matches: matches.map((m) => makePerson(m.other_phone_hash, "matched", timeAgo(m.matched_at))),
+    pending: adds
+      .filter((a) => !matchedHashes.has(a.added_phone_hash))
+      .map((a) => makePerson(a.added_phone_hash, "pending")),
+  };
 }
 
-/** Insert one or more "I added them" rows. Ignores duplicates. */
-export async function addPhones(myPhoneE164: string, phones: string[]) {
-  const rows = phones
-    .map((p) => toE164(p))
-    .filter((p) => p && p !== myPhoneE164)
-    .map((p) => ({ adder_phone: myPhoneE164, added_phone: p }));
-
-  if (rows.length === 0) return;
-
-  // Need adder_id for RLS — get it from session
-  const { data: userData } = await supabase.auth.getUser();
-  const userId = userData.user?.id;
-  if (!userId) throw new Error("Not authenticated");
-
-  const withId = rows.map((r) => ({ ...r, adder_id: userId }));
-
-  // Upsert-style: ignore duplicates via the unique index
-  const { error } = await supabase.from("adds").upsert(withId, {
-    onConflict: "adder_phone,added_phone",
-    ignoreDuplicates: true,
-  });
-  if (error) throw error;
+/**
+ * Insert one or more "I added them" rows. Hashing happens server-side.
+ * Returns the E.164 phones that were sent (for local hash-cache hydration).
+ */
+export async function addPhones(myPhoneE164: string, phones: string[]): Promise<string[]> {
+  const e164s = Array.from(
+    new Set(
+      phones
+        .map((p) => toE164(p))
+        .filter((p) => p && p !== myPhoneE164),
+    ),
+  );
+  if (e164s.length === 0) return [];
+  await callAddPhones(e164s);
+  return e164s;
 }
