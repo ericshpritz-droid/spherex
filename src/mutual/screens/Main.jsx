@@ -179,6 +179,17 @@ export function ScreenAdd({ accent, onSubmit, onBack, onBrowseContacts }) {
 export function ScreenContacts({ accent, onBack, onPick }) {
   const [q, setQ] = useState('');
   const [picked, setPicked] = useState(new Set());
+  const [pickerSupported, setPickerSupported] = useState(false);
+  const [pickerBusy, setPickerBusy] = useState(false);
+  const [showManual, setShowManual] = useState(false);
+  const [manualName, setManualName] = useState('');
+  const [manualPhone, setManualPhone] = useState('');
+
+  useEffect(() => {
+    const nav = typeof navigator !== 'undefined' ? navigator : null;
+    setPickerSupported(!!(nav && nav.contacts && typeof nav.contacts.select === 'function'));
+  }, []);
+
   const filtered = CONTACTS.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.phone.includes(q));
   const toggle = (phone) => {
     const s = new Set(picked); s.has(phone) ? s.delete(phone) : s.add(phone); setPicked(s);
@@ -186,6 +197,33 @@ export function ScreenContacts({ accent, onBack, onPick }) {
   const groups = {};
   filtered.forEach(c => { const k = c.name[0].toUpperCase(); (groups[k] = groups[k] || []).push(c); });
   const letters = Object.keys(groups).sort();
+
+  const openDevicePicker = async () => {
+    if (!pickerSupported || pickerBusy) return;
+    setPickerBusy(true);
+    try {
+      const results = await navigator.contacts.select(['name', 'tel'], { multiple: true });
+      const phones = [];
+      for (const r of results) {
+        const tels = Array.isArray(r.tel) ? r.tel : [];
+        for (const t of tels) if (t) phones.push(String(t));
+      }
+      const unique = [...new Set(phones)];
+      if (unique.length > 0) onPick(unique);
+    } catch (e) {
+      // user cancelled or denied — silent
+    } finally {
+      setPickerBusy(false);
+    }
+  };
+
+  const manualDigits = manualPhone.replace(/\D/g, '');
+  const manualValid = manualDigits.length >= 10;
+  const submitManual = () => {
+    if (!manualValid) return;
+    onPick([manualDigits]);
+  };
+
   return (
     <div className="relative h-full overflow-hidden bg-ink text-white flex flex-col">
       <Aura accent={accent} intensity={0.4}/>
@@ -197,6 +235,52 @@ export function ScreenContacts({ accent, onBack, onPick }) {
             <div className="text-xs text-fg-50">{CONTACTS.length} people · pick as many as you want</div>
           </div>
         </div>
+
+        <div className="flex gap-2 mb-3">
+          {pickerSupported && (
+            <button
+              onClick={openDevicePicker}
+              disabled={pickerBusy}
+              className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-08 text-white text-[14px] font-semibold cursor-pointer"
+              style={{ padding: '12px 14px', opacity: pickerBusy ? 0.6 : 1 }}
+            >
+              {pickerBusy ? 'Opening…' : '📇 Pick from device'}
+            </button>
+          )}
+          <button
+            onClick={() => setShowManual(v => !v)}
+            className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-06 text-white text-[14px] font-semibold cursor-pointer"
+            style={{ padding: '12px 14px' }}
+          >
+            {showManual ? 'Hide manual' : '✍️ Enter manually'}
+          </button>
+        </div>
+
+        {showManual && (
+          <div className="rounded-[14px] bg-glass-06 border border-hairline-08 mb-3" style={{ padding: 12 }}>
+            <input
+              value={manualName}
+              onChange={e => setManualName(e.target.value)}
+              placeholder="Name (optional)"
+              className="w-full bg-transparent border-0 outline-none text-white text-[15px] mb-2"
+              style={{ padding: '6px 4px' }}
+            />
+            <input
+              value={manualPhone}
+              onChange={e => setManualPhone(e.target.value)}
+              placeholder="Phone number"
+              inputMode="tel"
+              className="w-full bg-transparent border-0 outline-none text-white text-[15px]"
+              style={{ padding: '6px 4px', borderTop: '1px solid rgba(255,255,255,0.08)' }}
+            />
+            <div className="mt-3">
+              <Button accent={accent} disabled={!manualValid} onClick={submitManual}>
+                {manualValid ? 'Add them' : 'Enter 10+ digits'}
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="rounded-[14px] bg-glass-06 border border-hairline-08 flex items-center gap-2.5" style={{ padding: '12px 16px' }}>
           <span className="text-fg-40">🔍</span>
           <input
