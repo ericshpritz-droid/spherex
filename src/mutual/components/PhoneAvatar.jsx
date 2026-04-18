@@ -8,14 +8,15 @@ export function PhoneAvatar({ phone, size = 44, accent, style = {} }) {
   const p = ACCENT_PRESETS[a];
   const last = String(phone).replace(/\D/g, '').slice(-2) || '••';
   return (
-    <div style={{
-      width: size, height: size, borderRadius: size * 0.32,
-      background: `linear-gradient(140deg, ${p.a}, ${p.c})`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'Sora, system-ui', fontWeight: 700,
-      fontSize: size * 0.38, color: '#fff',
-      boxShadow: `0 4px 12px ${p.a}40`,
-      flexShrink: 0, ...style,
-    }}>{last}</div>
+    <div
+      className="flex items-center justify-center font-bold text-white shrink-0"
+      style={{
+        width: size, height: size, borderRadius: size * 0.32,
+        background: `linear-gradient(140deg, ${p.a}, ${p.c})`,
+        fontSize: size * 0.38,
+        boxShadow: `0 4px 12px ${p.a}40`,
+        ...style,
+      }}
+    >{last}</div>
   );
 }
