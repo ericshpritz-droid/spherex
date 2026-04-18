@@ -251,6 +251,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     persistSeen(next);
   }, [lastByHash, seenByHash, persistSeen]);
 
+  // ---- New-match tracking ------------------------------------------------
+  // Mirrors the seenByHash pattern: persist the set of match IDs the user has
+  // already seen on /home, so realtime / refresh deltas show up as a dot.
+  const seenMatchKey = (uid: string | undefined) => `mutual.matchesSeen.${uid ?? "anon"}`;
+  const [seenMatchIds, setSeenMatchIds] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const raw = localStorage.getItem(seenMatchKey(undefined));
+      return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+    } catch { return new Set(); }
+  });
+  useEffect(() => {
+    if (typeof window === "undefined" || !user?.id) return;
+    try {
+      const raw = localStorage.getItem(seenMatchKey(user.id));
+      setSeenMatchIds(new Set(raw ? (JSON.parse(raw) as string[]) : []));
+    } catch { setSeenMatchIds(new Set()); }
+  }, [user?.id]);
+
+  const matchIds = matches.map((m) => String(m.id));
+  let newMatchCount = 0;
+  for (const id of matchIds) if (!seenMatchIds.has(id)) newMatchCount++;
+
+  const markMatchesSeen = useCallback(() => {
+    if (matchIds.length === 0) return;
+    const next = new Set(seenMatchIds);
+    let changed = false;
+    for (const id of matchIds) if (!next.has(id)) { next.add(id); changed = true; }
+    if (!changed) return;
+    setSeenMatchIds(next);
+    if (typeof window !== "undefined") {
+      try { localStorage.setItem(seenMatchKey(user?.id), JSON.stringify(Array.from(next))); } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchIds.join("|"), seenMatchIds, user?.id]);
+
   const startOtp = useCallback(async (digits: string) => {
     const e164 = toE164(digits);
     setPendingPhone(e164);
