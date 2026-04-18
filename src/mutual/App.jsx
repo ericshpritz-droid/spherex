@@ -102,7 +102,9 @@ export default function App() {
 
   let content;
   if (sessionLoading) {
-    content = <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', background: '#120A32', fontFamily: 'Sora, system-ui' }}>Loading…</div>;
+    content = (
+      <div className="h-full flex items-center justify-center text-white bg-ink">Loading…</div>
+    );
   } else if (scene === 'welcome') content = <ScreenWelcome accent={accent} onNext={() => setScene('phone')}/>;
   else if (scene === 'phone') content = <ScreenPhone accent={accent} onSendCode={handleSendCode} onBack={() => setScene('welcome')}/>;
   else if (scene === 'code') content = <ScreenCode accent={accent} phoneFormatted={formatE164(pendingPhone)} onVerify={handleVerify} onBack={() => setScene('phone')}/>;
@@ -129,13 +131,16 @@ export default function App() {
   const showTabBar = session && ['home', 'add', 'profile'].includes(scene);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0620', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px 0' }}>
-      <div style={{
-        width: 'min(402px, 100vw)', height: 'min(874px, 100vh)',
-        maxWidth: 402, maxHeight: 874,
-        borderRadius: 48, overflow: 'hidden', position: 'relative',
-        background: '#000', boxShadow: '0 40px 80px rgba(0,0,0,0.4)',
-      }}>
+    <div className="min-h-screen bg-frame flex justify-center items-center" style={{ padding: '20px 0' }}>
+      <div
+        className="overflow-hidden relative bg-black"
+        style={{
+          width: 'min(402px, 100vw)', height: 'min(874px, 100vh)',
+          maxWidth: 402, maxHeight: 874,
+          borderRadius: 48,
+          boxShadow: '0 40px 80px rgba(0,0,0,0.4)',
+        }}
+      >
         {content}
         {showTabBar && <TabBar tab={tab} setTab={goTab} accent={accent}/>}
       </div>
