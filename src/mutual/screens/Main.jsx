@@ -434,17 +434,76 @@ export function ScreenAdd({ accent, onSubmit, onBack, onBrowseContacts, allowTes
   );
 }
 
+// Extract candidate phone numbers from arbitrary pasted text or a vCard blob.
+// Strategy: scan for digit runs of 7-15 (allowing spaces/dashes/parens/dots/+
+// between them), then keep US-shaped 10-digit (or 11-digit starting with 1)
+// candidates. Returns formatted "(###) ###-####" strings, deduped.
+function extractPhones(text) {
+  if (!text) return [];
+  const out = [];
+  const seen = new Set();
+  // Match runs that look phone-like.
+  const re = /(\+?\d[\d\s().\-]{6,20}\d)/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    let d = m[1].replace(/\D/g, '');
+    if (d.length === 11 && d.startsWith('1')) d = d.slice(1);
+    if (d.length !== 10) continue;
+    if (!/^[2-9]/.test(d)) continue;
+    if (seen.has(d)) continue;
+    seen.add(d);
+    out.push(`(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`);
+  }
+  return out;
+}
+
+// Pair phones with the closest preceding FN: line in a .vcf so we can show
+// names in the confirmation sheet.
+function parseVCardEntries(text) {
+  if (!text) return [];
+  // Unfold continuation lines (RFC 6350: a line starting with space/tab
+  // continues the previous one).
+  const unfolded = String(text).replace(/\r?\n[ \t]/g, '');
+  const lines = unfolded.split(/\r?\n/);
+  const out = [];
+  const seen = new Set();
+  let currentName = '';
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    // FN may be FN: or FN;CHARSET=...:
+    const fnMatch = line.match(/^FN(?:;[^:]*)?:(.*)$/i);
+    if (fnMatch) { currentName = fnMatch[1].trim(); continue; }
+    if (/^BEGIN:VCARD/i.test(line)) { currentName = ''; continue; }
+    const telMatch = line.match(/^TEL(?:;[^:]*)?:(.*)$/i);
+    if (telMatch) {
+      let d = telMatch[1].replace(/\D/g, '');
+      if (d.length === 11 && d.startsWith('1')) d = d.slice(1);
+      if (d.length !== 10 || !/^[2-9]/.test(d)) continue;
+      if (seen.has(d)) continue;
+      seen.add(d);
+      out.push({
+        name: currentName || '',
+        phone: `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`,
+      });
+    }
+  }
+  return out;
+}
+
 export function ScreenContacts({ accent, onBack, onPick }) {
   const [q, setQ] = useState('');
   const [picked, setPicked] = useState(new Set());
   const [pickerSupported, setPickerSupported] = useState(false);
   const [pickerBusy, setPickerBusy] = useState(false);
   const [showManual, setShowManual] = useState(false);
+  const [showPaste, setShowPaste] = useState(false);
+  const [pasteText, setPasteText] = useState('');
   const [manualName, setManualName] = useState('');
   const [manualPhone, setManualPhone] = useState('');
   // Confirmation sheet for device-picked contacts
   const [confirmList, setConfirmList] = useState(null); // null | Array<{ name, phone }>
-
+  const fileInputRef = useRef(null);
   useEffect(() => {
     const nav = typeof navigator !== 'undefined' ? navigator : null;
     setPickerSupported(!!(nav && nav.contacts && typeof nav.contacts.select === 'function'));
