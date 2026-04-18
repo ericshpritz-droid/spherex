@@ -94,7 +94,7 @@ function HomeRoute() {
   return (
     <ScreenHome
       accent={accent}
-      matches={matches}
+      matches={sortedMatches}
       pending={pending}
       lastByHash={lastByHash}
       unreadByHash={unreadByHash}
