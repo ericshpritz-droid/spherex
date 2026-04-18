@@ -26,6 +26,7 @@ type Ctx = {
   lastByHash: Record<string, { body: string; sender_phone_hash: string; created_at: string }>;
   unreadByHash: Record<string, boolean>;
   markThreadRead: (otherHash: string) => void;
+  myHash: string;
   // OTP flow
   pendingPhone: string;
   startOtp: (digits: string) => Promise<void>;
@@ -323,7 +324,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     pendingPhone, startOtp, verifyCode,
     lastAddedPhone, addOne, addMany,
     activeMatch, setActiveMatch,
-    lastByHash, unreadByHash, markThreadRead,
+    lastByHash, unreadByHash, markThreadRead, myHash,
     doSignOut,
   };
 
