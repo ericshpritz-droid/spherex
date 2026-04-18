@@ -135,6 +135,40 @@ export function ScreenThread({ accent, match, onBack }: Props) {
     }
   };
 
+  const UNSEND_WINDOW_MS = 60_000;
+  const canUnsend = (m: Msg) =>
+    m.sender_phone_hash === myHash &&
+    now - new Date(m.created_at).getTime() < UNSEND_WINDOW_MS;
+
+  const doUnsend = async (id: string) => {
+    setConfirmId(null);
+    // Optimistic remove
+    const prev = messages;
+    setMessages((cur) => cur.filter((x) => x.id !== id));
+    try {
+      await unsend({ data: { id } });
+    } catch (e: any) {
+      setMessages(prev);
+      toast.error(e?.message || "Couldn't unsend");
+    }
+  };
+
+  const startLongPress = (id: string) => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    longPressTimer.current = setTimeout(() => setConfirmId(id), 450);
+  };
+  const cancelLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const confirmMsg = confirmId ? messages.find((x) => x.id === confirmId) : null;
+  const confirmSecsLeft = confirmMsg
+    ? Math.max(0, Math.ceil((UNSEND_WINDOW_MS - (now - new Date(confirmMsg.created_at).getTime())) / 1000))
+    : 0;
+
   const p = ACCENT_PRESETS[accent];
 
   return (
@@ -177,6 +211,7 @@ export function ScreenThread({ accent, match, onBack }: Props) {
           <div className="flex flex-col gap-2">
             {messages.map((m) => {
               const mine = m.sender_phone_hash === myHash;
+              const unsendable = mine && canUnsend(m);
               return (
                 <div
                   key={m.id}
@@ -184,18 +219,30 @@ export function ScreenThread({ accent, match, onBack }: Props) {
                   style={{ justifyContent: mine ? "flex-end" : "flex-start" }}
                 >
                   <div
-                    className="rounded-[20px]"
+                    onContextMenu={(e) => {
+                      if (!unsendable) return;
+                      e.preventDefault();
+                      setConfirmId(m.id);
+                    }}
+                    onPointerDown={() => unsendable && startLongPress(m.id)}
+                    onPointerUp={cancelLongPress}
+                    onPointerLeave={cancelLongPress}
+                    onPointerCancel={cancelLongPress}
+                    className="rounded-[20px] select-none"
                     style={{
                       padding: "10px 14px",
                       fontSize: 28,
                       lineHeight: 1.1,
                       maxWidth: "75%",
+                      cursor: unsendable ? "pointer" : "default",
+                      WebkitTouchCallout: "none",
                       background: mine
                         ? gradient(accent, "135deg")
                         : "rgba(255,255,255,0.08)",
                       border: mine ? "none" : "1px solid rgba(255,255,255,0.10)",
                       boxShadow: mine ? `0 6px 16px ${p.a}33` : "none",
                     }}
+                    title={unsendable ? "Long-press to unsend" : undefined}
                   >
                     {m.body}
                   </div>
