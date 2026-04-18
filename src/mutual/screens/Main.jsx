@@ -6,6 +6,20 @@ import { LinkedRings, Aura, NumPad, Wordmark } from '../components/index.jsx';
 import { Spinner } from '../components/Spinner.jsx';
 import { CONTACTS } from '../data.js';
 
+// Compact relative time for last-message timestamps on match cards.
+function messageAgo(iso) {
+  if (!iso) return '';
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 45_000) return 'just now';
+  const m = Math.floor(diff / 60_000);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(diff / 3_600_000);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(diff / 86_400_000);
+  if (d < 7) return `${d}d`;
+  return `${Math.floor(d / 7)}w`;
+}
+
 // ── Home header
 function HomeHeader({ accent, matchCount }) {
   return (
