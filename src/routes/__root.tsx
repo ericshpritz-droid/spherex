@@ -1,5 +1,4 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
 
@@ -38,12 +37,17 @@ export const Route = createRootRoute({
       { property: "og:image:height", content: "640" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: "/og-image.jpg" },
+      { title: "sphere." },
+      { property: "og:title", content: "sphere." },
+      { name: "twitter:title", content: "sphere." },
+      { name: "description", content: "Sphere is a mobile application for managing contacts and matches with real-time updates." },
+      { property: "og:description", content: "Sphere is a mobile application for managing contacts and matches with real-time updates." },
+      { name: "twitter:description", content: "Sphere is a mobile application for managing contacts and matches with real-time updates." },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "apple-touch-icon", href: "/favicon.svg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" },
@@ -62,7 +66,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        <Toaster />
         <Scripts />
       </body>
     </html>
