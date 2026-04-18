@@ -19,7 +19,8 @@ function AppLayout() {
 }
 
 function PhoneFrame() {
-  const { session, sessionLoading, accent } = useApp();
+  const { session, sessionLoading, accent, unreadByHash } = useApp();
+  const unreadCount = Object.values(unreadByHash).filter(Boolean).length;
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname;
