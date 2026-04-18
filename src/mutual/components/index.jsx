@@ -73,7 +73,7 @@ export function NumPad({ onKey }) {
   );
 }
 
-export function TabBar({ tab, setTab, accent, homeBadge = 0 }) {
+export function TabBar({ tab, setTab, accent, homeBadge = 0, homeDot = false }) {
   const tabs = [
     { id: 'home', label: 'Mutuals', icon: '◉' },
     { id: 'add',  label: 'Add',     icon: '+' },
