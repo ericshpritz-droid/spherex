@@ -21,6 +21,7 @@ import { Route as AppMatchRouteImport } from './routes/_app.match'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
+import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppAddRouteImport } from './routes/_app.add'
 
 const TermsRoute = TermsRouteImport.update({
@@ -82,6 +83,11 @@ const AppCodeRoute = AppCodeRouteImport.update({
   path: '/code',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAddRoute = AppAddRouteImport.update({
   id: '/add',
   path: '/add',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/add': typeof AppAddRoute
+  '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/add': typeof AppAddRoute
+  '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/_app/add': typeof AppAddRoute
+  '/_app/admin': typeof AppAdminRoute
   '/_app/code': typeof AppCodeRoute
   '/_app/contacts': typeof AppContactsRoute
   '/_app/home': typeof AppHomeRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/add'
+    | '/admin'
     | '/code'
     | '/contacts'
     | '/home'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/add'
+    | '/admin'
     | '/code'
     | '/contacts'
     | '/home'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/_app/add'
+    | '/_app/admin'
     | '/_app/code'
     | '/_app/contacts'
     | '/_app/home'
@@ -271,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCodeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/add': {
       id: '/_app/add'
       path: '/add'
@@ -283,6 +302,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppAddRoute: typeof AppAddRoute
+  AppAdminRoute: typeof AppAdminRoute
   AppCodeRoute: typeof AppCodeRoute
   AppContactsRoute: typeof AppContactsRoute
   AppHomeRoute: typeof AppHomeRoute
@@ -295,6 +315,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAddRoute: AppAddRoute,
+  AppAdminRoute: AppAdminRoute,
   AppCodeRoute: AppCodeRoute,
   AppContactsRoute: AppContactsRoute,
   AppHomeRoute: AppHomeRoute,
@@ -316,3 +337,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
