@@ -3,6 +3,7 @@ import { toast } from "../mutual/toast";
 import { ScreenProfile } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
+import { ShareInviteButton } from "../mutual/components/ShareInviteButton";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
