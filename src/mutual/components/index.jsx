@@ -35,7 +35,8 @@ export function Aura({ accent = 'pink', intensity = 1, style = {} }) {
   );
 }
 
-export function Wordmark({ size = 32, color = '#fff' }) {
+export function Wordmark({ size = 32, color = '#fff', accent = 'pink' }) {
+  const dot = (ACCENT_PRESETS[accent] || ACCENT_PRESETS.pink).a;
   return (
     <div
       className="font-extrabold leading-none flex items-center"
@@ -46,7 +47,7 @@ export function Wordmark({ size = 32, color = '#fff' }) {
         e
         <span
           className="absolute rounded-full"
-          style={{ top: size * 0.05, right: size * -0.05, width: size * 0.22, height: size * 0.22, background: '#F13F5E' }}
+          style={{ top: size * 0.05, right: size * -0.05, width: size * 0.22, height: size * 0.22, background: dot }}
         />
       </span>
     </div>
