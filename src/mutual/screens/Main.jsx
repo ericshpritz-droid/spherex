@@ -207,7 +207,7 @@ function RefreshingPill({ accent }) {
   );
 }
 
-export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInvite, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '' }) {
+export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInvite, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '', invitedByHash = '' }) {
   const { ref: pullRef, pull, refreshing } = usePullToRefresh(onRetry);
   // Only show the background pill when not already pulling-to-refresh
   const showPill = bgRefreshing && !refreshing && pull === 0;
@@ -367,7 +367,7 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInv
             <div className="text-[13px] text-fg-55">They haven't added you back yet</div>
           </div>
           <div className="flex flex-col gap-2">
-            {pending.map((p, i) => <PendingRow key={i} person={p} accent={accent}/>)}
+            {pending.map((p, i) => <PendingRow key={i} person={p} accent={accent} invited={!!invitedByHash && String(p.id) === invitedByHash}/>)}
           </div>
         </div>
       </div>
