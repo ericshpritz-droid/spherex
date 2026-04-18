@@ -310,10 +310,11 @@ export function ScreenMatchReveal({ accent, match, onBack, onClose, variant = 'b
   );
 }
 
-export function ScreenProfile({ accent, onAccent }) {
-  const Row = ({ label, value, last, onClick }) => (
+export function ScreenProfile({ accent, onAccent, phone, onSignOut }) {
+  const displayPhone = phone || '—';
+  const Row = ({ label, value, last, onClick, danger }) => (
     <div onClick={onClick} style={{ padding: '14px 18px', borderBottom: last ? 'none' : '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', cursor: onClick ? 'pointer' : 'default' }}>
-      <div style={{ fontSize: 15, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: 15, fontWeight: 500, color: danger ? '#ff8f8f' : '#fff' }}>{label}</div>
       <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>{value}</div>
     </div>
   );
@@ -329,10 +330,10 @@ export function ScreenProfile({ accent, onAccent }) {
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{ padding: '72px 24px 24px', textAlign: 'center' }}>
           <div style={{ display: 'inline-block', marginBottom: 12 }}>
-            <PhoneAvatar phone="5551234567" size={84} accent={accent}/>
+            <PhoneAvatar phone={displayPhone} size={84} accent={accent}/>
           </div>
-          <div style={{ fontWeight: 700, fontSize: 22 }}>(555) 123-4567</div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>Joined April 2026</div>
+          <div style={{ fontWeight: 700, fontSize: 22 }}>{displayPhone}</div>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>Signed in</div>
         </div>
         <Section title="Accent hue">
           <div style={{ padding: 16, display: 'flex', gap: 10 }}>
@@ -348,14 +349,11 @@ export function ScreenProfile({ accent, onAccent }) {
           </div>
         </Section>
         <Section title="Privacy">
-          <Row label="Your number" value="(555) 123-4567"/>
-          <Row label="Visible to" value="No one"/>
-          <Row label="Block list" value="0 numbers" last/>
+          <Row label="Your number" value={displayPhone}/>
+          <Row label="Visible to" value="No one" last/>
         </Section>
-        <Section title="About">
-          <Row label="How Mutual works" value="→" onClick={() => {}}/>
-          <Row label="Privacy policy" value="→" onClick={() => {}}/>
-          <Row label="Delete account" value="" last onClick={() => {}}/>
+        <Section title="Account">
+          <Row label="Sign out" value="→" last danger onClick={onSignOut}/>
         </Section>
       </div>
     </div>

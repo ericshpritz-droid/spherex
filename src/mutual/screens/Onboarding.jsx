@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BRAND, ACCENT_PRESETS, formatPhone, gradient } from '../brand.js';
+import { BRAND, ACCENT_PRESETS, formatPhone } from '../brand.js';
 import { Button } from '../components/Button.jsx';
 import { LinkedRings, Aura, NumPad } from '../components/index.jsx';
 
@@ -32,10 +32,20 @@ export function ScreenWelcome({ accent, onNext }) {
   );
 }
 
-export function ScreenPhone({ accent, onNext, onBack }) {
-  const [digits, setDigits] = useState('5551234567');
+export function ScreenPhone({ accent, onSendCode, onBack }) {
+  const [digits, setDigits] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
   const formatted = formatPhone(digits);
   const valid = digits.length === 10;
+
+  const submit = async () => {
+    setErr(''); setBusy(true);
+    try { await onSendCode(digits); }
+    catch (e) { setErr(e?.message || 'Could not send code'); }
+    finally { setBusy(false); }
+  };
+
   return (
     <div style={{ position: 'relative', height: '100%', color: '#fff', overflow: 'hidden', background: BRAND.ink }}>
       <Aura accent={accent} intensity={0.7}/>
@@ -53,6 +63,7 @@ export function ScreenPhone({ accent, onNext, onBack }) {
               {formatted || <span style={{ color: 'rgba(255,255,255,0.3)' }}>(555) 123-4567</span>}
             </div>
           </div>
+          {err && <div style={{ marginTop: 12, fontSize: 13, color: '#ff8f8f', lineHeight: 1.4 }}>{err}</div>}
         </div>
         <div style={{ flex: 1 }}/>
         <NumPad onKey={(k) => {
@@ -60,18 +71,27 @@ export function ScreenPhone({ accent, onNext, onBack }) {
           else if (digits.length < 10) setDigits(d => d + k);
         }}/>
         <div style={{ marginTop: 20 }}>
-          <Button accent={accent} disabled={!valid} onClick={onNext}>Send code</Button>
+          <Button accent={accent} disabled={!valid || busy} onClick={submit}>{busy ? 'Sending…' : 'Send code'}</Button>
         </div>
       </div>
     </div>
   );
 }
 
-export function ScreenCode({ accent, onNext, onBack }) {
+export function ScreenCode({ accent, phoneFormatted, onVerify, onBack }) {
   const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+
   useEffect(() => {
-    if (code.length === 6) { const t = setTimeout(onNext, 500); return () => clearTimeout(t); }
-  }, [code]);
+    if (code.length === 6 && !busy) {
+      setErr(''); setBusy(true);
+      onVerify(code)
+        .catch((e) => { setErr(e?.message || 'Invalid code'); setCode(''); })
+        .finally(() => setBusy(false));
+    }
+  }, [code, busy, onVerify]);
+
   return (
     <div style={{ position: 'relative', height: '100%', color: '#fff', overflow: 'hidden', background: BRAND.ink }}>
       <Aura accent={accent} intensity={0.7}/>
@@ -79,7 +99,7 @@ export function ScreenCode({ accent, onNext, onBack }) {
         <button onClick={onBack} style={{ width: 44, height: 44, borderRadius: 22, border: 'none', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 20, cursor: 'pointer', marginBottom: 24 }}>←</button>
         <div style={{ fontFamily: 'Sora, system-ui', fontWeight: 700, fontSize: 34, lineHeight: 1.05, letterSpacing: -1.2 }}>Check your<br/>texts.</div>
         <div style={{ marginTop: 12, fontFamily: 'Sora, system-ui', fontSize: 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.45 }}>
-          Six digits coming to <span style={{ color: '#fff' }}>(555) 123-4567</span>.
+          Six digits coming to <span style={{ color: '#fff' }}>{phoneFormatted}</span>.
         </div>
         <div style={{ marginTop: 40, display: 'flex', gap: 10, justifyContent: 'space-between' }}>
           {[0,1,2,3,4,5].map(i => {
@@ -96,9 +116,11 @@ export function ScreenCode({ accent, onNext, onBack }) {
             );
           })}
         </div>
-        <div style={{ marginTop: 20, textAlign: 'center', fontFamily: 'Sora, system-ui', fontSize: 14, color: ACCENT_PRESETS[accent].b, cursor: 'pointer' }}>Resend in 0:47</div>
+        {err && <div style={{ marginTop: 16, textAlign: 'center', fontSize: 13, color: '#ff8f8f' }}>{err}</div>}
+        {busy && <div style={{ marginTop: 16, textAlign: 'center', fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>Verifying…</div>}
         <div style={{ flex: 1 }}/>
         <NumPad onKey={(k) => {
+          if (busy) return;
           if (k === 'del') setCode(c => c.slice(0, -1));
           else if (code.length < 6) setCode(c => c + k);
         }}/>
