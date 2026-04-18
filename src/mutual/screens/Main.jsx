@@ -310,10 +310,11 @@ export function ScreenMatchReveal({ accent, match, onBack, onClose, variant = 'b
   );
 }
 
-export function ScreenProfile({ accent, onAccent }) {
-  const Row = ({ label, value, last, onClick }) => (
+export function ScreenProfile({ accent, onAccent, phone, onSignOut }) {
+  const displayPhone = phone || '—';
+  const Row = ({ label, value, last, onClick, danger }) => (
     <div onClick={onClick} style={{ padding: '14px 18px', borderBottom: last ? 'none' : '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', cursor: onClick ? 'pointer' : 'default' }}>
-      <div style={{ fontSize: 15, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: 15, fontWeight: 500, color: danger ? '#ff8f8f' : '#fff' }}>{label}</div>
       <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>{value}</div>
     </div>
   );
@@ -329,10 +330,10 @@ export function ScreenProfile({ accent, onAccent }) {
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{ padding: '72px 24px 24px', textAlign: 'center' }}>
           <div style={{ display: 'inline-block', marginBottom: 12 }}>
-            <PhoneAvatar phone="5551234567" size={84} accent={accent}/>
+            <PhoneAvatar phone={displayPhone} size={84} accent={accent}/>
           </div>
-          <div style={{ fontWeight: 700, fontSize: 22 }}>(555) 123-4567</div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>Joined April 2026</div>
+          <div style={{ fontWeight: 700, fontSize: 22 }}>{displayPhone}</div>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>Signed in</div>
         </div>
         <Section title="Accent hue">
           <div style={{ padding: 16, display: 'flex', gap: 10 }}>
