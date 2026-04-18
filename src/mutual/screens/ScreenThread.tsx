@@ -37,13 +37,18 @@ type Props = {
 export function ScreenThread({ accent, match, onBack }: Props) {
   const send = useServerFn(sendMessageServer);
   const load = useServerFn(loadThreadServer);
+  const unsend = useServerFn(unsendMessageServer);
 
   const [messages, setMessages] = useState<Msg[]>([]);
   const [myHash, setMyHash] = useState("");
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  // Re-render every second so the "X seconds left" hint stays accurate.
+  const [now, setNow] = useState(() => Date.now());
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Initial load
   useEffect(() => {
