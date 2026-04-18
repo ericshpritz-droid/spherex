@@ -63,17 +63,20 @@ function TermsSheet({ accent, open, onClose, onAgree }) {
         <div className="mt-1 text-[13px] text-fg-55">Plain-English summary of how Sphere handles your number.</div>
 
         <div className="mt-5 flex flex-col gap-3">
-          <TermItem accent={accent} icon="🔒" title="Your number stays private">
-            We use it only to find mutuals. It is never shown to anyone you haven't matched with, and we never DM you or sell your data.
+          <TermItem accent={accent} icon="🔒" title="Numbers you add are hashed">
+            Every contact you upload is one-way hashed on our servers with a secret key before it touches the database. Even our admins can't see who you've added — only an opaque code.
           </TermItem>
-          <TermItem accent={accent} icon="👀" title="Numbers you add are invisible">
-            People you add are <span className="text-white">never told</span> you added them — unless they add you back. Then, and only then, you both see each other.
+          <TermItem accent={accent} icon="🤝" title="Matches stay between the two of you">
+            We compare hashes, never raw numbers. The only way someone learns you added them is if they add you back — then you both see each other.
+          </TermItem>
+          <TermItem accent={accent} icon="📱" title="Your login number">
+            Your own phone number is only used to send your login code, never shared, never shown to anyone.
           </TermItem>
           <TermItem accent={accent} icon="🛡️" title="Per-user access rules">
-            Your contacts list is protected by row-level security. Other users cannot read your adds or your matches.
+            On top of hashing, your contacts list is protected by row-level security. Other users cannot read your adds or your matches.
           </TermItem>
           <TermItem accent={accent} icon="🗑️" title="Delete anytime">
-            Sign out and request deletion from the profile screen and we'll wipe your account and all your adds.
+            Sign out and request deletion from the profile screen and we'll wipe your account and all your hashed adds.
           </TermItem>
           <TermItem accent={accent} icon="📜" title="The legal stuff">
             By continuing you agree to our Terms of Service and Privacy Policy. You confirm you're 17+ and that you have the right to share any phone numbers you add.
