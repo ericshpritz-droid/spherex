@@ -23,6 +23,7 @@ import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppAddRouteImport } from './routes/_app.add'
+import { Route as AppThreadHashRouteImport } from './routes/_app.thread.$hash'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -93,6 +94,11 @@ const AppAddRoute = AppAddRouteImport.update({
   path: '/add',
   getParentRoute: () => AppRoute,
 } as any)
+const AppThreadHashRoute = AppThreadHashRouteImport.update({
+  id: '/thread/$hash',
+  path: '/thread/$hash',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
   '/welcome': typeof AppWelcomeRoute
+  '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
   '/welcome': typeof AppWelcomeRoute
+  '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/sent': typeof AppSentRoute
   '/_app/welcome': typeof AppWelcomeRoute
+  '/_app/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sent'
     | '/welcome'
+    | '/thread/$hash'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sent'
     | '/welcome'
+    | '/thread/$hash'
   id:
     | '__root__'
     | '/'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/sent'
     | '/_app/welcome'
+    | '/_app/thread/$hash'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -297,6 +309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAddRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/thread/$hash': {
+      id: '/_app/thread/$hash'
+      path: '/thread/$hash'
+      fullPath: '/thread/$hash'
+      preLoaderRoute: typeof AppThreadHashRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -311,6 +330,7 @@ interface AppRouteChildren {
   AppProfileRoute: typeof AppProfileRoute
   AppSentRoute: typeof AppSentRoute
   AppWelcomeRoute: typeof AppWelcomeRoute
+  AppThreadHashRoute: typeof AppThreadHashRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -324,6 +344,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProfileRoute: AppProfileRoute,
   AppSentRoute: AppSentRoute,
   AppWelcomeRoute: AppWelcomeRoute,
+  AppThreadHashRoute: AppThreadHashRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
