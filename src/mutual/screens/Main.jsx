@@ -42,18 +42,33 @@ function HomeHeader({ accent, matchCount }) {
   );
 }
 
-function PendingRow({ person, accent }) {
+function PendingRow({ person, accent, invited = false }) {
   return (
     <div className="rounded-[18px] bg-glass-04 border border-hairline-06 flex items-center gap-3.5" style={{ padding: '14px 16px' }}>
       <PhoneAvatar phone={person.phone} size={44} accent={person.avatar}/>
       <div className="flex-1 min-w-0">
-        <div className="text-[15px] font-semibold text-white tracking-sora-tight">{person.unknown ? person.phone : person.name}</div>
+        <div className="text-[15px] font-semibold text-white tracking-sora-tight flex items-center gap-2">
+          <span className="truncate">{person.unknown ? person.phone : person.name}</span>
+          {invited && (
+            <span
+              className="shrink-0 rounded-full text-[9px] font-semibold uppercase tracking-widest text-white/85"
+              style={{
+                padding: '2px 7px',
+                background: `linear-gradient(135deg, ${ACCENT_PRESETS[accent].a}, ${ACCENT_PRESETS[accent].b})`,
+                letterSpacing: 1.2,
+              }}
+              title="You opened their invite link"
+            >
+              Invited you
+            </span>
+          )}
+        </div>
         <div className="text-[13px] text-fg-50 flex items-center gap-1.5">
           <span
             className="w-1.5 h-1.5 rounded-full"
             style={{ background: ACCENT_PRESETS[accent].b, animation: 'mutualPulse 1.8s ease-in-out infinite' }}
           />
-          Waiting
+          {invited ? 'You were invited by them · add them back' : 'Waiting'}
         </div>
       </div>
       <div className="text-lg text-fg-30">⋯</div>
