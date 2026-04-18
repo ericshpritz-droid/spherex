@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { AppProvider, useApp } from "../mutual/AppContext";
-import { TabBar, Wordmark } from "../mutual/components/index.jsx";
+import { TabBar } from "../mutual/components/index.jsx";
 import { Spinner } from "../mutual/components/Spinner.jsx";
 import { TestModeBanner } from "../mutual/testmode/TestModeBanner";
 
@@ -67,14 +67,6 @@ function PhoneFrame() {
           </div>
         ) : (
           <Outlet />
-        )}
-        {!sessionLoading && (
-          <div
-            className="absolute top-0 left-0 right-0 z-40 flex justify-center pointer-events-none"
-            style={{ paddingTop: 24 }}
-          >
-            <Wordmark size={22} color="#fff" accent={accent}/>
-          </div>
         )}
         {tabPath && <TabBar tab={tabPath} setTab={goTab} accent={accent}/>}
       </div>
