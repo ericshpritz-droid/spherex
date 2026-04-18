@@ -7,9 +7,9 @@ export function ScreenWelcome({ accent, onNext }) {
   return (
     <div className="relative h-full overflow-hidden bg-ink text-white">
       <Aura accent={accent} intensity={1.1}/>
-      <div className="relative z-[1] h-full flex flex-col" style={{ padding: '72px 32px 56px' }}>
+      <div className="relative z-[1] h-full flex flex-col" style={{ padding: '32px 32px 56px' }}>
         <div className="flex justify-center">
-          <Wordmark size={40} accent={accent}/>
+          <Wordmark size={56} accent={accent}/>
         </div>
         <div className="flex-1 flex flex-col justify-center gap-8">
           <div className="flex justify-center">
