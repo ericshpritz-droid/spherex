@@ -281,9 +281,10 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
   );
 }
 
-export function ScreenAdd({ accent, onSubmit, onBack, onBrowseContacts }) {
+export function ScreenAdd({ accent, onSubmit, onBack, onBrowseContacts, allowTestPin = false }) {
   const [digits, setDigits] = useState('');
-  const valid = digits.length === 10;
+  const isTestPin = allowTestPin && digits.length === 4;
+  const valid = digits.length === 10 || isTestPin;
   return (
     <div className="relative h-full overflow-hidden bg-ink text-white">
       <Aura accent={accent} intensity={0.5}/>
@@ -293,15 +294,24 @@ export function ScreenAdd({ accent, onSubmit, onBack, onBrowseContacts }) {
           <div className="font-bold text-[22px]">Add a number</div>
         </div>
         <div className="rounded-[18px] bg-glass-04 border border-hairline-10 mb-4" style={{ padding: 18 }}>
-          <div className="text-xs font-semibold text-fg-50 uppercase mb-2.5" style={{ letterSpacing: 0.4 }}>Their phone</div>
+          <div className="text-xs font-semibold text-fg-50 uppercase mb-2.5" style={{ letterSpacing: 0.4 }}>
+            {isTestPin ? 'Their test PIN' : 'Their phone'}
+          </div>
           <div className="flex items-center gap-3">
-            <div className="font-semibold text-xl text-fg-50">🇺🇸 +1</div>
+            <div className="font-semibold text-xl text-fg-50">{isTestPin ? '🧪' : '🇺🇸 +1'}</div>
             <div className="w-px bg-hairline-12" style={{ height: 22 }}/>
             <div className="flex-1 font-semibold text-white tracking-sora-tighter" style={{ fontSize: 22 }}>
-              {formatPhone(digits) || <span className="text-fg-25">(555) 000-0000</span>}
+              {isTestPin
+                ? digits
+                : (formatPhone(digits) || <span className="text-fg-25">(555) 000-0000</span>)}
             </div>
           </div>
         </div>
+        {allowTestPin && (
+          <div className="text-[12px] text-fg-50 -mt-2 mb-3">
+            Tip: in test mode, enter their 4-digit PIN instead of a full number.
+          </div>
+        )}
         <div
           className="rounded-[14px] mb-4 flex gap-2.5"
           style={{ padding: 14, background: `${ACCENT_PRESETS[accent].a}12`, border: `1px solid ${ACCENT_PRESETS[accent].a}30` }}
@@ -335,7 +345,9 @@ export function ScreenAdd({ accent, onSubmit, onBack, onBrowseContacts }) {
         }}/>
         <div className="mt-3.5">
           <Button accent={accent} disabled={!valid} onClick={() => onSubmit(digits)}>
-            {valid ? 'Add them' : 'Enter 10 digits'}
+            {valid
+              ? (isTestPin ? 'Add by PIN' : 'Add them')
+              : (allowTestPin ? 'Enter 4-digit PIN or 10-digit number' : 'Enter 10 digits')}
           </Button>
         </div>
       </div>
