@@ -1,26 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import App from "../mutual/App.jsx";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Mutual — Only if they pick you back." },
+      { name: "description", content: "Add a number. If they add yours, it's mutual. No DMs. No maybe." },
+      { property: "og:title", content: "Mutual — Only if they pick you back." },
+      { property: "og:description", content: "Phone-number-based double-opt-in matching." },
+    ],
+  }),
+  component: App,
 });
-
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
-}
