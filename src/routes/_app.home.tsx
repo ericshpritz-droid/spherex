@@ -15,13 +15,16 @@ export const Route = createFileRoute("/_app/home")({
 });
 
 function HomeRoute() {
-  const { accent, matches, pending, setActiveMatch } = useApp();
+  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh } = useApp();
   const navigate = useNavigate();
   return (
     <ScreenHome
       accent={accent}
       matches={matches}
       pending={pending}
+      loading={dataLoading && matches.length === 0 && pending.length === 0}
+      error={dataError}
+      onRetry={refresh}
       onOpenMatch={(m: any) => { setActiveMatch(m); navigate({ to: "/match" }); }}
       onAdd={() => navigate({ to: "/add" })}
     />

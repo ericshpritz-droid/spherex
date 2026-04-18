@@ -15,6 +15,8 @@ type Ctx = {
   myPhoneFormatted: string;
   matches: Person[];
   pending: Person[];
+  dataLoading: boolean;
+  dataError: string | null;
   refresh: () => Promise<void>;
   // OTP flow
   pendingPhone: string;
@@ -39,6 +41,17 @@ export function useApp(): Ctx {
   return v;
 }
 
+function friendlyError(e: unknown): string {
+  const msg = (e as any)?.message || String(e);
+  if (/network|fetch|failed to fetch/i.test(msg)) {
+    return "Can't reach the network. Check your connection and try again.";
+  }
+  if (/jwt|auth|not authenticated/i.test(msg)) {
+    return "Your session expired. Please sign in again.";
+  }
+  return msg || "Something went wrong. Please try again.";
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [accent, setAccentState] = useState<Accent>(() => {
     if (typeof window === "undefined") return "pink";
@@ -55,18 +68,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const [matches, setMatches] = useState<Person[]>([]);
   const [pending, setPending] = useState<Person[]>([]);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [dataError, setDataError] = useState<string | null>(null);
   const [pendingPhone, setPendingPhone] = useState("");
   const [lastAddedPhone, setLastAddedPhone] = useState("");
   const [activeMatch, setActiveMatch] = useState<Person | null>(null);
 
   const refresh = useCallback(async () => {
     if (!myPhone) return;
+    setDataLoading(true);
+    setDataError(null);
     try {
       const { matches, pending } = await loadAddsAndMatches(myPhone);
       setMatches(matches);
       setPending(pending);
     } catch (e) {
       console.error("loadAddsAndMatches failed", e);
+      setDataError(friendlyError(e));
+    } finally {
+      setDataLoading(false);
     }
   }, [myPhone]);
 
@@ -77,36 +97,56 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const startOtp = useCallback(async (digits: string) => {
     const e164 = toE164(digits);
     setPendingPhone(e164);
-    await sendOtp(e164);
+    try {
+      await sendOtp(e164);
+    } catch (e) {
+      throw new Error(friendlyError(e));
+    }
   }, []);
 
   const verifyCode = useCallback(async (code: string) => {
-    await verifyOtp(pendingPhone, code);
+    try {
+      await verifyOtp(pendingPhone, code);
+    } catch (e) {
+      throw new Error(friendlyError(e));
+    }
   }, [pendingPhone]);
 
   const addOne = useCallback(async (digits: string) => {
     const e164 = toE164(digits);
-    await addPhones(myPhone, [e164]);
+    try {
+      await addPhones(myPhone, [e164]);
+    } catch (e) {
+      throw new Error(friendlyError(e));
+    }
     setLastAddedPhone(formatE164(e164));
     refresh();
   }, [myPhone, refresh]);
 
   const addMany = useCallback(async (formattedPhones: string[]) => {
     const e164s = formattedPhones.map((p) => toE164(p));
-    await addPhones(myPhone, e164s);
-    setLastAddedPhone(formatE164(e164s[0]));
+    try {
+      await addPhones(myPhone, e164s);
+    } catch (e) {
+      throw new Error(friendlyError(e));
+    }
+    if (e164s[0]) setLastAddedPhone(formatE164(e164s[0]));
     refresh();
   }, [myPhone, refresh]);
 
   const doSignOut = useCallback(async () => {
-    await signOut();
+    try {
+      await signOut();
+    } catch (e) {
+      throw new Error(friendlyError(e));
+    }
   }, []);
 
   const value: Ctx = {
     accent, setAccent,
     session, sessionLoading, user,
     myPhone, myPhoneFormatted,
-    matches, pending, refresh,
+    matches, pending, dataLoading, dataError, refresh,
     pendingPhone, startOtp, verifyCode,
     lastAddedPhone, addOne, addMany,
     activeMatch, setActiveMatch,
