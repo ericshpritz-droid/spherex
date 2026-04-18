@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_app/home")({
 const MIN_HIDDEN_MS = 10_000;
 
 function HomeRoute() {
-  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh } = useApp();
+  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash } = useApp();
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
 
@@ -82,11 +82,18 @@ function HomeRoute() {
       accent={accent}
       matches={matches}
       pending={pending}
+      lastByHash={lastByHash}
+      unreadByHash={unreadByHash}
+      myHash={myHash}
       loading={dataLoading && !hasData}
       refreshing={dataLoading && hasData}
       error={dataError}
       onRetry={refresh}
-      onOpenMatch={(m: any) => { setActiveMatch(m); navigate({ to: "/thread/$hash", params: { hash: String(m.id) } }); }}
+      onOpenMatch={(m: any) => {
+        markThreadRead(String(m.id));
+        setActiveMatch(m);
+        navigate({ to: "/thread/$hash", params: { hash: String(m.id) } });
+      }}
       onAdd={() => navigate({ to: "/add" })}
     />
   );

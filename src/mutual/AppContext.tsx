@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession, formatE164, sendOtp, verifyOtp, signOut, toE164 } from "./auth";
 import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
 import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
+import { loadLastMessagesServer } from "./messages.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 type Accent = "pink" | "lavender" | "blue";
 
@@ -20,6 +22,11 @@ type Ctx = {
   dataLoading: boolean;
   dataError: string | null;
   refresh: () => Promise<void>;
+  // Last message per matched hash + unread tracking
+  lastByHash: Record<string, { body: string; sender_phone_hash: string; created_at: string }>;
+  unreadByHash: Record<string, boolean>;
+  markThreadRead: (otherHash: string) => void;
+  myHash: string;
   // OTP flow
   pendingPhone: string;
   startOtp: (digits: string) => Promise<void>;
@@ -162,6 +169,85 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => { supabase.removeChannel(channel); };
   }, [session, myHash]);
 
+  // ---- Last-message preview + unread tracking ---------------------------
+  const loadLast = useServerFn(loadLastMessagesServer);
+  const [lastByHash, setLastByHash] = useState<Record<string, { body: string; sender_phone_hash: string; created_at: string }>>({});
+
+  // Per-thread "last seen" timestamps live in localStorage, namespaced by user.
+  const seenKey = (uid: string | undefined) => `mutual.threadSeen.${uid ?? "anon"}`;
+  const [seenByHash, setSeenByHash] = useState<Record<string, string>>(() => {
+    if (typeof window === "undefined") return {};
+    try { return JSON.parse(localStorage.getItem(seenKey(undefined)) || "{}"); } catch { return {}; }
+  });
+  useEffect(() => {
+    if (typeof window === "undefined" || !user?.id) return;
+    try { setSeenByHash(JSON.parse(localStorage.getItem(seenKey(user.id)) || "{}")); } catch { setSeenByHash({}); }
+  }, [user?.id]);
+
+  const persistSeen = useCallback((next: Record<string, string>) => {
+    setSeenByHash(next);
+    if (typeof window !== "undefined") {
+      try { localStorage.setItem(seenKey(user?.id), JSON.stringify(next)); } catch {}
+    }
+  }, [user?.id]);
+
+  const refreshLast = useCallback(async () => {
+    if (!session || !myHash) return;
+    try {
+      const res = await loadLast({ data: undefined as any });
+      setLastByHash((res as any).lastByHash || {});
+    } catch (e) {
+      console.warn("loadLastMessages failed", e);
+    }
+  }, [session, myHash, loadLast]);
+
+  useEffect(() => { refreshLast(); }, [refreshLast]);
+
+  // Realtime: any new message I'm part of updates the preview + unread state.
+  useEffect(() => {
+    if (!session || !myHash) return;
+    const channel = supabase
+      .channel(`msgs-for-${myHash.slice(0, 12)}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages" },
+        (payload) => {
+          const m = payload.new as { body: string; sender_phone_hash: string; recipient_phone_hash: string; created_at: string };
+          const involvesMe = m.sender_phone_hash === myHash || m.recipient_phone_hash === myHash;
+          if (!involvesMe) return;
+          const other = m.sender_phone_hash === myHash ? m.recipient_phone_hash : m.sender_phone_hash;
+          setLastByHash((prev) => {
+            const cur = prev[other];
+            if (cur && cur.created_at >= m.created_at) return prev;
+            return { ...prev, [other]: { body: m.body, sender_phone_hash: m.sender_phone_hash, created_at: m.created_at } };
+          });
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "messages" },
+        () => { refreshLast(); },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [session, myHash, refreshLast]);
+
+  // A thread is unread when its last message is from *them* and newer than my
+  // last-seen timestamp for that hash.
+  const unreadByHash: Record<string, boolean> = {};
+  for (const [hash, last] of Object.entries(lastByHash)) {
+    if (last.sender_phone_hash === myHash) continue;
+    const seen = seenByHash[hash];
+    if (!seen || seen < last.created_at) unreadByHash[hash] = true;
+  }
+
+  const markThreadRead = useCallback((otherHash: string) => {
+    const last = lastByHash[otherHash];
+    const ts = last?.created_at || new Date().toISOString();
+    const next = { ...seenByHash, [otherHash]: ts };
+    persistSeen(next);
+  }, [lastByHash, seenByHash, persistSeen]);
+
   const startOtp = useCallback(async (digits: string) => {
     const e164 = toE164(digits);
     setPendingPhone(e164);
@@ -238,6 +324,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     pendingPhone, startOtp, verifyCode,
     lastAddedPhone, addOne, addMany,
     activeMatch, setActiveMatch,
+    lastByHash, unreadByHash, markThreadRead, myHash,
     doSignOut,
   };
 
