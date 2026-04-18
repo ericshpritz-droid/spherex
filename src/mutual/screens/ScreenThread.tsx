@@ -67,7 +67,7 @@ export function ScreenThread({ accent, match, onBack }: Props) {
     return () => { cancelled = true; };
   }, [match.id, load]);
 
-  // Realtime: append new messages between us and them
+  // Realtime: append new messages, drop unsent ones
   useEffect(() => {
     if (!myHash) return;
     const channel = supabase
@@ -84,9 +84,24 @@ export function ScreenThread({ accent, match, onBack }: Props) {
           setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
         },
       )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "messages" },
+        (payload) => {
+          const old = payload.old as Partial<Msg>;
+          if (!old?.id) return;
+          setMessages((prev) => prev.filter((x) => x.id !== old.id));
+        },
+      )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [myHash, match.id]);
+
+  // Tick every second so the unsend countdown stays fresh.
+  useEffect(() => {
+    const i = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(i);
+  }, []);
 
   // Auto-scroll to newest
   useEffect(() => {
