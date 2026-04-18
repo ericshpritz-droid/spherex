@@ -18,6 +18,7 @@ function ProfileRoute() {
   const { accent, setAccent, myPhoneFormatted, doSignOut, user } = useApp();
   const navigate = useNavigate();
   const isAdmin = useIsAdmin(user?.id);
+  const testPin: string | undefined = user?.user_metadata?.test_pin;
   return (
     <div className="relative h-full">
       <ScreenProfile
@@ -34,6 +35,36 @@ function ProfileRoute() {
           }
         }}
       />
+      {testPin && (
+        <div
+          className="absolute left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-1 rounded-2xl"
+          style={{
+            top: 80,
+            padding: "10px 18px",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.18)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-white/60">
+            Your test PIN
+          </div>
+          <button
+            onClick={() => {
+              navigator.clipboard?.writeText(testPin).then(
+                () => toast.success("PIN copied"),
+                () => {},
+              );
+            }}
+            className="text-white font-bold tracking-widest cursor-pointer bg-transparent border-0"
+            style={{ fontSize: 24, letterSpacing: 6 }}
+            title="Tap to copy"
+          >
+            {testPin}
+          </button>
+          <div className="text-[10px] text-white/50">Share this so others can add you</div>
+        </div>
+      )}
       {isAdmin && (
         <button
           onClick={() => navigate({ to: "/admin" })}
