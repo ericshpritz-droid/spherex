@@ -44,6 +44,8 @@ type Ctx = {
   setActiveMatch: (m: Person | null) => void;
   // Sign out
   doSignOut: () => Promise<void>;
+  // Invite attribution: hash of the user who invited me, only fresh for 24h.
+  invitedByHash: string;
 };
 
 const AppCtx = createContext<Ctx | null>(null);
