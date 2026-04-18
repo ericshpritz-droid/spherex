@@ -170,18 +170,23 @@ export function ScreenThread({ accent, match, onBack }: Props) {
 
   const UNSEND_WINDOW_MS = 60_000;
   const canUnsend = (m: Msg) =>
+    !m.tomb &&
     m.sender_phone_hash === myHash &&
     now - new Date(m.created_at).getTime() < UNSEND_WINDOW_MS;
 
   const doUnsend = async (id: string) => {
     setConfirmId(null);
-    // Optimistic remove
-    const prev = messages;
-    setMessages((cur) => cur.filter((x) => x.id !== id));
+    // Optimistic: flip to tombstone immediately so the sender sees the same
+    // "unsent" state the recipient will see via realtime DELETE.
+    const before = messages;
+    markTombstone(id);
     try {
       await unsend({ data: { id } });
     } catch (e: any) {
-      setMessages(prev);
+      // Revert: cancel the auto-removal timer and restore the original row.
+      const t = tombTimers.current.get(id);
+      if (t) { clearTimeout(t); tombTimers.current.delete(id); }
+      setMessages(before);
       toast.error(e?.message || "Couldn't unsend");
     }
   };
@@ -245,6 +250,31 @@ export function ScreenThread({ accent, match, onBack }: Props) {
             {messages.map((m) => {
               const mine = m.sender_phone_hash === myHash;
               const unsendable = mine && canUnsend(m);
+              if (m.tomb) {
+                return (
+                  <div
+                    key={m.id}
+                    className="flex"
+                    style={{ justifyContent: mine ? "flex-end" : "flex-start" }}
+                  >
+                    <div
+                      className="rounded-full flex items-center gap-1.5"
+                      style={{
+                        padding: "6px 12px",
+                        fontSize: 12,
+                        lineHeight: 1,
+                        color: "rgba(255,255,255,0.55)",
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px dashed rgba(255,255,255,0.15)",
+                        animation: "mutualFadeIn 180ms ease-out",
+                      }}
+                    >
+                      <span style={{ fontSize: 11 }}>↩︎</span>
+                      <span>{mine ? "You unsent" : "Unsent"}</span>
+                    </div>
+                  </div>
+                );
+              }
               return (
                 <div
                   key={m.id}
