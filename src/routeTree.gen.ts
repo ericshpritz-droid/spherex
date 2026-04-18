@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppWelcomeRouteImport } from './routes/_app.welcome'
@@ -21,6 +22,11 @@ import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAddRouteImport } from './routes/_app.add'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -78,6 +84,7 @@ const AppAddRoute = AppAddRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/terms': typeof TermsRoute
   '/add': typeof AppAddRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/terms': typeof TermsRoute
   '/add': typeof AppAddRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/terms': typeof TermsRoute
   '/_app/add': typeof AppAddRoute
   '/_app/code': typeof AppCodeRoute
   '/_app/contacts': typeof AppContactsRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/terms'
     | '/add'
     | '/code'
     | '/contacts'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/terms'
     | '/add'
     | '/code'
     | '/contacts'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_app'
+    | '/terms'
     | '/_app/add'
     | '/_app/code'
     | '/_app/contacts'
@@ -157,10 +169,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -270,6 +290,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
