@@ -79,7 +79,11 @@ function TermsSheet({ accent, open, onClose, onAgree }) {
             Sign out and request deletion from the profile screen and we'll wipe your account and all your hashed adds.
           </TermItem>
           <TermItem accent={accent} icon="📜" title="The legal stuff">
-            By continuing you agree to our Terms of Service and Privacy Policy. You confirm you're 17+ and that you have the right to share any phone numbers you add.
+            By continuing you agree to our{' '}
+            <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline text-white">Terms of Service</a>
+            {' '}and{' '}
+            <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white">Privacy Policy</a>.
+            You confirm you're 17+ and that you have the right to share any phone numbers you add.
           </TermItem>
         </div>
 
