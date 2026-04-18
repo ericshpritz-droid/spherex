@@ -9,8 +9,7 @@ import { CONTACTS } from '../data.js';
 function HomeHeader({ accent, matchCount }) {
   return (
     <div style={{ padding: '72px 24px 12px' }}>
-      <div className="flex items-center justify-between">
-        <Wordmark size={28} color="#fff"/>
+      <div className="flex items-center justify-end">
         <div className="w-10 h-10 rounded-full bg-glass-08 border border-hairline-10 flex items-center justify-center text-lg">🔔</div>
       </div>
       <div className="mt-7">

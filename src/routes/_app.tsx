@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { AppProvider, useApp } from "../mutual/AppContext";
-import { TabBar } from "../mutual/components/index.jsx";
+import { TabBar, Wordmark } from "../mutual/components/index.jsx";
 
 const PUBLIC_PATHS = new Set(["/welcome", "/phone", "/code"]);
 
@@ -61,6 +61,14 @@ function PhoneFrame() {
           <div className="h-full flex items-center justify-center text-white bg-ink">Loading…</div>
         ) : (
           <Outlet />
+        )}
+        {!sessionLoading && (
+          <div
+            className="absolute top-0 left-0 right-0 z-40 flex justify-center pointer-events-none"
+            style={{ paddingTop: 24 }}
+          >
+            <Wordmark size={22} color="#fff"/>
+          </div>
         )}
         {tabPath && <TabBar tab={tabPath} setTab={goTab} accent={accent}/>}
       </div>

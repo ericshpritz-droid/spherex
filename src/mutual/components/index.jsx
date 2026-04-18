@@ -41,9 +41,9 @@ export function Wordmark({ size = 32, color = '#fff' }) {
       className="font-extrabold leading-none flex items-center"
       style={{ fontSize: size, letterSpacing: size * -0.04, color, gap: size * 0.08 }}
     >
-      <span>mutua</span>
+      <span>spher</span>
       <span className="relative inline-block" style={{ width: size * 0.55 }}>
-        l
+        e
         <span
           className="absolute rounded-full"
           style={{ top: size * 0.05, right: size * -0.05, width: size * 0.22, height: size * 0.22, background: '#F13F5E' }}
