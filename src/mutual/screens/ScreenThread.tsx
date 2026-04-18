@@ -21,7 +21,11 @@ type Msg = {
   recipient_phone_hash: string;
   body: string;
   created_at: string;
+  /** When set, render as a transient "unsent" tombstone instead of the body. */
+  tomb?: boolean;
 };
+
+const TOMB_MS = 5_000;
 
 type Props = {
   accent: "pink" | "lavender" | "blue";
