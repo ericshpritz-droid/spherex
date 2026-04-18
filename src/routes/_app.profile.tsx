@@ -109,8 +109,22 @@ function ProfileRoute() {
           Admin
         </button>
       )}
-      <div className="absolute left-4 right-4 z-40" style={{ bottom: 96 }}>
+      <div className="absolute left-4 right-4 z-40 flex flex-col items-stretch gap-2" style={{ bottom: 96 }}>
         <ShareInviteButton accent={accent} />
+        {invites.count >= 1 && (
+          <div
+            className="text-center text-[12px] text-white/70"
+            style={{ letterSpacing: 0.2 }}
+          >
+            <span className="font-semibold text-white">
+              {invites.count} {invites.count === 1 ? "friend" : "friends"}
+            </span>{" "}
+            joined via your link
+            {invites.lastAt && (
+              <span className="text-white/50"> · last {relativeTime(invites.lastAt)}</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
