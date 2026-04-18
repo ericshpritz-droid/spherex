@@ -5,7 +5,7 @@ import { useApp } from "../mutual/AppContext";
 export const Route = createFileRoute("/_app/sent")({
   head: () => ({
     meta: [
-      { title: "Added — Mutual" },
+      { title: "Added — Sphere" },
       { name: "description", content: "Now we wait. If they add you, it's mutual." },
     ],
   }),

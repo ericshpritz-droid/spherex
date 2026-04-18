@@ -5,7 +5,7 @@ import { useApp } from "../mutual/AppContext";
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
     meta: [
-      { title: "Your profile — Mutual" },
+      { title: "Your profile — Sphere" },
       { name: "description", content: "Manage your accent and account." },
     ],
   }),

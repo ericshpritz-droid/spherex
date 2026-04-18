@@ -5,9 +5,9 @@ import { useApp } from "../mutual/AppContext";
 export const Route = createFileRoute("/_app/home")({
   head: () => ({
     meta: [
-      { title: "Your mutuals — Mutual" },
+      { title: "Your mutuals — Sphere" },
       { name: "description", content: "See who picked you back." },
-      { property: "og:title", content: "Your mutuals — Mutual" },
+      { property: "og:title", content: "Your mutuals — Sphere" },
       { property: "og:description", content: "See who picked you back." },
     ],
   }),

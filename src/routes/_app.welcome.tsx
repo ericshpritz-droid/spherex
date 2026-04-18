@@ -5,9 +5,9 @@ import { useApp } from "../mutual/AppContext";
 export const Route = createFileRoute("/_app/welcome")({
   head: () => ({
     meta: [
-      { title: "Mutual — Only if they pick you back." },
+      { title: "Sphere — Only if they pick you back." },
       { name: "description", content: "Add a number. If they add yours, it's mutual. No DMs. No maybe." },
-      { property: "og:title", content: "Mutual — Only if they pick you back." },
+      { property: "og:title", content: "Sphere — Only if they pick you back." },
       { property: "og:description", content: "Phone-number-based double-opt-in matching." },
     ],
   }),
