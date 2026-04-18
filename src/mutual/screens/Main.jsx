@@ -183,6 +183,8 @@ export function ScreenContacts({ accent, onBack, onPick }) {
   const [showManual, setShowManual] = useState(false);
   const [manualName, setManualName] = useState('');
   const [manualPhone, setManualPhone] = useState('');
+  // Confirmation sheet for device-picked contacts
+  const [confirmList, setConfirmList] = useState(null); // null | Array<{ name, phone }>
 
   useEffect(() => {
     const nav = typeof navigator !== 'undefined' ? navigator : null;
@@ -202,18 +204,41 @@ export function ScreenContacts({ accent, onBack, onPick }) {
     setPickerBusy(true);
     try {
       const results = await navigator.contacts.select(['name', 'tel'], { multiple: true });
-      const phones = [];
+      const items = [];
+      const seen = new Set();
       for (const r of results) {
         const tels = Array.isArray(r.tel) ? r.tel : [];
-        for (const t of tels) if (t) phones.push(String(t));
+        const names = Array.isArray(r.name) ? r.name : [];
+        const displayName = (names.find(Boolean) || '').toString().trim();
+        for (const t of tels) {
+          if (!t) continue;
+          const phone = String(t);
+          if (seen.has(phone)) continue;
+          seen.add(phone);
+          items.push({ name: displayName, phone });
+        }
       }
-      const unique = [...new Set(phones)];
-      if (unique.length > 0) onPick(unique);
+      if (items.length > 0) setConfirmList(items);
     } catch (e) {
       // user cancelled or denied — silent
     } finally {
       setPickerBusy(false);
     }
+  };
+
+  const removeConfirmItem = (phone) => {
+    setConfirmList((list) => {
+      if (!list) return list;
+      const next = list.filter((i) => i.phone !== phone);
+      return next.length === 0 ? null : next;
+    });
+  };
+
+  const confirmAdd = () => {
+    if (!confirmList || confirmList.length === 0) return;
+    const phones = confirmList.map((i) => i.phone);
+    setConfirmList(null);
+    onPick(phones);
   };
 
   const manualDigits = manualPhone.replace(/\D/g, '');
