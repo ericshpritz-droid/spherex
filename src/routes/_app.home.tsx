@@ -40,6 +40,24 @@ function HomeRoute() {
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
 
+  // Track known mutuals to detect newly-arrived ones (via Realtime or refresh)
+  const knownIdsRef = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    // Wait until first successful load before tracking
+    if (dataLoading) return;
+    const ids = new Set(matches.map((m: any) => String(m.id ?? m.phone ?? m.other_phone)));
+    if (knownIdsRef.current === null) {
+      knownIdsRef.current = ids;
+      return;
+    }
+    let isNew = false;
+    for (const id of ids) {
+      if (!knownIdsRef.current.has(id)) { isNew = true; break; }
+    }
+    if (isNew) celebrateMutual(accent);
+    knownIdsRef.current = ids;
+  }, [matches, dataLoading, accent]);
+
   // Auto-refresh on tab visibility return
   const hiddenSince = useRef<number | null>(null);
   useEffect(() => {
