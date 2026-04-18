@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession, formatE164, sendOtp, verifyOtp, signOut, toE164 } from "./auth";
 import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
 import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
+import { loadLastMessagesServer } from "./messages.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 type Accent = "pink" | "lavender" | "blue";
 
@@ -20,6 +22,10 @@ type Ctx = {
   dataLoading: boolean;
   dataError: string | null;
   refresh: () => Promise<void>;
+  // Last message per matched hash + unread tracking
+  lastByHash: Record<string, { body: string; sender_phone_hash: string; created_at: string }>;
+  unreadByHash: Record<string, boolean>;
+  markThreadRead: (otherHash: string) => void;
   // OTP flow
   pendingPhone: string;
   startOtp: (digits: string) => Promise<void>;
