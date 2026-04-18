@@ -17,22 +17,28 @@ export type Database = {
       adds: {
         Row: {
           added_phone: string
+          added_phone_hash: string | null
           adder_id: string
           adder_phone: string
+          adder_phone_hash: string | null
           created_at: string
           id: string
         }
         Insert: {
           added_phone: string
+          added_phone_hash?: string | null
           adder_id: string
           adder_phone: string
+          adder_phone_hash?: string | null
           created_at?: string
           id?: string
         }
         Update: {
           added_phone?: string
+          added_phone_hash?: string | null
           adder_id?: string
           adder_phone?: string
+          adder_phone_hash?: string | null
           created_at?: string
           id?: string
         }
@@ -43,7 +49,7 @@ export type Database = {
       matches: {
         Row: {
           matched_at: string | null
-          other_phone: string | null
+          other_phone_hash: string | null
           user_id: string | null
         }
         Relationships: []
