@@ -1,6 +1,11 @@
 // Helper to call our server functions with the current user's Supabase
 // access token attached as a Bearer header (required by `requireSupabaseAuth`).
+//
+// All exported functions are wrapped with `createClientOnlyFn` so they're
+// safely no-ops during SSR — preventing the import-protection plugin from
+// flagging us when AppContext (which lives in the SSR graph) imports them.
 
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import {
   addPhonesServer,
@@ -17,30 +22,36 @@ async function bearerHeaders(): Promise<Record<string, string>> {
   return { Authorization: `Bearer ${token}` };
 }
 
-export async function callAddPhones(phones: string[]): Promise<{ inserted: number }> {
-  const headers = await bearerHeaders();
-  return await addPhonesServer({ data: { phones }, headers });
-}
+export const callAddPhones = createClientOnlyFn(
+  async (phones: string[]): Promise<{ inserted: number }> => {
+    const headers = await bearerHeaders();
+    return await addPhonesServer({ data: { phones }, headers });
+  },
+);
 
-export async function callLoadAddsAndMatches() {
+export const callLoadAddsAndMatches = createClientOnlyFn(async () => {
   const headers = await bearerHeaders();
   return await loadAddsAndMatchesServer({ headers });
-}
+});
 
-export async function callGetMyPhoneHash(): Promise<string> {
+export const callGetMyPhoneHash = createClientOnlyFn(async (): Promise<string> => {
   const headers = await bearerHeaders();
   const { hash } = await getMyPhoneHash({ headers });
   return hash;
-}
+});
 
-export async function callHashPhones(phones: string[]): Promise<string[]> {
-  if (phones.length === 0) return [];
-  const headers = await bearerHeaders();
-  const { hashes } = await hashPhonesServer({ data: { phones }, headers });
-  return hashes;
-}
+export const callHashPhones = createClientOnlyFn(
+  async (phones: string[]): Promise<string[]> => {
+    if (phones.length === 0) return [];
+    const headers = await bearerHeaders();
+    const { hashes } = await hashPhonesServer({ data: { phones }, headers });
+    return hashes;
+  },
+);
 
-export async function callBackfillPhoneHashes(): Promise<{ updated: number }> {
-  const headers = await bearerHeaders();
-  return await backfillPhoneHashes({ headers });
-}
+export const callBackfillPhoneHashes = createClientOnlyFn(
+  async (): Promise<{ updated: number }> => {
+    const headers = await bearerHeaders();
+    return await backfillPhoneHashes({ headers });
+  },
+);
