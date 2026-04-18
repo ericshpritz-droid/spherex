@@ -149,8 +149,33 @@ function PullIndicator({ pull, refreshing, accent, threshold = 70 }) {
   );
 }
 
-export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loading = false, error = null, onRetry, variant = 'cards' }) {
+function RefreshingPill({ accent }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 6, pointerEvents: 'none',
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '6px 12px', borderRadius: 999,
+        background: 'rgba(20,20,28,0.7)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        animation: 'mutualFadeIn 180ms ease-out',
+      }}
+    >
+      <Spinner accent={accent} size={12}/>
+      <span className="text-[12px] text-fg-75 font-medium">Refreshing…</span>
+    </div>
+  );
+}
+
+export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards' }) {
   const { ref: pullRef, pull, refreshing } = usePullToRefresh(onRetry);
+  // Only show the background pill when not already pulling-to-refresh
+  const showPill = bgRefreshing && !refreshing && pull === 0;
   if (loading) {
     return (
       <div className="h-full bg-ink text-white relative overflow-hidden">
