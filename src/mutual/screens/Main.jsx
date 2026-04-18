@@ -149,8 +149,33 @@ function PullIndicator({ pull, refreshing, accent, threshold = 70 }) {
   );
 }
 
-export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loading = false, error = null, onRetry, variant = 'cards' }) {
+function RefreshingPill({ accent }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 6, pointerEvents: 'none',
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '6px 12px', borderRadius: 999,
+        background: 'rgba(20,20,28,0.7)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        animation: 'mutualFadeIn 180ms ease-out',
+      }}
+    >
+      <Spinner accent={accent} size={12}/>
+      <span className="text-[12px] text-fg-75 font-medium">Refreshing…</span>
+    </div>
+  );
+}
+
+export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards' }) {
   const { ref: pullRef, pull, refreshing } = usePullToRefresh(onRetry);
+  // Only show the background pill when not already pulling-to-refresh
+  const showPill = bgRefreshing && !refreshing && pull === 0;
   if (loading) {
     return (
       <div className="h-full bg-ink text-white relative overflow-hidden">
@@ -185,6 +210,7 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
       <div ref={pullRef} className="h-full bg-ink text-white relative overflow-auto pb-[120px]" style={{ overscrollBehaviorY: 'contain' }}>
         <Aura accent={accent} intensity={0.5}/>
         <PullIndicator pull={pull} refreshing={refreshing} accent={accent}/>
+        {showPill && <RefreshingPill accent={accent}/>}
         <div className="relative z-[1]" style={{ transform: `translateY(${refreshing ? 56 : pull}px)`, transition: pull === 0 && !refreshing ? 'transform 180ms ease' : 'none' }}>
           <HomeHeader accent={accent} matchCount={0}/>
           <div className="rounded-[28px] bg-glass-04 text-center" style={{ margin: '40px 24px', padding: 32, border: '1px dashed rgba(255,255,255,0.12)' }}>
@@ -206,6 +232,7 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
     <div ref={pullRef} className="h-full bg-ink text-white overflow-auto relative pb-[120px]" style={{ overscrollBehaviorY: 'contain' }}>
       <Aura accent={accent} intensity={0.5}/>
       <PullIndicator pull={pull} refreshing={refreshing} accent={accent}/>
+      {showPill && <RefreshingPill accent={accent}/>}
       <div className="relative z-[1]" style={{ transform: `translateY(${refreshing ? 56 : pull}px)`, transition: pull === 0 && !refreshing ? 'transform 180ms ease' : 'none' }}>
         <HomeHeader accent={accent} matchCount={matches.length}/>
         <div style={{ padding: '16px 24px 0' }}>

@@ -198,4 +198,5 @@
 @keyframes mutualSpin  { to { transform: rotate(360deg); } }
 @keyframes mutualBlink { 50% { opacity: 0; } }
 @keyframes mutualPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+@keyframes mutualFadeIn { from { opacity: 0; transform: translate(-50%, -4px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
