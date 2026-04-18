@@ -94,12 +94,41 @@ export function ScreenThread({ accent, match, onBack }: Props) {
         (payload) => {
           const old = payload.old as Partial<Msg>;
           if (!old?.id) return;
-          setMessages((prev) => prev.filter((x) => x.id !== old.id));
+          markTombstone(old.id);
         },
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [myHash, match.id]);
+
+  // Flip a message into a tombstone, then auto-remove it after TOMB_MS.
+  // Idempotent — if it's already a tomb (e.g. sender unsent + realtime DELETE
+  // both fire), we don't reset the timer.
+  const tombTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const markTombstone = (id: string) => {
+    setMessages((prev) => {
+      const idx = prev.findIndex((x) => x.id === id);
+      if (idx === -1) return prev;
+      if (prev[idx].tomb) return prev;
+      const next = prev.slice();
+      next[idx] = { ...next[idx], tomb: true };
+      return next;
+    });
+    if (tombTimers.current.has(id)) return;
+    const t = setTimeout(() => {
+      setMessages((prev) => prev.filter((x) => x.id !== id));
+      tombTimers.current.delete(id);
+    }, TOMB_MS);
+    tombTimers.current.set(id, t);
+  };
+
+  // Clean up any pending tombstone timers on unmount.
+  useEffect(() => {
+    return () => {
+      tombTimers.current.forEach((t) => clearTimeout(t));
+      tombTimers.current.clear();
+    };
+  }, []);
 
   // Tick every second so the unsend countdown stays fresh.
   useEffect(() => {
