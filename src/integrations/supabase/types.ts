@@ -56,6 +56,33 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          recipient_phone_hash: string
+          sender_id: string
+          sender_phone_hash: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          recipient_phone_hash: string
+          sender_id: string
+          sender_phone_hash: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          recipient_phone_hash?: string
+          sender_id?: string
+          sender_phone_hash?: string
+        }
+        Relationships: []
+      }
       test_accounts: {
         Row: {
           created_at: string
@@ -114,6 +141,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_mutual_match: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
