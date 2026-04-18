@@ -67,7 +67,7 @@ function PhoneFrame() {
             className="absolute top-0 left-0 right-0 z-40 flex justify-center pointer-events-none"
             style={{ paddingTop: 24 }}
           >
-            <Wordmark size={22} color="#fff"/>
+            <Wordmark size={22} color="#fff" accent={accent}/>
           </div>
         )}
         {tabPath && <TabBar tab={tabPath} setTab={goTab} accent={accent}/>}
