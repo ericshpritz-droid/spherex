@@ -3,6 +3,7 @@ import { ACCENT_PRESETS, formatPhone, gradient } from '../brand.js';
 import { Button } from '../components/Button.jsx';
 import { PhoneAvatar } from '../components/PhoneAvatar.jsx';
 import { LinkedRings, Aura, NumPad, Wordmark } from '../components/index.jsx';
+import { Spinner } from '../components/Spinner.jsx';
 import { CONTACTS } from '../data.js';
 
 // ── Home header
