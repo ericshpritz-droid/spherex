@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ACCENT_PRESETS, formatPhone, gradient } from '../brand.js';
 import { Button } from '../components/Button.jsx';
 import { PhoneAvatar } from '../components/PhoneAvatar.jsx';
