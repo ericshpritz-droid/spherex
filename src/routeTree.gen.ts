@@ -13,11 +13,13 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as IHashRouteImport } from './routes/i.$hash'
 import { Route as ApiDevSeedRouteImport } from './routes/api.dev-seed'
 import { Route as AppWelcomeRouteImport } from './routes/_app.welcome'
 import { Route as AppSentRouteImport } from './routes/_app.sent'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppPhoneRouteImport } from './routes/_app.phone'
+import { Route as AppOnboardingImportRouteImport } from './routes/_app.onboarding-import'
 import { Route as AppMatchRouteImport } from './routes/_app.match'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppContactsRouteImport } from './routes/_app.contacts'
@@ -45,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IHashRoute = IHashRouteImport.update({
+  id: '/i/$hash',
+  path: '/i/$hash',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDevSeedRoute = ApiDevSeedRouteImport.update({
   id: '/api/dev-seed',
   path: '/api/dev-seed',
@@ -68,6 +75,11 @@ const AppProfileRoute = AppProfileRouteImport.update({
 const AppPhoneRoute = AppPhoneRouteImport.update({
   id: '/phone',
   path: '/phone',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOnboardingImportRoute = AppOnboardingImportRouteImport.update({
+  id: '/onboarding-import',
+  path: '/onboarding-import',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMatchRoute = AppMatchRouteImport.update({
@@ -116,11 +128,13 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
   '/match': typeof AppMatchRoute
+  '/onboarding-import': typeof AppOnboardingImportRoute
   '/phone': typeof AppPhoneRoute
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
   '/welcome': typeof AppWelcomeRoute
   '/api/dev-seed': typeof ApiDevSeedRoute
+  '/i/$hash': typeof IHashRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesByTo {
@@ -133,11 +147,13 @@ export interface FileRoutesByTo {
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
   '/match': typeof AppMatchRoute
+  '/onboarding-import': typeof AppOnboardingImportRoute
   '/phone': typeof AppPhoneRoute
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
   '/welcome': typeof AppWelcomeRoute
   '/api/dev-seed': typeof ApiDevSeedRoute
+  '/i/$hash': typeof IHashRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesById {
@@ -152,11 +168,13 @@ export interface FileRoutesById {
   '/_app/contacts': typeof AppContactsRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/match': typeof AppMatchRoute
+  '/_app/onboarding-import': typeof AppOnboardingImportRoute
   '/_app/phone': typeof AppPhoneRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/sent': typeof AppSentRoute
   '/_app/welcome': typeof AppWelcomeRoute
   '/api/dev-seed': typeof ApiDevSeedRoute
+  '/i/$hash': typeof IHashRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRouteTypes {
@@ -171,11 +189,13 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/home'
     | '/match'
+    | '/onboarding-import'
     | '/phone'
     | '/profile'
     | '/sent'
     | '/welcome'
     | '/api/dev-seed'
+    | '/i/$hash'
     | '/thread/$hash'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -188,11 +208,13 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/home'
     | '/match'
+    | '/onboarding-import'
     | '/phone'
     | '/profile'
     | '/sent'
     | '/welcome'
     | '/api/dev-seed'
+    | '/i/$hash'
     | '/thread/$hash'
   id:
     | '__root__'
@@ -206,11 +228,13 @@ export interface FileRouteTypes {
     | '/_app/contacts'
     | '/_app/home'
     | '/_app/match'
+    | '/_app/onboarding-import'
     | '/_app/phone'
     | '/_app/profile'
     | '/_app/sent'
     | '/_app/welcome'
     | '/api/dev-seed'
+    | '/i/$hash'
     | '/_app/thread/$hash'
   fileRoutesById: FileRoutesById
 }
@@ -220,6 +244,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   ApiDevSeedRoute: typeof ApiDevSeedRoute
+  IHashRoute: typeof IHashRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -250,6 +275,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/i/$hash': {
+      id: '/i/$hash'
+      path: '/i/$hash'
+      fullPath: '/i/$hash'
+      preLoaderRoute: typeof IHashRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/dev-seed': {
@@ -285,6 +317,13 @@ declare module '@tanstack/react-router' {
       path: '/phone'
       fullPath: '/phone'
       preLoaderRoute: typeof AppPhoneRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/onboarding-import': {
+      id: '/_app/onboarding-import'
+      path: '/onboarding-import'
+      fullPath: '/onboarding-import'
+      preLoaderRoute: typeof AppOnboardingImportRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/match': {
@@ -346,6 +385,7 @@ interface AppRouteChildren {
   AppContactsRoute: typeof AppContactsRoute
   AppHomeRoute: typeof AppHomeRoute
   AppMatchRoute: typeof AppMatchRoute
+  AppOnboardingImportRoute: typeof AppOnboardingImportRoute
   AppPhoneRoute: typeof AppPhoneRoute
   AppProfileRoute: typeof AppProfileRoute
   AppSentRoute: typeof AppSentRoute
@@ -360,6 +400,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppContactsRoute: AppContactsRoute,
   AppHomeRoute: AppHomeRoute,
   AppMatchRoute: AppMatchRoute,
+  AppOnboardingImportRoute: AppOnboardingImportRoute,
   AppPhoneRoute: AppPhoneRoute,
   AppProfileRoute: AppProfileRoute,
   AppSentRoute: AppSentRoute,
@@ -375,6 +416,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   ApiDevSeedRoute: ApiDevSeedRoute,
+  IHashRoute: IHashRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

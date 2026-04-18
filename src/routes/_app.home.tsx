@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { ScreenHome } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
 import { ACCENT_PRESETS } from "../mutual/brand.js";
+import { callGetMyPhoneHash } from "../mutual/dataApi.rpc";
+import { toast } from "../mutual/toast";
 
 function celebrateMutual(accent: string) {
   const p = (ACCENT_PRESETS as any)[accent] || ACCENT_PRESETS.pink;
@@ -108,6 +110,25 @@ function HomeRoute() {
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [refresh]);
 
+  const handleInvite = useCallback(async () => {
+    try {
+      const hash = await callGetMyPhoneHash();
+      if (!hash || typeof window === "undefined") return;
+      const url = `${window.location.origin}/i/${hash}`;
+      const text = "I'm on Sphere — add me and we're mutual. ✨";
+      const nav = navigator as any;
+      if (nav?.share) {
+        try { await nav.share({ title: "Sphere", text, url }); return; } catch {}
+      }
+      try {
+        await nav?.clipboard?.writeText(`${text} ${url}`);
+        toast.success("Invite link copied");
+      } catch { toast.error("Couldn't copy link"); }
+    } catch (e: any) {
+      toast.error(e?.message || "Couldn't build invite link");
+    }
+  }, []);
+
   return (
     <ScreenHome
       accent={accent}
@@ -126,6 +147,7 @@ function HomeRoute() {
         navigate({ to: "/thread/$hash", params: { hash: String(m.id) } });
       }}
       onAdd={() => navigate({ to: "/add" })}
+      onInvite={handleInvite}
     />
   );
 }

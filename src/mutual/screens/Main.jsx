@@ -192,7 +192,7 @@ function RefreshingPill({ accent }) {
   );
 }
 
-export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '' }) {
+export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInvite, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '' }) {
   const { ref: pullRef, pull, refreshing } = usePullToRefresh(onRetry);
   // Only show the background pill when not already pulling-to-refresh
   const showPill = bgRefreshing && !refreshing && pull === 0;
@@ -239,9 +239,30 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
             </div>
             <div className="font-bold text-[22px]">Nothing mutual yet</div>
             <div className="mt-2 text-sm text-fg-60" style={{ lineHeight: 1.4 }}>
-              Add a number. If they've added yours,<br/>it'll light up here.
+              Sphere lights up when someone you've added<br/>adds you back. Invite a few friends to start.
             </div>
-            <div className="mt-5"><Button accent={accent} onClick={onAdd} full={false}>+ Add first number</Button></div>
+            <div className="mt-5 flex flex-col gap-2 items-stretch">
+              {onInvite && (
+                <div
+                  onClick={onInvite}
+                  className="rounded-[16px] text-white font-semibold cursor-pointer"
+                  style={{
+                    padding: '14px 16px', fontSize: 15,
+                    background: gradient(accent, '135deg'),
+                    boxShadow: `0 10px 28px ${ACCENT_PRESETS[accent].a}40`,
+                  }}
+                >
+                  ✨ Invite friends
+                </div>
+              )}
+              <button
+                onClick={onAdd}
+                className="rounded-[14px] bg-glass-08 border border-hairline-10 text-white text-[14px] font-semibold cursor-pointer"
+                style={{ padding: '12px 14px' }}
+              >
+                + Add a number
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -413,17 +434,76 @@ export function ScreenAdd({ accent, onSubmit, onBack, onBrowseContacts, allowTes
   );
 }
 
+// Extract candidate phone numbers from arbitrary pasted text or a vCard blob.
+// Strategy: scan for digit runs of 7-15 (allowing spaces/dashes/parens/dots/+
+// between them), then keep US-shaped 10-digit (or 11-digit starting with 1)
+// candidates. Returns formatted "(###) ###-####" strings, deduped.
+function extractPhones(text) {
+  if (!text) return [];
+  const out = [];
+  const seen = new Set();
+  // Match runs that look phone-like.
+  const re = /(\+?\d[\d\s().\-]{6,20}\d)/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    let d = m[1].replace(/\D/g, '');
+    if (d.length === 11 && d.startsWith('1')) d = d.slice(1);
+    if (d.length !== 10) continue;
+    if (!/^[2-9]/.test(d)) continue;
+    if (seen.has(d)) continue;
+    seen.add(d);
+    out.push(`(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`);
+  }
+  return out;
+}
+
+// Pair phones with the closest preceding FN: line in a .vcf so we can show
+// names in the confirmation sheet.
+function parseVCardEntries(text) {
+  if (!text) return [];
+  // Unfold continuation lines (RFC 6350: a line starting with space/tab
+  // continues the previous one).
+  const unfolded = String(text).replace(/\r?\n[ \t]/g, '');
+  const lines = unfolded.split(/\r?\n/);
+  const out = [];
+  const seen = new Set();
+  let currentName = '';
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    // FN may be FN: or FN;CHARSET=...:
+    const fnMatch = line.match(/^FN(?:;[^:]*)?:(.*)$/i);
+    if (fnMatch) { currentName = fnMatch[1].trim(); continue; }
+    if (/^BEGIN:VCARD/i.test(line)) { currentName = ''; continue; }
+    const telMatch = line.match(/^TEL(?:;[^:]*)?:(.*)$/i);
+    if (telMatch) {
+      let d = telMatch[1].replace(/\D/g, '');
+      if (d.length === 11 && d.startsWith('1')) d = d.slice(1);
+      if (d.length !== 10 || !/^[2-9]/.test(d)) continue;
+      if (seen.has(d)) continue;
+      seen.add(d);
+      out.push({
+        name: currentName || '',
+        phone: `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`,
+      });
+    }
+  }
+  return out;
+}
+
 export function ScreenContacts({ accent, onBack, onPick }) {
   const [q, setQ] = useState('');
   const [picked, setPicked] = useState(new Set());
   const [pickerSupported, setPickerSupported] = useState(false);
   const [pickerBusy, setPickerBusy] = useState(false);
   const [showManual, setShowManual] = useState(false);
+  const [showPaste, setShowPaste] = useState(false);
+  const [pasteText, setPasteText] = useState('');
   const [manualName, setManualName] = useState('');
   const [manualPhone, setManualPhone] = useState('');
   // Confirmation sheet for device-picked contacts
   const [confirmList, setConfirmList] = useState(null); // null | Array<{ name, phone }>
-
+  const fileInputRef = useRef(null);
   useEffect(() => {
     const nav = typeof navigator !== 'undefined' ? navigator : null;
     setPickerSupported(!!(nav && nav.contacts && typeof nav.contacts.select === 'function'));
@@ -514,25 +594,107 @@ export function ScreenContacts({ accent, onBack, onPick }) {
           </div>
         </div>
 
-        <div className="flex gap-2 mb-3">
+        <div className="flex flex-wrap gap-2 mb-3">
           {pickerSupported && (
             <button
               onClick={openDevicePicker}
               disabled={pickerBusy}
               className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-08 text-white text-[14px] font-semibold cursor-pointer"
-              style={{ padding: '12px 14px', opacity: pickerBusy ? 0.6 : 1 }}
+              style={{ padding: '12px 14px', opacity: pickerBusy ? 0.6 : 1, minWidth: '46%' }}
             >
               {pickerBusy ? 'Opening…' : '📇 Pick from device'}
             </button>
           )}
+          {!pickerSupported && (
+            <>
+              <button
+                onClick={() => setShowPaste(v => !v)}
+                className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-08 text-white text-[14px] font-semibold cursor-pointer"
+                style={{ padding: '12px 14px', minWidth: '46%' }}
+              >
+                {showPaste ? 'Hide paste' : '📋 Paste a list'}
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-08 text-white text-[14px] font-semibold cursor-pointer"
+                style={{ padding: '12px 14px', minWidth: '46%' }}
+              >
+                📎 Upload .vcf
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".vcf,text/vcard,text/x-vcard"
+                style={{ display: 'none' }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = '';
+                  if (!file) return;
+                  try {
+                    const text = await file.text();
+                    const items = parseVCardEntries(text);
+                    if (items.length === 0) {
+                      // Fallback: scan raw text for phone-shaped runs.
+                      const phones = extractPhones(text);
+                      if (phones.length === 0) return;
+                      setConfirmList(phones.map((p) => ({ name: '', phone: p })));
+                      return;
+                    }
+                    setConfirmList(items);
+                  } catch {
+                    /* ignore unreadable files */
+                  }
+                }}
+              />
+            </>
+          )}
           <button
             onClick={() => setShowManual(v => !v)}
             className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-06 text-white text-[14px] font-semibold cursor-pointer"
-            style={{ padding: '12px 14px' }}
+            style={{ padding: '12px 14px', minWidth: '46%' }}
           >
             {showManual ? 'Hide manual' : '✍️ Enter manually'}
           </button>
         </div>
+
+        {showPaste && !pickerSupported && (
+          <div className="rounded-[14px] bg-glass-06 border border-hairline-08 mb-3" style={{ padding: 12 }}>
+            <div className="text-[12px] text-fg-55 mb-2" style={{ lineHeight: 1.4 }}>
+              Paste names + numbers from anywhere. We'll grab the US phone numbers.
+            </div>
+            <textarea
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value.slice(0, 20000))}
+              placeholder={'Alex Kim 555-123-4567\nSam Lee (415) 555 9876'}
+              rows={5}
+              className="w-full bg-transparent border-0 outline-none text-white text-[14px] resize-y"
+              style={{ padding: '6px 4px', lineHeight: 1.4, fontFamily: 'inherit' }}
+            />
+            {(() => {
+              const found = extractPhones(pasteText);
+              return (
+                <>
+                  <div className="mt-2 text-[12px] text-fg-55 px-1">
+                    {found.length === 0 ? 'No phone numbers found yet.' : `Found ${found.length} number${found.length === 1 ? '' : 's'}.`}
+                  </div>
+                  <div className="mt-3">
+                    <Button
+                      accent={accent}
+                      disabled={found.length === 0}
+                      onClick={() => {
+                        setConfirmList(found.map((p) => ({ name: '', phone: p })));
+                        setPasteText('');
+                        setShowPaste(false);
+                      }}
+                    >
+                      {found.length === 0 ? 'Paste at least one number' : `Review ${found.length}`}
+                    </Button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
 
         {showManual && (
           <div className="rounded-[14px] bg-glass-06 border border-hairline-08 mb-3" style={{ padding: 12 }}>

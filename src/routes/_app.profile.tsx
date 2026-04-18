@@ -3,6 +3,7 @@ import { toast } from "../mutual/toast";
 import { ScreenProfile } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
+import { ShareInviteButton } from "../mutual/components/ShareInviteButton";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
@@ -80,6 +81,9 @@ function ProfileRoute() {
           Admin
         </button>
       )}
+      <div className="absolute left-4 right-4 z-40" style={{ bottom: 96 }}>
+        <ShareInviteButton accent={accent} />
+      </div>
     </div>
   );
 }
