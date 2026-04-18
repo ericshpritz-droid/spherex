@@ -362,6 +362,79 @@ export function ScreenContacts({ accent, onBack, onPick }) {
           </Button>
         </div>
       )}
+
+      {confirmList && (
+        <>
+          <div
+            className="absolute inset-0 z-40"
+            onClick={() => setConfirmList(null)}
+            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+          />
+          <div
+            className="absolute left-0 right-0 bottom-0 z-50 bg-ink text-white"
+            style={{
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderBottom: 'none',
+              padding: '14px 16px 20px',
+              maxHeight: '75%',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 -20px 60px rgba(0,0,0,0.5)',
+            }}
+          >
+            <div
+              className="mx-auto mb-3 rounded-full"
+              style={{ width: 36, height: 4, background: 'rgba(255,255,255,0.18)' }}
+            />
+            <div className="flex items-baseline justify-between mb-1 px-1">
+              <div className="font-bold text-[18px]">
+                Add {confirmList.length} {confirmList.length === 1 ? 'person' : 'people'}?
+              </div>
+              <button
+                onClick={() => setConfirmList(null)}
+                className="text-fg-50 text-sm bg-transparent border-0 cursor-pointer"
+              >Cancel</button>
+            </div>
+            <div className="text-[13px] text-fg-55 mb-3 px-1">
+              They won't be notified unless they add you back.
+            </div>
+            <div className="flex-1 overflow-y-auto" style={{ marginBottom: 12 }}>
+              {confirmList.map((c) => (
+                <div
+                  key={c.phone}
+                  className="flex items-center gap-3 rounded-[14px]"
+                  style={{
+                    padding: '10px 12px',
+                    marginBottom: 4,
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <PhoneAvatar phone={c.phone} size={36} accent={accent}/>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[15px] font-semibold truncate">
+                      {c.name || c.phone}
+                    </div>
+                    {c.name && (
+                      <div className="text-[13px] text-fg-50 truncate">{c.phone}</div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => removeConfirmItem(c.phone)}
+                    aria-label="Remove"
+                    className="w-7 h-7 rounded-full border-0 bg-glass-08 text-white cursor-pointer flex items-center justify-center text-sm"
+                  >✕</button>
+                </div>
+              ))}
+            </div>
+            <Button accent={accent} onClick={confirmAdd}>
+              Add {confirmList.length} {confirmList.length === 1 ? 'person' : 'people'}
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
