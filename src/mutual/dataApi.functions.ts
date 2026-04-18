@@ -80,35 +80,13 @@ export const addPhonesServer = createServerFn({ method: "POST" })
   });
 
 /**
- * One-time backfill: rehash any rows where hash columns are NULL.
- * Uses the admin client to bypass RLS (we re-hash *every* row, regardless
- * of owner — this is intentional during the migration window).
- *
- * Safe to call multiple times — only fills NULL hashes.
+ * No-op stub kept for compatibility with any earlier client builds.
+ * The schema no longer has raw phone columns to backfill from.
  */
 export const backfillPhoneHashes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async () => {
-    const { data, error } = await supabaseAdmin
-      .from("adds")
-      .select("id, adder_phone, added_phone, adder_phone_hash, added_phone_hash")
-      .or("adder_phone_hash.is.null,added_phone_hash.is.null")
-      .limit(5000);
-    if (error) throw new Error(error.message);
-    if (!data || data.length === 0) return { updated: 0 };
-
-    let updated = 0;
-    for (const row of data as any[]) {
-      const adderHash = row.adder_phone_hash || (row.adder_phone ? hashPhone(row.adder_phone) : null);
-      const addedHash = row.added_phone_hash || (row.added_phone ? hashPhone(row.added_phone) : null);
-      if (!adderHash || !addedHash) continue;
-      const { error: upErr } = await supabaseAdmin
-        .from("adds")
-        .update({ adder_phone_hash: adderHash, added_phone_hash: addedHash })
-        .eq("id", row.id);
-      if (!upErr) updated += 1;
-    }
-    return { updated };
+    return { updated: 0 };
   });
 
 /**
