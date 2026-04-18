@@ -5,6 +5,7 @@ import { Spinner } from "../mutual/components/Spinner.jsx";
 import { TestModeBanner } from "../mutual/testmode/TestModeBanner";
 
 const PUBLIC_PATHS = new Set(["/welcome", "/phone", "/code"]);
+const ONBOARDED_KEY = (uid: string) => `mutual.onboarded.${uid}`;
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -19,7 +20,7 @@ function AppLayout() {
 }
 
 function PhoneFrame() {
-  const { session, sessionLoading, accent, unreadByHash, newMatchCount } = useApp();
+  const { session, sessionLoading, accent, unreadByHash, newMatchCount, user, matches, pending, dataLoading } = useApp();
   const unreadCount = Object.values(unreadByHash).filter(Boolean).length;
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,7 +33,14 @@ function PhoneFrame() {
       // Bounce to welcome
       queueMicrotask(() => navigate({ to: "/welcome", replace: true }));
     } else if (session && (isPublic || path === "/")) {
-      queueMicrotask(() => navigate({ to: "/home", replace: true }));
+      // Fresh users with zero activity get the contact-import nudge first.
+      const uid = user?.id;
+      const onboarded = typeof window !== "undefined" && uid
+        ? !!localStorage.getItem(ONBOARDED_KEY(uid))
+        : true;
+      const empty = !dataLoading && matches.length === 0 && pending.length === 0;
+      const dest = !onboarded && empty ? "/onboarding-import" : "/home";
+      queueMicrotask(() => navigate({ to: dest, replace: true }));
     }
   }
 
