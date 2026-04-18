@@ -511,7 +511,51 @@ export function ScreenContacts({ accent, onBack, onPick }) {
         </div>
       </div>
       <div className="flex-1 overflow-y-auto relative z-[1] pb-[140px]">
-        {letters.map(L => (
+        {letters.length === 0 ? (
+          <div
+            className="rounded-[20px] bg-glass-04 text-center"
+            style={{ margin: '24px 16px 0', padding: 28, border: '1px dashed rgba(255,255,255,0.12)' }}
+          >
+            <div className="flex justify-center mb-4">
+              <div
+                className="rounded-full flex items-center justify-center"
+                style={{
+                  width: 72, height: 72,
+                  background: `${ACCENT_PRESETS[accent].a}18`,
+                  border: `1px solid ${ACCENT_PRESETS[accent].a}40`,
+                  fontSize: 30,
+                }}
+              >🔍</div>
+            </div>
+            <div className="font-bold text-[18px]">No contacts match “{q}”</div>
+            <div className="mt-2 text-[13px] text-fg-60" style={{ lineHeight: 1.45 }}>
+              Try a different name or number — or add them by hand.
+            </div>
+            <div className="mt-5 flex flex-col gap-2 items-center">
+              <Button
+                accent={accent}
+                full={false}
+                onClick={() => {
+                  setShowManual(true);
+                  // Pre-fill manual entry if the query looks like digits
+                  const justDigits = q.replace(/\D/g, '');
+                  if (justDigits.length > 0 && justDigits.length <= 11) {
+                    setManualPhone(normalizeManual(justDigits));
+                  }
+                }}
+              >
+                ✍️ Enter “{q}” manually
+              </Button>
+              <button
+                onClick={() => setQ('')}
+                className="bg-transparent border-0 text-[13px] text-fg-55 cursor-pointer"
+                style={{ padding: 6 }}
+              >
+                Clear search
+              </button>
+            </div>
+          </div>
+        ) : letters.map(L => (
           <div key={L}>
             <div
               className="font-bold tracking-sora-caps"
