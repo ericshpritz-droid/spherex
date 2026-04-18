@@ -137,8 +137,20 @@
     border-color: var(--color-border);
   }
 
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: 'Sora', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: #0A0620;
+    color: #fff;
   }
+
+  ::-webkit-scrollbar { width: 0; height: 0; }
 }
+
+@keyframes mutualSpin  { to { transform: rotate(360deg); } }
+@keyframes mutualBlink { 50% { opacity: 0; } }
+@keyframes mutualPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+
