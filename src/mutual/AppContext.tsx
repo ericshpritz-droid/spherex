@@ -287,6 +287,59 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchIds.join("|"), seenMatchIds, user?.id]);
 
+  // ---- Global new-mutual celebration ------------------------------------
+  // Fires a soft chime + haptic anywhere in the app (e.g. /add, /profile)
+  // when a brand-new mutual arrives. /home already has its own confetti, so
+  // we suppress this when the user is currently looking at /home.
+  const knownMatchIdsRef = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    if (dataLoading) return;
+    const ids = new Set(matchIds);
+    // First settle after load: prime the baseline, no celebration.
+    if (knownMatchIdsRef.current === null) {
+      knownMatchIdsRef.current = ids;
+      return;
+    }
+    let arrived = false;
+    for (const id of ids) {
+      if (!knownMatchIdsRef.current.has(id)) { arrived = true; break; }
+    }
+    knownMatchIdsRef.current = ids;
+    if (!arrived) return;
+
+    if (typeof window === "undefined") return;
+    if (window.location?.pathname === "/home") return; // /home plays confetti
+
+    // Soft haptic
+    try { (navigator as any).vibrate?.([10, 35, 12]); } catch {}
+
+    // Tiny two-tone chime via WebAudio (no asset).
+    try {
+      const Ctx: typeof AudioContext | undefined =
+        (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const now = ctx.currentTime;
+      const tone = (freq: number, start: number, dur: number, peak: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, now + start);
+        gain.gain.exponentialRampToValueAtTime(peak, now + start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + dur);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now + start);
+        osc.stop(now + start + dur + 0.02);
+      };
+      tone(880, 0, 0.18, 0.08);   // A5
+      tone(1318.5, 0.12, 0.22, 0.06); // E6
+      // Close the context shortly after to free resources.
+      setTimeout(() => { try { ctx.close(); } catch {} }, 500);
+    } catch { /* audio blocked or unsupported — silent fail */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchIds.join("|"), dataLoading]);
+
   const startOtp = useCallback(async (digits: string) => {
     const e164 = toE164(digits);
     setPendingPhone(e164);
