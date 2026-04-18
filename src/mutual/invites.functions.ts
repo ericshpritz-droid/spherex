@@ -53,5 +53,45 @@ export const consumeInviteServer = createServerFn({ method: "POST" })
       console.error("consumeInvite insert error", error);
       throw new Error(error.message);
     }
+
+    // Record the conversion (idempotent thanks to the unique constraint).
+    // Use the admin client because the invitee can't write rows that read as
+    // belonging to the inviter under RLS.
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("invite_conversions").upsert(
+        [{
+          inviter_phone_hash: data.inviterHash,
+          invitee_phone_hash: myHash,
+          invitee_id: userId,
+        }],
+        { onConflict: "inviter_phone_hash,invitee_phone_hash", ignoreDuplicates: true },
+      );
+    } catch (e) {
+      // Don't block the invite flow if logging fails.
+      console.warn("invite_conversions log failed", e);
+    }
+
     return { applied: true };
+  });
+
+// How many fresh users joined via *my* invite link, plus when the most recent
+// one happened. RLS scopes the rows to the calling inviter automatically.
+export const getInviteConversionsServer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = context as { supabase: any };
+    const { data, error } = await supabase
+      .from("invite_conversions")
+      .select("created_at")
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.error("getInviteConversions error", error);
+      return { count: 0, lastAt: null as string | null };
+    }
+    const rows = (data ?? []) as { created_at: string }[];
+    return {
+      count: rows.length,
+      lastAt: rows[0]?.created_at ?? null,
+    };
   });

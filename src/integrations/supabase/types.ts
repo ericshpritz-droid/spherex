@@ -56,6 +56,30 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_conversions: {
+        Row: {
+          created_at: string
+          id: string
+          invitee_id: string
+          invitee_phone_hash: string
+          inviter_phone_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invitee_id: string
+          invitee_phone_hash: string
+          inviter_phone_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invitee_id?: string
+          invitee_phone_hash?: string
+          inviter_phone_hash?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
