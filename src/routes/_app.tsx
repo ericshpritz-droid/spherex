@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { AppProvider, useApp } from "../mutual/AppContext";
-import { TabBar, Wordmark } from "../mutual/components/index.jsx";
+import { TabBar } from "../mutual/components/index.jsx";
 import { Spinner } from "../mutual/components/Spinner.jsx";
 import { TestModeBanner } from "../mutual/testmode/TestModeBanner";
 
