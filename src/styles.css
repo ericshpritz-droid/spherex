@@ -19,6 +19,35 @@
  */
 
 @theme inline {
+  /* Mutual brand tokens — used as bg-ink, bg-ink-deep, text-error, etc. */
+  --color-ink: var(--ink);
+  --color-ink-deep: var(--ink-deep);
+  --color-ink-card: var(--ink-card);
+  --color-frame: var(--frame);
+  --color-error: var(--error);
+  /* Glass surface alphas on white */
+  --color-glass-04: rgb(255 255 255 / 0.04);
+  --color-glass-06: rgb(255 255 255 / 0.06);
+  --color-glass-08: rgb(255 255 255 / 0.08);
+  --color-glass-10: rgb(255 255 255 / 0.10);
+  /* Foreground alphas on white */
+  --color-fg-25: rgb(255 255 255 / 0.25);
+  --color-fg-30: rgb(255 255 255 / 0.30);
+  --color-fg-40: rgb(255 255 255 / 0.40);
+  --color-fg-45: rgb(255 255 255 / 0.45);
+  --color-fg-50: rgb(255 255 255 / 0.50);
+  --color-fg-55: rgb(255 255 255 / 0.55);
+  --color-fg-60: rgb(255 255 255 / 0.60);
+  --color-fg-65: rgb(255 255 255 / 0.65);
+  --color-fg-70: rgb(255 255 255 / 0.70);
+  --color-fg-75: rgb(255 255 255 / 0.75);
+  --color-fg-85: rgb(255 255 255 / 0.85);
+  /* Border alphas on white */
+  --color-hairline-06: rgb(255 255 255 / 0.06);
+  --color-hairline-08: rgb(255 255 255 / 0.08);
+  --color-hairline-10: rgb(255 255 255 / 0.10);
+  --color-hairline-12: rgb(255 255 255 / 0.12);
+  --color-hairline-14: rgb(255 255 255 / 0.14);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -62,6 +91,12 @@
 }
 
 :root {
+  /* Mutual brand surfaces (kept as raw hex to preserve exact visuals) */
+  --ink: #120A32;
+  --ink-deep: #08041C;
+  --ink-card: #1E1240;
+  --frame: #0A0620;
+  --error: #ff8f8f;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -143,11 +178,21 @@
     min-height: 100%;
     font-family: 'Sora', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
-    background: #0A0620;
+    background: var(--frame);
     color: #fff;
   }
 
   ::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* Sora display tracking — replaces letterSpacing: -0.2/-0.5/-1.2/-2.5/-3 */
+  .tracking-sora-tight  { letter-spacing: -0.2px; }
+  .tracking-sora-tighter { letter-spacing: -0.5px; }
+  .tracking-sora-display { letter-spacing: -1.2px; }
+  .tracking-sora-mega   { letter-spacing: -2.5px; }
+  .tracking-sora-giant  { letter-spacing: -3px; }
+  .tracking-sora-label  { letter-spacing: 0.5px; }
+  .tracking-sora-caps   { letter-spacing: 1.5px; }
+  .tracking-sora-eyebrow { letter-spacing: 3px; }
 }
 
 @keyframes mutualSpin  { to { transform: rotate(360deg); } }
