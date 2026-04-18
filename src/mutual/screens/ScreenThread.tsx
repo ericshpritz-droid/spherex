@@ -309,6 +309,61 @@ export function ScreenThread({ accent, match, onBack }: Props) {
           Send
         </button>
       </div>
+
+      {/* Unsend confirm sheet */}
+      {confirmMsg && (
+        <div
+          className="absolute inset-0 z-[10] flex items-end justify-center"
+          style={{ background: "rgba(0,0,0,0.55)" }}
+          onClick={() => setConfirmId(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full bg-ink rounded-t-3xl border-t border-hairline-12"
+            style={{ padding: "20px 22px 28px" }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="rounded-2xl flex items-center justify-center"
+                style={{
+                  width: 56, height: 56, fontSize: 28,
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                }}
+              >
+                {confirmMsg.body}
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold text-[16px]">Unsend this?</div>
+                <div className="text-[12px] text-fg-55">
+                  {confirmSecsLeft > 0
+                    ? `${confirmSecsLeft}s left to take it back`
+                    : "Too late — this message is permanent now"}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => doUnsend(confirmMsg.id)}
+              disabled={confirmSecsLeft === 0}
+              className="w-full rounded-full text-white font-semibold cursor-pointer disabled:opacity-40 mb-2"
+              style={{
+                padding: "14px 18px",
+                border: 0,
+                background: "rgba(241,63,94,0.85)",
+              }}
+            >
+              Unsend
+            </button>
+            <button
+              onClick={() => setConfirmId(null)}
+              className="w-full rounded-full bg-glass-06 text-white font-semibold cursor-pointer border border-hairline-12"
+              style={{ padding: "14px 18px" }}
+            >
+              Keep it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
