@@ -5,6 +5,7 @@ import { useSession, formatE164, sendOtp, verifyOtp, signOut, toE164 } from "./a
 import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
 import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
 import { loadLastMessagesServer } from "./messages.functions";
+import { consumeInviteServer } from "./invites.functions";
 import { useServerFn } from "@tanstack/react-start";
 
 type Accent = "pink" | "lavender" | "blue";
@@ -149,6 +150,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (session) refresh();
   }, [session, refresh]);
+
+  // ---- Invite-link consumption ------------------------------------------
+  // /i/<hash> stashes the inviter's hash in sessionStorage. After the user
+  // is signed in, redeem it once (one-sided: inviter is added to my list).
+  const consumeInvite = useServerFn(consumeInviteServer);
+  useEffect(() => {
+    if (!session || typeof window === "undefined") return;
+    const KEY = "mutual.pendingInviteHash";
+    const inviterHash = sessionStorage.getItem(KEY);
+    if (!inviterHash || !/^[a-f0-9]{64}$/i.test(inviterHash)) return;
+    sessionStorage.removeItem(KEY);
+    (async () => {
+      try {
+        await consumeInvite({ data: { inviterHash: inviterHash.toLowerCase() } });
+        refresh();
+      } catch (e) {
+        console.warn("consumeInvite failed", e);
+      }
+    })();
+  }, [session, consumeInvite, refresh]);
 
   // Realtime: when someone adds *me* a new mutual may have just been created.
   // Filter on my hashed phone (the column the DB now stores).
