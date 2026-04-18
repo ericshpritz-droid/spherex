@@ -72,6 +72,13 @@ function HomeRoute() {
     knownIdsRef.current = ids;
   }, [matches, dataLoading, accent]);
 
+  // Once /home has been viewed with the latest matches loaded, clear the
+  // "new mutuals" dot on the bottom-nav tab.
+  useEffect(() => {
+    if (dataLoading) return;
+    markMatchesSeen();
+  }, [matches, dataLoading, markMatchesSeen]);
+
   // Auto-refresh on tab visibility return
   const hiddenSince = useRef<number | null>(null);
   useEffect(() => {
