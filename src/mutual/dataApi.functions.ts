@@ -139,6 +139,27 @@ export const loadAddsAndMatchesServer = createServerFn({ method: "GET" })
     };
   });
 
+/**
+ * Hash a list of E.164 phones using the server pepper, so the client can
+ * remember "this hash → this contact's readable number" locally without
+ * ever seeing the pepper. The result is opaque to anyone but this user.
+ */
+export const hashPhonesServer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { phones: string[] }) => {
+    if (!input || !Array.isArray(input.phones)) {
+      throw new Error("phones must be an array");
+    }
+    if (input.phones.length === 0 || input.phones.length > 500) {
+      throw new Error("phones must contain 1–500 entries");
+    }
+    return { phones: input.phones };
+  })
+  .handler(async ({ data }) => {
+    const e164s = data.phones.map(toE164Server).filter(Boolean);
+    return { hashes: hashPhones(e164s) };
+  });
+
 /** Returns the hash of the caller's own phone — needed for realtime filters. */
 export const getMyPhoneHash = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
