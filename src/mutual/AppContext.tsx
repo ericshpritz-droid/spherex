@@ -469,6 +469,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     lastByHash, unreadByHash, markThreadRead, myHash,
     newMatchCount, markMatchesSeen,
     doSignOut,
+    invitedByHash,
   };
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;
