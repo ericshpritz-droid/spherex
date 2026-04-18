@@ -6,6 +6,7 @@ import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
 import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
 import { loadLastMessagesServer } from "./messages.functions";
 import { consumeInviteServer } from "./invites.functions";
+import { testmodeListPhones } from "./testmode/testmode.functions";
 import { useServerFn } from "@tanstack/react-start";
 
 type Accent = "pink" | "lavender" | "blue";
@@ -133,6 +134,34 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => { cancelled = true; };
   }, [session]);
 
+  // ---- Test-mode hash cache hydration -----------------------------------
+  // Test PIN accounts never went through the contacts/add flow with real
+  // phone numbers, so seeded mutuals would otherwise show as "Hidden
+  // contact". Pull every registered test phone, hash them, and prime this
+  // device's local cache. Runs once per signed-in test user.
+  const listTestPhones = useServerFn(testmodeListPhones);
+  useEffect(() => {
+    if (!session || !user) return;
+    const isTest = !!(user.user_metadata as any)?.test_pin;
+    if (!isTest) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res: any = await listTestPhones({ data: undefined as any });
+        const phones: string[] = res?.phones || [];
+        if (cancelled || phones.length === 0) return;
+        const hashes = await callHashPhones(phones);
+        const map = hashCacheRef.current;
+        phones.forEach((p, i) => { if (hashes[i]) map.set(hashes[i], p); });
+        saveHashCache(user.id, map);
+        // Re-render rows that previously rendered as "Hidden contact".
+        refreshRef.current?.();
+      } catch (e) {
+        console.warn("test-mode hash hydration failed", e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [session, user, listTestPhones]);
   const refresh = useCallback(async () => {
     if (!myPhone) return;
     setDataLoading(true);

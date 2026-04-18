@@ -121,3 +121,19 @@ export const testmodeLogin = createServerFn({ method: "POST" })
       refresh_token: session.session.refresh_token,
     };
   });
+
+/**
+ * Returns the synthetic E.164 phones for every registered test PIN.
+ * Test users use this to hydrate their local hash cache so seeded mutuals
+ * show up as readable numbers (e.g. "+1 (999) 000-2222") instead of
+ * "Hidden contact". Only works while test mode is enabled.
+ */
+export const testmodeListPhones = createServerFn({ method: "POST" })
+  .handler(async () => {
+    await ensureTestModeEnabled();
+    const { data, error } = await supabaseAdmin
+      .from("test_accounts")
+      .select("pin");
+    if (error) throw new Error("Could not list test accounts");
+    return { phones: (data || []).map((r) => synthPhone(r.pin as string)) };
+  });
