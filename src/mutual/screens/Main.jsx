@@ -241,11 +241,27 @@ export function ScreenContacts({ accent, onBack, onPick }) {
     onPick(phones);
   };
 
-  const manualDigits = manualPhone.replace(/\D/g, '');
-  const manualValid = manualDigits.length >= 10;
+  // Manual entry: store only digits. Strip a leading "1" (US country code) and cap at 10.
+  const normalizeManual = (raw) => {
+    let d = String(raw).replace(/\D/g, '');
+    if (d.length === 11 && d.startsWith('1')) d = d.slice(1);
+    return d.slice(0, 10);
+  };
+  const manualDigits = manualPhone; // already normalized in onChange
+  const manualValid = manualDigits.length === 10;
+  const manualError =
+    manualDigits.length === 0
+      ? ''
+      : manualDigits.length < 10
+        ? `${10 - manualDigits.length} more digit${10 - manualDigits.length === 1 ? '' : 's'}`
+        : !/^[2-9]/.test(manualDigits)
+          ? 'US numbers can\u2019t start with 0 or 1'
+          : '';
   const submitManual = () => {
-    if (!manualValid) return;
+    if (!manualValid || manualError) return;
     onPick([manualDigits]);
+    setManualPhone('');
+    setManualName('');
   };
 
   return (
@@ -284,22 +300,33 @@ export function ScreenContacts({ accent, onBack, onPick }) {
           <div className="rounded-[14px] bg-glass-06 border border-hairline-08 mb-3" style={{ padding: 12 }}>
             <input
               value={manualName}
-              onChange={e => setManualName(e.target.value)}
+              onChange={e => setManualName(e.target.value.slice(0, 80))}
               placeholder="Name (optional)"
+              maxLength={80}
               className="w-full bg-transparent border-0 outline-none text-white text-[15px] mb-2"
               style={{ padding: '6px 4px' }}
             />
-            <input
-              value={manualPhone}
-              onChange={e => setManualPhone(e.target.value)}
-              placeholder="Phone number"
-              inputMode="tel"
-              className="w-full bg-transparent border-0 outline-none text-white text-[15px]"
+            <div
+              className="flex items-center gap-2.5"
               style={{ padding: '6px 4px', borderTop: '1px solid rgba(255,255,255,0.08)' }}
-            />
+            >
+              <span className="text-[15px] font-semibold text-fg-60 select-none">🇺🇸 +1</span>
+              <span className="w-px h-5 bg-hairline-12"/>
+              <input
+                value={formatPhone(manualDigits)}
+                onChange={e => setManualPhone(normalizeManual(e.target.value))}
+                placeholder="(555) 123-4567"
+                inputMode="tel"
+                autoComplete="tel-national"
+                className="flex-1 bg-transparent border-0 outline-none text-white text-[15px]"
+              />
+            </div>
+            {manualError && (
+              <div className="mt-2 text-[12px] text-fg-50 px-1">{manualError}</div>
+            )}
             <div className="mt-3">
-              <Button accent={accent} disabled={!manualValid} onClick={submitManual}>
-                {manualValid ? 'Add them' : 'Enter 10+ digits'}
+              <Button accent={accent} disabled={!manualValid || !!manualError} onClick={submitManual}>
+                {manualValid && !manualError ? 'Add them' : 'Enter a 10-digit US number'}
               </Button>
             </div>
           </div>
