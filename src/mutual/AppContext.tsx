@@ -1,5 +1,6 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 import { useSession, formatE164, sendOtp, verifyOtp, signOut, toE164 } from "./auth";
 import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
 
@@ -93,6 +94,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (session) refresh();
   }, [session, refresh]);
+
+  // Realtime: when someone adds *me* (added_phone === myPhone), a new mutual
+  // may have just been created. Re-fetch matches/pending so the home screen
+  // updates live without a manual refresh.
+  const refreshRef = useRef(refresh);
+  useEffect(() => { refreshRef.current = refresh; }, [refresh]);
+  useEffect(() => {
+    if (!session || !myPhone) return;
+    const channel = supabase
+      .channel(`adds-for-${myPhone}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "adds",
+          filter: `added_phone=eq.${myPhone}`,
+        },
+        () => { refreshRef.current(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [session, myPhone]);
 
   const startOtp = useCallback(async (digits: string) => {
     const e164 = toE164(digits);
