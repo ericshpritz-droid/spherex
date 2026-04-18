@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { BRAND, ACCENT_PRESETS, formatPhone } from '../brand.js';
+import { ACCENT_PRESETS, formatPhone } from '../brand.js';
 import { Button } from '../components/Button.jsx';
 import { LinkedRings, Aura, NumPad } from '../components/index.jsx';
 
 export function ScreenWelcome({ accent, onNext }) {
   return (
-    <div style={{ position: 'relative', height: '100%', color: '#fff', overflow: 'hidden', background: BRAND.ink }}>
+    <div className="relative h-full overflow-hidden bg-ink text-white">
       <Aura accent={accent} intensity={1.1}/>
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '120px 32px 56px' }}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 40 }}>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div className="relative z-[1] h-full flex flex-col" style={{ padding: '120px 32px 56px' }}>
+        <div className="flex-1 flex flex-col justify-center gap-10">
+          <div className="flex justify-center">
             <LinkedRings size={140} accent={accent} spin/>
           </div>
           <div>
-            <div style={{ fontFamily: 'Sora, system-ui', fontWeight: 800, fontSize: 56, lineHeight: 0.95, letterSpacing: -2.5, textAlign: 'center' }}>
+            <div className="font-extrabold text-center tracking-sora-mega" style={{ fontSize: 56, lineHeight: 0.95 }}>
               Only if<br/>they pick<br/>you back.
             </div>
-            <div style={{ marginTop: 20, textAlign: 'center', fontFamily: 'Sora, system-ui', fontSize: 17, color: 'rgba(255,255,255,0.7)', lineHeight: 1.45, letterSpacing: -0.2 }}>
+            <div className="mt-5 text-center text-[17px] text-fg-70 tracking-sora-tight" style={{ lineHeight: 1.45 }}>
               Add a number. If they add yours too,<br/>it's mutual. No DMs. No maybe.
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="flex flex-col gap-3">
           <Button accent={accent} onClick={onNext}>Enter your number →</Button>
-          <div style={{ textAlign: 'center', fontFamily: 'Sora, system-ui', fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
+          <div className="text-center text-[13px] text-fg-45">
             By continuing you agree to the things.
           </div>
         </div>
@@ -47,30 +47,33 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
   };
 
   return (
-    <div style={{ position: 'relative', height: '100%', color: '#fff', overflow: 'hidden', background: BRAND.ink }}>
+    <div className="relative h-full overflow-hidden bg-ink text-white">
       <Aura accent={accent} intensity={0.7}/>
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '72px 28px 40px' }}>
-        <button onClick={onBack} style={{ width: 44, height: 44, borderRadius: 22, border: 'none', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 20, cursor: 'pointer', marginBottom: 24 }}>←</button>
-        <div style={{ fontFamily: 'Sora, system-ui', fontWeight: 700, fontSize: 34, lineHeight: 1.05, letterSpacing: -1.2 }}>What's your<br/>number?</div>
-        <div style={{ marginTop: 12, fontFamily: 'Sora, system-ui', fontSize: 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.45 }}>
+      <div className="relative z-[1] h-full flex flex-col" style={{ padding: '72px 28px 40px' }}>
+        <button
+          onClick={onBack}
+          className="w-11 h-11 rounded-full border-0 bg-glass-08 text-white text-xl cursor-pointer mb-6"
+        >←</button>
+        <div className="font-bold tracking-sora-display" style={{ fontSize: 34, lineHeight: 1.05 }}>What's your<br/>number?</div>
+        <div className="mt-3 text-[15px] text-fg-60" style={{ lineHeight: 1.45 }}>
           We'll send a 6-digit code. Your number is never shown publicly.
         </div>
-        <div style={{ marginTop: 40 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '18px 20px', borderRadius: 18, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
-            <div style={{ fontFamily: 'Sora, system-ui', fontWeight: 600, fontSize: 22, color: 'rgba(255,255,255,0.5)' }}>🇺🇸 +1</div>
-            <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.12)' }}/>
-            <div style={{ flex: 1, fontFamily: 'Sora, system-ui', fontWeight: 600, fontSize: 24, color: '#fff', letterSpacing: -0.6 }}>
-              {formatted || <span style={{ color: 'rgba(255,255,255,0.3)' }}>(555) 123-4567</span>}
+        <div className="mt-10">
+          <div className="flex items-center gap-3 rounded-[18px] bg-glass-06 border border-hairline-12" style={{ padding: '18px 20px' }}>
+            <div className="font-semibold text-[22px] text-fg-50">🇺🇸 +1</div>
+            <div className="w-px h-6 bg-hairline-12"/>
+            <div className="flex-1 font-semibold text-2xl text-white" style={{ letterSpacing: -0.6 }}>
+              {formatted || <span className="text-fg-30">(555) 123-4567</span>}
             </div>
           </div>
-          {err && <div style={{ marginTop: 12, fontSize: 13, color: '#ff8f8f', lineHeight: 1.4 }}>{err}</div>}
+          {err && <div className="mt-3 text-[13px] text-error" style={{ lineHeight: 1.4 }}>{err}</div>}
         </div>
-        <div style={{ flex: 1 }}/>
+        <div className="flex-1"/>
         <NumPad onKey={(k) => {
           if (k === 'del') setDigits(d => d.slice(0, -1));
           else if (digits.length < 10) setDigits(d => d + k);
         }}/>
-        <div style={{ marginTop: 20 }}>
+        <div className="mt-5">
           <Button accent={accent} disabled={!valid || busy} onClick={submit}>{busy ? 'Sending…' : 'Send code'}</Button>
         </div>
       </div>
@@ -93,32 +96,37 @@ export function ScreenCode({ accent, phoneFormatted, onVerify, onBack }) {
   }, [code, busy, onVerify]);
 
   return (
-    <div style={{ position: 'relative', height: '100%', color: '#fff', overflow: 'hidden', background: BRAND.ink }}>
+    <div className="relative h-full overflow-hidden bg-ink text-white">
       <Aura accent={accent} intensity={0.7}/>
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '72px 28px 40px' }}>
-        <button onClick={onBack} style={{ width: 44, height: 44, borderRadius: 22, border: 'none', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: 20, cursor: 'pointer', marginBottom: 24 }}>←</button>
-        <div style={{ fontFamily: 'Sora, system-ui', fontWeight: 700, fontSize: 34, lineHeight: 1.05, letterSpacing: -1.2 }}>Check your<br/>texts.</div>
-        <div style={{ marginTop: 12, fontFamily: 'Sora, system-ui', fontSize: 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.45 }}>
-          Six digits coming to <span style={{ color: '#fff' }}>{phoneFormatted}</span>.
+      <div className="relative z-[1] h-full flex flex-col" style={{ padding: '72px 28px 40px' }}>
+        <button
+          onClick={onBack}
+          className="w-11 h-11 rounded-full border-0 bg-glass-08 text-white text-xl cursor-pointer mb-6"
+        >←</button>
+        <div className="font-bold tracking-sora-display" style={{ fontSize: 34, lineHeight: 1.05 }}>Check your<br/>texts.</div>
+        <div className="mt-3 text-[15px] text-fg-60" style={{ lineHeight: 1.45 }}>
+          Six digits coming to <span className="text-white">{phoneFormatted}</span>.
         </div>
-        <div style={{ marginTop: 40, display: 'flex', gap: 10, justifyContent: 'space-between' }}>
+        <div className="mt-10 flex gap-2.5 justify-between">
           {[0,1,2,3,4,5].map(i => {
             const d = code[i]; const active = i === code.length;
             return (
-              <div key={i} style={{
-                flex: 1, aspectRatio: '1 / 1.15', borderRadius: 14,
-                background: 'rgba(255,255,255,0.06)',
-                border: `1.5px solid ${active ? ACCENT_PRESETS[accent].a : 'rgba(255,255,255,0.12)'}`,
-                boxShadow: active ? `0 0 0 4px ${ACCENT_PRESETS[accent].a}22` : undefined,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: 'Sora, system-ui', fontWeight: 700, fontSize: 28, color: '#fff',
-              }}>{d}</div>
+              <div
+                key={i}
+                className="flex-1 rounded-[14px] bg-glass-06 flex items-center justify-center font-bold text-white"
+                style={{
+                  aspectRatio: '1 / 1.15',
+                  border: `1.5px solid ${active ? ACCENT_PRESETS[accent].a : 'rgba(255,255,255,0.12)'}`,
+                  boxShadow: active ? `0 0 0 4px ${ACCENT_PRESETS[accent].a}22` : undefined,
+                  fontSize: 28,
+                }}
+              >{d}</div>
             );
           })}
         </div>
-        {err && <div style={{ marginTop: 16, textAlign: 'center', fontSize: 13, color: '#ff8f8f' }}>{err}</div>}
-        {busy && <div style={{ marginTop: 16, textAlign: 'center', fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>Verifying…</div>}
-        <div style={{ flex: 1 }}/>
+        {err && <div className="mt-4 text-center text-[13px] text-error">{err}</div>}
+        {busy && <div className="mt-4 text-center text-sm text-fg-60">Verifying…</div>}
+        <div className="flex-1"/>
         <NumPad onKey={(k) => {
           if (busy) return;
           if (k === 'del') setCode(c => c.slice(0, -1));
