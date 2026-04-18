@@ -1,9 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "../mutual/toast";
 import { ScreenProfile } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
 import { ShareInviteButton } from "../mutual/components/ShareInviteButton";
+import { getInviteConversionsServer } from "../mutual/invites.functions";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
@@ -15,11 +18,36 @@ export const Route = createFileRoute("/_app/profile")({
   component: ProfileRoute,
 });
 
+function relativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  const diff = Math.max(0, Date.now() - then);
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d ago`;
+  const w = Math.floor(d / 7);
+  return `${w}w ago`;
+}
+
 function ProfileRoute() {
-  const { accent, setAccent, myPhoneFormatted, doSignOut, user } = useApp();
+  const { accent, setAccent, myPhoneFormatted, doSignOut, user, session } = useApp();
   const navigate = useNavigate();
   const isAdmin = useIsAdmin(user?.id);
   const testPin: string | undefined = user?.user_metadata?.test_pin;
+
+  const fetchConversions = useServerFn(getInviteConversionsServer);
+  const [invites, setInvites] = useState<{ count: number; lastAt: string | null }>({ count: 0, lastAt: null });
+  useEffect(() => {
+    if (!session) return;
+    let cancelled = false;
+    fetchConversions({ data: undefined as any })
+      .then((res: any) => { if (!cancelled) setInvites({ count: res.count ?? 0, lastAt: res.lastAt ?? null }); })
+      .catch((e) => console.warn("getInviteConversions failed", e));
+    return () => { cancelled = true; };
+  }, [session, fetchConversions]);
   return (
     <div className="relative h-full">
       <ScreenProfile
