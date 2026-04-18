@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_app/home")({
 const MIN_HIDDEN_MS = 10_000;
 
 function HomeRoute() {
-  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash } = useApp();
+  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash, markMatchesSeen } = useApp();
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
 
