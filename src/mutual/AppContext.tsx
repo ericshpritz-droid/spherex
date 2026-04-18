@@ -3,7 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession, formatE164, sendOtp, verifyOtp, signOut, toE164 } from "./auth";
 import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
-import { callGetMyPhoneHash, callHashPhones } from "./dataApi.client";
+import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
 
 type Accent = "pink" | "lavender" | "blue";
 

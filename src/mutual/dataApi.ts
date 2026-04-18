@@ -1,5 +1,5 @@
 import { toE164, formatE164 } from "./auth";
-import { callAddPhones, callLoadAddsAndMatches } from "./dataApi.client";
+import { callAddPhones, callLoadAddsAndMatches } from "./dataApi.rpc";
 
 export type Person = {
   phone: string; // formatted "(555) 123-4567"
