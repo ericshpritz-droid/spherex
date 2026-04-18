@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useLocation, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { AppProvider, useApp } from "../mutual/AppContext";
 import { TabBar } from "../mutual/components/index.jsx";
 
