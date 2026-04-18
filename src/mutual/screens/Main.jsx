@@ -6,6 +6,20 @@ import { LinkedRings, Aura, NumPad, Wordmark } from '../components/index.jsx';
 import { Spinner } from '../components/Spinner.jsx';
 import { CONTACTS } from '../data.js';
 
+// Compact relative time for last-message timestamps on match cards.
+function messageAgo(iso) {
+  if (!iso) return '';
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 45_000) return 'just now';
+  const m = Math.floor(diff / 60_000);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(diff / 3_600_000);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(diff / 86_400_000);
+  if (d < 7) return `${d}d`;
+  return `${Math.floor(d / 7)}w`;
+}
+
 // ── Home header
 function HomeHeader({ accent, matchCount }) {
   return (
@@ -268,34 +282,42 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loadi
                 <div className="font-bold tracking-sora-tighter relative" style={{ fontSize: 20 }}>{m.name}</div>
                 <div className="text-sm text-fg-75 relative">{m.phone}</div>
                 {last && (
-                  <div className="relative flex items-center gap-2 mt-3" style={{ minHeight: 24 }}>
-                    <div
-                      className="rounded-full flex items-center"
-                      style={{
-                        padding: '4px 10px', fontSize: 16, lineHeight: 1,
-                        background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)',
-                        maxWidth: '85%',
-                      }}
-                      title={fromMe ? 'You sent' : 'They sent'}
-                    >
-                      <span style={{ fontSize: 11, opacity: 0.85, marginRight: 6, fontWeight: 600 }}>
-                        {fromMe ? 'You' : '→'}
-                      </span>
-                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {last.body}
-                      </span>
-                    </div>
-                    {unread && (
-                      <span
-                        aria-label="New message"
-                        className="rounded-full"
+                  <div className="relative mt-3">
+                    <div className="flex items-center gap-2" style={{ minHeight: 24 }}>
+                      <div
+                        className="rounded-full flex items-center"
                         style={{
-                          width: 10, height: 10, background: '#ffffff',
-                          boxShadow: '0 0 0 2px rgba(0,0,0,0.18)',
-                          animation: 'mutualPulse 1.8s ease-in-out infinite',
+                          padding: '4px 10px', fontSize: 16, lineHeight: 1,
+                          background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)',
+                          maxWidth: '85%',
                         }}
-                      />
-                    )}
+                        title={fromMe ? 'You sent' : 'They sent'}
+                      >
+                        <span style={{ fontSize: 11, opacity: 0.85, marginRight: 6, fontWeight: 600 }}>
+                          {fromMe ? 'You' : '→'}
+                        </span>
+                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {last.body}
+                        </span>
+                      </div>
+                      {unread && (
+                        <span
+                          aria-label="New message"
+                          className="rounded-full"
+                          style={{
+                            width: 10, height: 10, background: '#ffffff',
+                            boxShadow: '0 0 0 2px rgba(0,0,0,0.18)',
+                            animation: 'mutualPulse 1.8s ease-in-out infinite',
+                          }}
+                        />
+                      )}
+                    </div>
+                    <div
+                      className="text-fg-75"
+                      style={{ fontSize: 11, marginTop: 4, opacity: 0.85, letterSpacing: 0.1 }}
+                    >
+                      · {messageAgo(last.created_at)}
+                    </div>
                   </div>
                 )}
               </div>
