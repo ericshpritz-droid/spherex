@@ -180,43 +180,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [pendingPhone]);
 
-  // After a successful add, remember the hash → raw mapping locally so we
-  // can render the contact's number when (if) they become a mutual.
+  // After a successful add, ask the server to compute hashes for the just-
+  // uploaded raw phones (using its pepper) and remember the mapping locally.
+  // This is the *only* place a raw phone is associated with its hash, and
+  // it lives only in this device's localStorage — never on the server.
   const rememberLocally = useCallback(async (e164s: string[]) => {
     if (e164s.length === 0) return;
-    // Compute hashes by asking the server for a single round-trip per add
-    // is wasteful — instead, we mirror the server's algorithm using a tiny
-    // client-side hash that DOES NOT need the pepper: we use the server's
-    // *result* for matches by listening to refresh(), but for the local
-    // map we just store every raw phone we've ever uploaded indexed by
-    // the same hash the server will return. To keep client free of the
-    // pepper, we lazily backfill: when the matches view returns a hash
-    // that matches one of our uploads' future hashes we'd miss it.
-    //
-    // Simpler approach: stash raw phones in a local "uploaded" list and
-    // populate the hashCache after each refresh by asking the server to
-    // hash them. We avoid extra calls by computing client-side using
-    // SubtleCrypto + an "obfuscation only" prefix — but that wouldn't
-    // match the server hash.
-    //
-    // Final approach: store the raw phones in localStorage keyed by the
-    // *plain* sha256 of the phone (no pepper) AND ask the server, after
-    // each add, for the corresponding peppered hashes via a small RPC.
-    // This is the simplest correct option.
     try {
-      const headers = (await import("./dataApi.client")).
-        // re-use bearerHeaders via a tiny inline call
-        // (kept here to avoid a circular import at module top-level)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        callAddPhones as any; // satisfy the bundler
-      void headers;
-    } catch {}
-    // Fetch hashes for the just-uploaded raw phones via a dedicated RPC.
-    const { hashUploadedPhones } = await import("./dataApi.client.extras");
-    const hashes = await hashUploadedPhones(e164s);
-    const map = hashCacheRef.current;
-    e164s.forEach((p, i) => { if (hashes[i]) map.set(hashes[i], p); });
-    saveHashCache(user?.id, map);
+      const hashes = await callHashPhones(e164s);
+      const map = hashCacheRef.current;
+      e164s.forEach((p, i) => { if (hashes[i]) map.set(hashes[i], p); });
+      saveHashCache(user?.id, map);
+    } catch (e) {
+      console.warn("hashPhones failed (matches may show as 'Hidden contact')", e);
+    }
   }, [user?.id]);
 
   const addOne = useCallback(async (digits: string) => {
