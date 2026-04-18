@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { ScreenThread } from "../mutual/screens/ScreenThread";
 import { useApp } from "../mutual/AppContext";
 
@@ -14,8 +15,14 @@ export const Route = createFileRoute("/_app/thread/$hash")({
 
 function ThreadRoute() {
   const { hash } = Route.useParams();
-  const { accent, matches } = useApp();
+  const { accent, matches, markThreadRead, lastByHash } = useApp();
   const navigate = useNavigate();
+
+  // Mark thread as read whenever the latest message timestamp changes.
+  const lastTs = lastByHash[hash]?.created_at;
+  useEffect(() => {
+    if (hash) markThreadRead(hash);
+  }, [hash, lastTs, markThreadRead]);
 
   const match = matches.find((m) => m.id === hash);
   if (!match) {
