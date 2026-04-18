@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { ScreenAdd } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
 
@@ -27,7 +28,7 @@ function AddRoute() {
           await addOne(digits);
           navigate({ to: "/sent" });
         } catch (e: any) {
-          alert(e?.message || "Could not add number");
+          toast.error(e?.message || "Could not add number");
         }
       }}
     />

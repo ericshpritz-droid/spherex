@@ -46,7 +46,53 @@ function PendingRow({ person, accent }) {
   );
 }
 
-export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, variant = 'cards' }) {
+function Spinner({ accent = 'pink', size = 36 }) {
+  const c = ACCENT_PRESETS[accent]?.a || '#F13F5E';
+  return (
+    <div
+      role="status"
+      aria-label="Loading"
+      style={{
+        width: size, height: size,
+        borderRadius: '50%',
+        border: `3px solid rgba(255,255,255,0.12)`,
+        borderTopColor: c,
+        animation: 'mutualSpin 0.9s linear infinite',
+      }}
+    />
+  );
+}
+
+export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, loading = false, error = null, onRetry, variant = 'cards' }) {
+  if (loading) {
+    return (
+      <div className="h-full bg-ink text-white relative overflow-hidden">
+        <Aura accent={accent} intensity={0.5}/>
+        <div className="relative z-[1] h-full flex flex-col items-center justify-center gap-4">
+          <Spinner accent={accent} size={44}/>
+          <div className="text-sm text-fg-60">Loading your mutuals…</div>
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="h-full bg-ink text-white relative overflow-auto pb-[120px]">
+        <Aura accent={accent} intensity={0.5}/>
+        <div className="relative z-[1]">
+          <HomeHeader accent={accent} matchCount={0}/>
+          <div className="rounded-[28px] bg-glass-04 text-center" style={{ margin: '40px 24px', padding: 28, border: '1px solid rgba(241,63,94,0.25)' }}>
+            <div className="text-[28px] mb-2">⚠️</div>
+            <div className="font-bold text-[18px]">Couldn't load your mutuals</div>
+            <div className="mt-2 text-sm text-fg-60" style={{ lineHeight: 1.4 }}>{error}</div>
+            {onRetry && (
+              <div className="mt-5"><Button accent={accent} onClick={onRetry} full={false}>Try again</Button></div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (matches.length === 0 && pending.length === 0) {
     return (
       <div className="h-full bg-ink text-white relative overflow-auto pb-[120px]">

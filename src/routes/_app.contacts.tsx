@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { ScreenContacts } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
 
@@ -26,7 +27,7 @@ function ContactsRoute() {
           await addMany(phones);
           navigate({ to: "/sent" });
         } catch (e: any) {
-          alert(e?.message || "Could not add contacts");
+          toast.error(e?.message || "Could not add contacts");
         }
       }}
     />
