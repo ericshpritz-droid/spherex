@@ -16,29 +16,23 @@ export type Database = {
     Tables: {
       adds: {
         Row: {
-          added_phone: string
-          added_phone_hash: string | null
+          added_phone_hash: string
           adder_id: string
-          adder_phone: string
-          adder_phone_hash: string | null
+          adder_phone_hash: string
           created_at: string
           id: string
         }
         Insert: {
-          added_phone: string
-          added_phone_hash?: string | null
+          added_phone_hash: string
           adder_id: string
-          adder_phone: string
-          adder_phone_hash?: string | null
+          adder_phone_hash: string
           created_at?: string
           id?: string
         }
         Update: {
-          added_phone?: string
-          added_phone_hash?: string | null
+          added_phone_hash?: string
           adder_id?: string
-          adder_phone?: string
-          adder_phone_hash?: string | null
+          adder_phone_hash?: string
           created_at?: string
           id?: string
         }
