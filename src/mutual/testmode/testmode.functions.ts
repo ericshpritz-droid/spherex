@@ -43,6 +43,27 @@ export const testmodePinStatus = createServerFn({ method: "POST" })
   });
 
 /**
+ * Resolve a 4-digit test PIN to that test account's synthetic E.164 phone
+ * (so test users can add each other by PIN instead of full phone number).
+ * Errors if test mode is off or the PIN isn't registered yet.
+ */
+export const testmodeResolvePin = createServerFn({ method: "POST" })
+  .inputValidator((input: { pin: string }) => {
+    if (!validPin(input.pin)) throw new Error("PIN must be 4 digits");
+    return input;
+  })
+  .handler(async ({ data }) => {
+    await ensureTestModeEnabled();
+    const { data: row } = await supabaseAdmin
+      .from("test_accounts")
+      .select("pin")
+      .eq("pin", data.pin)
+      .maybeSingle();
+    if (!row) throw new Error("No test account with that PIN yet");
+    return { e164: synthPhone(data.pin) };
+  });
+
+/**
  * Sign up (first time) or sign in (returning) with a 4-digit PIN + 6-digit code.
  * Returns a session that the client sets via supabase.auth.setSession().
  */
