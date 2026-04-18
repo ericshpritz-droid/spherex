@@ -349,14 +349,11 @@ export function ScreenProfile({ accent, onAccent, phone, onSignOut }) {
           </div>
         </Section>
         <Section title="Privacy">
-          <Row label="Your number" value="(555) 123-4567"/>
-          <Row label="Visible to" value="No one"/>
-          <Row label="Block list" value="0 numbers" last/>
+          <Row label="Your number" value={displayPhone}/>
+          <Row label="Visible to" value="No one" last/>
         </Section>
-        <Section title="About">
-          <Row label="How Mutual works" value="→" onClick={() => {}}/>
-          <Row label="Privacy policy" value="→" onClick={() => {}}/>
-          <Row label="Delete account" value="" last onClick={() => {}}/>
+        <Section title="Account">
+          <Row label="Sign out" value="→" last danger onClick={onSignOut}/>
         </Section>
       </div>
     </div>
