@@ -19,7 +19,7 @@ function AppLayout() {
 }
 
 function PhoneFrame() {
-  const { session, sessionLoading, accent, unreadByHash } = useApp();
+  const { session, sessionLoading, accent, unreadByHash, newMatchCount } = useApp();
   const unreadCount = Object.values(unreadByHash).filter(Boolean).length;
   const location = useLocation();
   const navigate = useNavigate();
@@ -69,7 +69,7 @@ function PhoneFrame() {
         ) : (
           <Outlet />
         )}
-        {tabPath && <TabBar tab={tabPath} setTab={goTab} accent={accent} homeBadge={unreadCount}/>}
+        {tabPath && <TabBar tab={tabPath} setTab={goTab} accent={accent} homeBadge={unreadCount} homeDot={newMatchCount > 0}/>}
       </div>
     </div>
   );

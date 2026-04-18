@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_app/home")({
 const MIN_HIDDEN_MS = 10_000;
 
 function HomeRoute() {
-  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash } = useApp();
+  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash, markMatchesSeen } = useApp();
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
 
@@ -71,6 +71,13 @@ function HomeRoute() {
     if (isNew) celebrateMutual(accent);
     knownIdsRef.current = ids;
   }, [matches, dataLoading, accent]);
+
+  // Once /home has been viewed with the latest matches loaded, clear the
+  // "new mutuals" dot on the bottom-nav tab.
+  useEffect(() => {
+    if (dataLoading) return;
+    markMatchesSeen();
+  }, [matches, dataLoading, markMatchesSeen]);
 
   // Auto-refresh on tab visibility return
   const hiddenSince = useRef<number | null>(null);
