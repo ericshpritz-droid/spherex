@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { AppProvider, useApp } from "../mutual/AppContext";
 import { TabBar, Wordmark } from "../mutual/components/index.jsx";
+import { Spinner } from "../mutual/components/Spinner.jsx";
 
 const PUBLIC_PATHS = new Set(["/welcome", "/phone", "/code"]);
 
@@ -58,7 +59,10 @@ function PhoneFrame() {
         }}
       >
         {sessionLoading ? (
-          <div className="h-full flex items-center justify-center text-white bg-ink">Loading…</div>
+          <div className="h-full flex flex-col items-center justify-center gap-3 text-white bg-ink">
+            <Spinner accent={accent} size={36}/>
+            <div className="text-sm text-fg-60">Loading…</div>
+          </div>
         ) : (
           <Outlet />
         )}

@@ -3,6 +3,7 @@ import { ACCENT_PRESETS, formatPhone, gradient } from '../brand.js';
 import { Button } from '../components/Button.jsx';
 import { PhoneAvatar } from '../components/PhoneAvatar.jsx';
 import { LinkedRings, Aura, NumPad, Wordmark } from '../components/index.jsx';
+import { Spinner } from '../components/Spinner.jsx';
 import { CONTACTS } from '../data.js';
 
 // ── Home header
@@ -43,23 +44,6 @@ function PendingRow({ person, accent }) {
       </div>
       <div className="text-lg text-fg-30">⋯</div>
     </div>
-  );
-}
-
-function Spinner({ accent = 'pink', size = 36 }) {
-  const c = ACCENT_PRESETS[accent]?.a || '#F13F5E';
-  return (
-    <div
-      role="status"
-      aria-label="Loading"
-      style={{
-        width: size, height: size,
-        borderRadius: '50%',
-        border: `3px solid rgba(255,255,255,0.12)`,
-        borderTopColor: c,
-        animation: 'mutualSpin 0.9s linear infinite',
-      }}
-    />
   );
 }
 
