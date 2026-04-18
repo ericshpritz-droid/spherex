@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/rea
 import { AppProvider, useApp } from "../mutual/AppContext";
 import { TabBar, Wordmark } from "../mutual/components/index.jsx";
 import { Spinner } from "../mutual/components/Spinner.jsx";
+import { TestModeBanner } from "../mutual/testmode/TestModeBanner";
 
 const PUBLIC_PATHS = new Set(["/welcome", "/phone", "/code"]);
 
@@ -49,6 +50,7 @@ function PhoneFrame() {
 
   return (
     <div className="min-h-screen bg-frame flex justify-center items-center" style={{ padding: "20px 0" }}>
+      <TestModeBanner />
       <div
         className="overflow-hidden relative bg-black"
         style={{
