@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { ScreenHome } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
@@ -39,6 +39,16 @@ function HomeRoute() {
   const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash, markMatchesSeen } = useApp();
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
+
+  // 30s ticker so relative-time labels ("2m", "1h") stay fresh without a refetch.
+  const [, setNowTick] = useState(0);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") setNowTick((n) => n + 1);
+    }, 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   // Sort: unread threads first, then by most-recent message activity,
   // falling back to existing order for matches with no messages yet.
