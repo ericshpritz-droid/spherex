@@ -92,6 +92,8 @@ export function TabBar({ tab, setTab, accent, homeBadge = 0, homeDot = false }) 
       {tabs.map(t => {
         const active = tab === t.id;
         const showBadge = t.id === 'home' && homeBadge > 0;
+        // Tiny dot for brand-new mutuals — only when no number badge is showing.
+        const showDot = t.id === 'home' && homeDot && !showBadge;
         return (
           <button
             key={t.id}
@@ -102,7 +104,11 @@ export function TabBar({ tab, setTab, accent, homeBadge = 0, homeDot = false }) 
               letterSpacing: -0.1,
               boxShadow: active ? `0 6px 16px ${p.a}55` : 'none',
             }}
-            aria-label={showBadge ? `${t.label} (${homeBadge} unread)` : t.label}
+            aria-label={
+              showBadge ? `${t.label} (${homeBadge} unread)` :
+              showDot ? `${t.label} (new mutual)` :
+              t.label
+            }
           >
             <span className="leading-none" style={{ fontSize: t.id === 'add' ? 22 : 16 }}>{t.icon}</span>
             <span>{t.label}</span>
@@ -119,6 +125,19 @@ export function TabBar({ tab, setTab, accent, homeBadge = 0, homeDot = false }) 
               >
                 {homeBadge > 99 ? '99+' : homeBadge}
               </span>
+            )}
+            {showDot && (
+              <span
+                aria-hidden="true"
+                className="absolute rounded-full"
+                style={{
+                  top: 8, right: 14,
+                  width: 8, height: 8,
+                  background: `linear-gradient(135deg, ${p.a}, ${p.b})`,
+                  boxShadow: '0 0 0 2px rgba(30,18,64,0.85)',
+                  animation: 'mutualPulse 1.8s ease-in-out infinite',
+                }}
+              />
             )}
           </button>
         );
