@@ -73,7 +73,7 @@ export function NumPad({ onKey }) {
   );
 }
 
-export function TabBar({ tab, setTab, accent }) {
+export function TabBar({ tab, setTab, accent, homeBadge = 0 }) {
   const tabs = [
     { id: 'home', label: 'Mutuals', icon: '◉' },
     { id: 'add',  label: 'Add',     icon: '+' },
@@ -91,19 +91,35 @@ export function TabBar({ tab, setTab, accent }) {
     >
       {tabs.map(t => {
         const active = tab === t.id;
+        const showBadge = t.id === 'home' && homeBadge > 0;
         return (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className="flex-1 border-0 cursor-pointer rounded-[26px] text-white text-sm font-semibold flex items-center justify-center gap-1.5"
+            className="flex-1 border-0 cursor-pointer rounded-[26px] text-white text-sm font-semibold flex items-center justify-center gap-1.5 relative"
             style={{
               background: active ? `linear-gradient(135deg, ${p.a} 0%, ${p.b} 50%, ${p.c} 100%)` : 'transparent',
               letterSpacing: -0.1,
               boxShadow: active ? `0 6px 16px ${p.a}55` : 'none',
             }}
+            aria-label={showBadge ? `${t.label} (${homeBadge} unread)` : t.label}
           >
             <span className="leading-none" style={{ fontSize: t.id === 'add' ? 22 : 16 }}>{t.icon}</span>
             <span>{t.label}</span>
+            {showBadge && (
+              <span
+                className="absolute rounded-full flex items-center justify-center font-bold"
+                style={{
+                  top: 4, right: 10,
+                  minWidth: 18, height: 18, padding: '0 5px',
+                  fontSize: 11, lineHeight: 1,
+                  background: '#ffffff', color: '#1a0b3a',
+                  boxShadow: '0 0 0 2px rgba(30,18,64,0.85)',
+                }}
+              >
+                {homeBadge > 99 ? '99+' : homeBadge}
+              </span>
+            )}
           </button>
         );
       })}
