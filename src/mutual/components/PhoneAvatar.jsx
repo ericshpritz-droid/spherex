@@ -1,5 +1,5 @@
 import React from 'react';
-import { ACCENT_PRESETS } from '../lib/brand.js';
+import { ACCENT_PRESETS } from '../brand.js';
 
 export function PhoneAvatar({ phone, size = 44, accent, style = {} }) {
   const hash = String(phone).split('').reduce((a, c) => a + c.charCodeAt(0), 0);

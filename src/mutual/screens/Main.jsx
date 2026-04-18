@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BRAND, ACCENT_PRESETS, formatPhone, gradient } from '../lib/brand.js';
+import { BRAND, ACCENT_PRESETS, formatPhone, gradient } from '../brand.js';
 import { Button } from '../components/Button.jsx';
 import { PhoneAvatar } from '../components/PhoneAvatar.jsx';
 import { LinkedRings, Aura, NumPad, Wordmark } from '../components/index.jsx';
-import { CONTACTS } from '../lib/data.js';
+import { CONTACTS } from '../data.js';
 
 // ── Home header
 function HomeHeader({ accent, matchCount }) {

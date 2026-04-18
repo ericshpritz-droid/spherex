@@ -1,5 +1,5 @@
 import React from 'react';
-import { ACCENT_PRESETS } from '../lib/brand.js';
+import { ACCENT_PRESETS } from '../brand.js';
 
 export function Button({ children, onClick, variant = 'primary', accent = 'pink', disabled, full = true, style = {} }) {
   const p = ACCENT_PRESETS[accent] || ACCENT_PRESETS.pink;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ACCENT_PRESETS } from '../lib/brand.js';
+import { ACCENT_PRESETS } from '../brand.js';
 
 export function LinkedRings({ size = 120, accent = 'pink', spin = false }) {
   const p = ACCENT_PRESETS[accent] || ACCENT_PRESETS.pink;

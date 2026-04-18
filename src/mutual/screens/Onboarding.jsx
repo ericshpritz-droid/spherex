@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BRAND, ACCENT_PRESETS, formatPhone, gradient } from '../lib/brand.js';
+import { BRAND, ACCENT_PRESETS, formatPhone, gradient } from '../brand.js';
 import { Button } from '../components/Button.jsx';
 import { LinkedRings, Aura, NumPad } from '../components/index.jsx';
 
