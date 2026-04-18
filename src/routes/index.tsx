@@ -1,14 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import App from "../mutual/App.jsx";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Mutual — Only if they pick you back." },
-      { name: "description", content: "Add a number. If they add yours, it's mutual. No DMs. No maybe." },
-      { property: "og:title", content: "Mutual — Only if they pick you back." },
-      { property: "og:description", content: "Phone-number-based double-opt-in matching." },
-    ],
-  }),
-  component: App,
+  // Bounce immediately to /welcome — the layout handles auth-aware redirects from there
+  beforeLoad: () => {
+    throw redirect({ to: "/welcome", replace: true });
+  },
+  component: () => null,
 });
