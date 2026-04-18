@@ -40,6 +40,20 @@ function HomeRoute() {
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
 
+  // Sort: unread threads first, then by most-recent message activity,
+  // falling back to existing order for matches with no messages yet.
+  const sortedMatches = [...matches].sort((a: any, b: any) => {
+    const aId = String(a.id);
+    const bId = String(b.id);
+    const aUnread = unreadByHash[aId] ? 1 : 0;
+    const bUnread = unreadByHash[bId] ? 1 : 0;
+    if (aUnread !== bUnread) return bUnread - aUnread;
+    const aTs = lastByHash[aId]?.created_at || "";
+    const bTs = lastByHash[bId]?.created_at || "";
+    if (aTs !== bTs) return aTs < bTs ? 1 : -1;
+    return 0;
+  });
+
   // Track known mutuals to detect newly-arrived ones (via Realtime or refresh)
   const knownIdsRef = useRef<Set<string> | null>(null);
   useEffect(() => {
@@ -80,7 +94,7 @@ function HomeRoute() {
   return (
     <ScreenHome
       accent={accent}
-      matches={matches}
+      matches={sortedMatches}
       pending={pending}
       lastByHash={lastByHash}
       unreadByHash={unreadByHash}
