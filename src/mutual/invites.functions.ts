@@ -72,7 +72,7 @@ export const consumeInviteServer = createServerFn({ method: "POST" })
       console.warn("invite_conversions log failed", e);
     }
 
-    return { applied: true };
+    return { applied: true, inviterHash: data.inviterHash };
   });
 
 // How many fresh users joined via *my* invite link, plus when the most recent
