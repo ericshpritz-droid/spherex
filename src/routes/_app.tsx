@@ -69,7 +69,7 @@ function PhoneFrame() {
         ) : (
           <Outlet />
         )}
-        {tabPath && <TabBar tab={tabPath} setTab={goTab} accent={accent}/>}
+        {tabPath && <TabBar tab={tabPath} setTab={goTab} accent={accent} homeBadge={unreadCount}/>}
       </div>
     </div>
   );
