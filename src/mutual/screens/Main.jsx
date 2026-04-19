@@ -261,7 +261,7 @@ function RefreshingPill({ accent }) {
   );
 }
 
-export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInvite, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '', invitedByHash = '' }) {
+export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInvite, onOpenProfile, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '', invitedByHash = '' }) {
   const { ref: pullRef, pull, refreshing } = usePullToRefresh(onRetry);
   // Only show the background pill when not already pulling-to-refresh
   const showPill = bgRefreshing && !refreshing && pull === 0;
