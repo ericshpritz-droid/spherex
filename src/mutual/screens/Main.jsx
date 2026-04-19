@@ -261,7 +261,7 @@ function RefreshingPill({ accent }) {
   );
 }
 
-export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInvite, onOpenProfile, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '', invitedByHash = '' }) {
+export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInvite, onOpenProfile, loading = false, refreshing: bgRefreshing = false, error = null, onRetry, variant = 'cards', lastByHash = {}, unreadByHash = {}, myHash = '', invitedByHash = '', photoByHash = null }) {
   const { ref: pullRef, pull, refreshing } = usePullToRefresh(onRetry);
   // Only show the background pill when not already pulling-to-refresh
   const showPill = bgRefreshing && !refreshing && pull === 0;
@@ -373,7 +373,7 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInv
 
                   {/* Top row: avatar + name/phone, timestamp pill */}
                   <div className="relative flex items-start gap-4">
-                    <PhoneAvatar phone={m.phone} size={64} accent={m.avatar}/>
+                    <PhoneAvatar phone={m.phone} size={64} accent={m.avatar} photoUrl={photoByHash ? (photoByHash.get?.(String(m.id)) || photoByHash[String(m.id)]) : null}/>
                     <div className="flex-1 min-w-0 pt-0.5">
                       <div className="font-bold tracking-sora-tighter truncate" style={{ fontSize: 22, lineHeight: 1.15 }}>{m.name}</div>
                       <div className="text-[13px] text-white/75 mt-0.5 truncate">{m.phone}</div>

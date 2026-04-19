@@ -6,6 +6,7 @@ import { useApp } from "../mutual/AppContext";
 import { ACCENT_PRESETS } from "../mutual/brand.js";
 import { callGetMyPhoneHash } from "../mutual/dataApi.rpc";
 import { toast } from "../mutual/toast";
+import { useContactPhotos } from "../mutual/native/useContactPhotos";
 
 function celebrateMutual(accent: string) {
   const p = (ACCENT_PRESETS as any)[accent] || ACCENT_PRESETS.pink;
@@ -39,6 +40,7 @@ const MIN_HIDDEN_MS = 10_000;
 
 function HomeRoute() {
   const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash, markMatchesSeen, invitedByHash } = useApp();
+  const photoByHash = useContactPhotos();
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
 
@@ -158,6 +160,7 @@ function HomeRoute() {
       onAdd={() => navigate({ to: "/add" })}
       onInvite={handleInvite}
       onOpenProfile={() => navigate({ to: "/profile" })}
+      photoByHash={photoByHash}
     />
   );
 }
