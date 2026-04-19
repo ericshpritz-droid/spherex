@@ -281,7 +281,7 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInv
       <div className="h-full bg-ink text-white relative overflow-auto pb-[120px]">
         <Aura accent={accent} intensity={0.5}/>
         <div className="relative z-[1]">
-          <HomeHeader accent={accent} matchCount={0}/>
+          <HomeHeader accent={accent} matchCount={0} onOpenProfile={onOpenProfile}/>
           <div className="rounded-[28px] bg-glass-04 text-center" style={{ margin: '40px 24px', padding: 28, border: '1px solid rgba(241,63,94,0.25)' }}>
             <div className="text-[28px] mb-2">⚠️</div>
             <div className="font-bold text-[18px]">Couldn't load your mutuals</div>
@@ -301,7 +301,7 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInv
         <PullIndicator pull={pull} refreshing={refreshing} accent={accent}/>
         {showPill && <RefreshingPill accent={accent}/>}
         <div className="relative z-[1]" style={{ transform: `translateY(${refreshing ? 56 : pull}px)`, transition: pull === 0 && !refreshing ? 'transform 180ms ease' : 'none' }}>
-          <HomeHeader accent={accent} matchCount={0}/>
+          <HomeHeader accent={accent} matchCount={0} onOpenProfile={onOpenProfile}/>
           <div className="rounded-[28px] bg-glass-04 text-center" style={{ margin: '40px 24px', padding: 32, border: '1px dashed rgba(255,255,255,0.12)' }}>
             <div className="flex justify-center mb-5">
               <LinkedRings size={96} accent={accent}/>
