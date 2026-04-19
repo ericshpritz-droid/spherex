@@ -40,7 +40,7 @@ const MIN_HIDDEN_MS = 10_000;
 
 function HomeRoute() {
   const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash, markMatchesSeen, invitedByHash } = useApp();
-  const photoByHash = useContactPhotos();
+  const { photos: photoByHash } = useContactPhotos();
   const navigate = useNavigate();
   const hasData = matches.length > 0 || pending.length > 0;
 
