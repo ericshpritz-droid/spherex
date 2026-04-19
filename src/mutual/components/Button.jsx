@@ -1,7 +1,14 @@
 import React from 'react';
 import { ACCENT_PRESETS } from '../brand.js';
+import { haptics } from '../native/haptics';
 
 export function Button({ children, onClick, variant = 'primary', accent = 'pink', disabled, full = true, style = {} }) {
+  const handleClick = disabled
+    ? undefined
+    : (e) => {
+        haptics.light();
+        onClick?.(e);
+      };
   const p = ACCENT_PRESETS[accent] || ACCENT_PRESETS.pink;
   const baseClass = [
     'h-14 rounded-2xl border-0 font-semibold text-[17px] tracking-sora-tight',
