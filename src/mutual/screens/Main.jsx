@@ -43,12 +43,29 @@ function HomeHeader({ accent, matchCount }) {
 }
 
 function PendingRow({ person, accent, invited = false }) {
+  const [showWhy, setShowWhy] = useState(false);
+  const isHidden = !!person.unknown && !invited;
   return (
-    <div className="rounded-[18px] bg-glass-04 border border-hairline-06 flex items-center gap-3.5" style={{ padding: '14px 16px' }}>
+    <div className="relative rounded-[18px] bg-glass-04 border border-hairline-06 flex items-center gap-3.5" style={{ padding: '14px 16px' }}>
       <PhoneAvatar phone={person.phone} size={44} accent={person.avatar}/>
       <div className="flex-1 min-w-0">
         <div className="text-[15px] font-semibold text-white tracking-sora-tight flex items-center gap-2">
           <span className="truncate">{person.unknown ? person.phone : person.name}</span>
+          {isHidden && (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setShowWhy((v) => !v); }}
+              className="shrink-0 inline-flex items-center justify-center rounded-full text-[10px] font-semibold text-fg-55 hover:text-white cursor-pointer"
+              style={{
+                width: 18, height: 18,
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.14)',
+              }}
+              aria-label="Why is this contact hidden?"
+            >
+              ?
+            </button>
+          )}
           {invited && (
             <span
               className="shrink-0 rounded-full text-[9px] font-semibold uppercase tracking-widest text-white/85"
@@ -72,6 +89,28 @@ function PendingRow({ person, accent, invited = false }) {
         </div>
       </div>
       <div className="text-lg text-fg-30">⋯</div>
+
+      {showWhy && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setShowWhy(false)} />
+          <div
+            role="tooltip"
+            className="absolute left-4 right-4 z-50 rounded-[12px] text-[12px] leading-snug text-white/90"
+            style={{
+              top: 'calc(100% + 6px)',
+              padding: '10px 12px',
+              background: 'rgba(20, 14, 32, 0.96)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              boxShadow: '0 12px 30px -12px rgba(0,0,0,0.6)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+            }}
+          >
+            <div className="font-semibold text-white mb-0.5">Why hidden?</div>
+            For privacy, you only see numbers of people you've added. They'll appear once you both add each other.
+          </div>
+        </>
+      )}
     </div>
   );
 }
