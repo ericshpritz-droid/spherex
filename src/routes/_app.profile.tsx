@@ -67,11 +67,9 @@ function ProfileRoute() {
         return;
       }
       try {
-        // App.openUrl with the iOS settings deep-link bounces the user to the
-        // Sphere entry of the system Settings app, where they can toggle the
-        // Contacts permission.
-        const { App } = await import("@capacitor/app");
-        await App.openUrl({ url: "app-settings:" });
+        // Deep-link to the Sphere entry of the iOS Settings app, where the
+        // user can toggle the Contacts permission.
+        window.location.href = "app-settings:";
       } catch {
         toast.error("Could not open Settings");
       }
