@@ -1,6 +1,5 @@
 import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { AppProvider, useApp } from "../mutual/AppContext";
-import { TabBar } from "../mutual/components/index.jsx";
 import { Spinner } from "../mutual/components/Spinner.jsx";
 import { TestModeBanner } from "../mutual/testmode/TestModeBanner";
 
@@ -20,8 +19,7 @@ function AppLayout() {
 }
 
 function PhoneFrame() {
-  const { session, sessionLoading, accent, unreadByHash, newMatchCount, user, matches, pending, dataLoading } = useApp();
-  const unreadCount = Object.values(unreadByHash).filter(Boolean).length;
+  const { session, sessionLoading, accent, user, matches, pending, dataLoading } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname;
@@ -30,10 +28,8 @@ function PhoneFrame() {
   // Auth-aware redirects (client-side; SSR-safe because we wait for sessionLoading)
   if (!sessionLoading) {
     if (!session && !isPublic && path !== "/") {
-      // Bounce to welcome
       queueMicrotask(() => navigate({ to: "/welcome", replace: true }));
     } else if (session && (isPublic || path === "/")) {
-      // Fresh users with zero activity get the contact-import nudge first.
       const uid = user?.id;
       const onboarded = typeof window !== "undefined" && uid
         ? !!localStorage.getItem(ONBOARDED_KEY(uid))
@@ -43,19 +39,6 @@ function PhoneFrame() {
       queueMicrotask(() => navigate({ to: dest, replace: true }));
     }
   }
-
-  // Tab bar visible on the main 3 sections
-  const tabPath: "home" | "add" | "me" | null =
-    path === "/home" ? "home" :
-    path === "/add" ? "add" :
-    path === "/profile" ? "me" :
-    null;
-
-  const goTab = (t: "home" | "add" | "me") => {
-    if (t === "home") navigate({ to: "/home" });
-    else if (t === "add") navigate({ to: "/add" });
-    else navigate({ to: "/profile" });
-  };
 
   return (
     <div className="min-h-screen bg-frame flex justify-center items-center" style={{ padding: "20px 0" }}>
@@ -77,7 +60,6 @@ function PhoneFrame() {
         ) : (
           <Outlet />
         )}
-        {tabPath && <TabBar tab={tabPath} setTab={goTab} accent={accent} homeBadge={unreadCount} homeDot={newMatchCount > 0}/>}
       </div>
     </div>
   );

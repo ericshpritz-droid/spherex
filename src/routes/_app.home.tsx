@@ -157,6 +157,7 @@ function HomeRoute() {
       }}
       onAdd={() => navigate({ to: "/add" })}
       onInvite={handleInvite}
+      onOpenProfile={() => navigate({ to: "/profile" })}
     />
   );
 }
