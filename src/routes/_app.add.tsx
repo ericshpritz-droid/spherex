@@ -1,10 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "../mutual/toast";
 import { ScreenAdd } from "../mutual/screens/Main.jsx";
 import { useApp } from "../mutual/AppContext";
 import { useTestMode } from "../mutual/testmode/useTestMode";
-import { testmodeResolvePin } from "../mutual/testmode/testmode.functions";
+import { isValidTestPin, synthPhone } from "../mutual/testmode/shared";
 
 export const Route = createFileRoute("/_app/add")({
   head: () => ({
@@ -22,7 +21,6 @@ function AddRoute() {
   const { accent, addOne } = useApp();
   const navigate = useNavigate();
   const { enabled: testModeEnabled } = useTestMode();
-  const resolvePin = useServerFn(testmodeResolvePin);
 
   return (
     <ScreenAdd
@@ -32,11 +30,7 @@ function AddRoute() {
       onBrowseContacts={() => navigate({ to: "/contacts" })}
       onSubmit={async (digits: string) => {
         try {
-          let target = digits;
-          if (testModeEnabled && digits.length === 4) {
-            const { e164 } = await resolvePin({ data: { pin: digits } });
-            target = e164; // synthetic E.164 for that PIN
-          }
+          const target = testModeEnabled && isValidTestPin(digits) ? synthPhone(digits) : digits;
           await addOne(target);
           navigate({ to: "/sent" });
         } catch (e: any) {
