@@ -21,13 +21,28 @@ function messageAgo(iso) {
 }
 
 // ── Home header
-function HomeHeader({ accent, matchCount }) {
+function HomeHeader({ accent, matchCount, onOpenProfile }) {
+  const p = ACCENT_PRESETS[accent] || ACCENT_PRESETS.pink;
   return (
-    <div style={{ padding: '72px 24px 12px' }}>
-      <div className="flex items-center justify-end">
-        <div className="w-10 h-10 rounded-full bg-glass-08 border border-hairline-10 flex items-center justify-center text-lg">🔔</div>
+    <div style={{ padding: '64px 24px 8px' }}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Wordmark size={26} accent={accent} />
+        </div>
+        <button
+          onClick={onOpenProfile}
+          aria-label="Profile"
+          className="w-11 h-11 rounded-full border-0 cursor-pointer flex items-center justify-center text-white font-bold"
+          style={{
+            background: `linear-gradient(135deg, ${p.a} 0%, ${p.b} 100%)`,
+            boxShadow: `0 6px 18px ${p.a}55, inset 0 1px 0 rgba(255,255,255,0.25)`,
+            fontSize: 15,
+          }}
+        >
+          ME
+        </button>
       </div>
-      <div className="mt-7">
+      <div className="mt-6">
         <div className="text-[13px] font-medium text-fg-55 tracking-sora-label uppercase">Your mutuals</div>
         <div
           className="mt-1.5 font-extrabold tracking-sora-giant"
