@@ -5,6 +5,7 @@ import { PhoneAvatar } from '../components/PhoneAvatar.jsx';
 import { LinkedRings, Aura, NumPad, Wordmark } from '../components/index.jsx';
 import { Spinner } from '../components/Spinner.jsx';
 import { CONTACTS } from '../data.js';
+import { haptics } from '../native/haptics';
 
 // Compact relative time for last-message timestamps on match cards.
 function messageAgo(iso) {
@@ -130,14 +131,6 @@ function PendingRow({ person, accent, invited = false }) {
   );
 }
 
-function vibrate(pattern) {
-  try {
-    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-      navigator.vibrate(pattern);
-    }
-  } catch { /* ignore */ }
-}
-
 function usePullToRefresh(onRefresh, { threshold = 70, max = 110 } = {}) {
   const ref = useRef(null);
   const startY = useRef(null);
@@ -168,10 +161,10 @@ function usePullToRefresh(onRefresh, { threshold = 70, max = 110 } = {}) {
       // and a softer tick if user backs off below it again.
       if (!armed.current && eased >= threshold) {
         armed.current = true;
-        vibrate(12);
+        haptics.selection();
       } else if (armed.current && eased < threshold - 6) {
         armed.current = false;
-        vibrate(6);
+        haptics.selection();
       }
       if (dy > 6 && el.scrollTop <= 0) e.preventDefault();
     };
@@ -183,10 +176,11 @@ function usePullToRefresh(onRefresh, { threshold = 70, max = 110 } = {}) {
       if (reached) {
         setRefreshing(true);
         setPull(threshold);
+        haptics.light();
         try { await onRefresh(); } catch { /* handled upstream */ }
         setRefreshing(false);
         // Confirmation pulse on refresh complete
-        vibrate([8, 40, 8]);
+        haptics.success();
       }
       armed.current = false;
       setPull(0);
