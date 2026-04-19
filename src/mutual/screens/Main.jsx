@@ -130,13 +130,8 @@ function PendingRow({ person, accent, invited = false }) {
   );
 }
 
-function vibrate(pattern) {
-  try {
-    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-      navigator.vibrate(pattern);
-    }
-  } catch { /* ignore */ }
-}
+import { haptics } from '../native/haptics';
+
 
 function usePullToRefresh(onRefresh, { threshold = 70, max = 110 } = {}) {
   const ref = useRef(null);
