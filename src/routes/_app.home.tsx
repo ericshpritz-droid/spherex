@@ -7,6 +7,7 @@ import { ACCENT_PRESETS } from "../mutual/brand.js";
 import { callGetMyPhoneHash } from "../mutual/dataApi.rpc";
 import { toast } from "../mutual/toast";
 import { useContactPhotos } from "../mutual/native/useContactPhotos";
+import { haptics } from "../mutual/native/haptics";
 
 function celebrateMutual(accent: string) {
   const p = (ACCENT_PRESETS as any)[accent] || ACCENT_PRESETS.pink;
@@ -17,9 +18,8 @@ function celebrateMutual(accent: string) {
     confetti({ ...defaults, particleCount: 50, spread: 100, startVelocity: 35, scalar: 0.9, origin: { x: 0.2, y: 0.4 } });
     confetti({ ...defaults, particleCount: 50, spread: 100, startVelocity: 35, scalar: 0.9, origin: { x: 0.8, y: 0.4 } });
   }, 180);
-  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-    try { navigator.vibrate?.([12, 40, 18]); } catch {}
-  }
+  // iOS taptic success notification — falls back to navigator.vibrate on web.
+  haptics.success();
 }
 
 export const Route = createFileRoute("/_app/home")({
