@@ -20,7 +20,7 @@ export function Button({ children, onClick, variant = 'primary', accent = 'pink'
   if (variant === 'primary') {
     return (
       <button
-        onClick={disabled ? undefined : onClick}
+        onClick={handleClick}
         className={`${baseClass} text-white`}
         style={{
           background: `linear-gradient(135deg, ${p.a} 0%, ${p.b} 100%)`,
@@ -33,7 +33,7 @@ export function Button({ children, onClick, variant = 'primary', accent = 'pink'
   if (variant === 'ghost') {
     return (
       <button
-        onClick={disabled ? undefined : onClick}
+        onClick={handleClick}
         className={`${baseClass} text-white bg-glass-08 border border-hairline-14 backdrop-blur-xl`}
         style={style}
       >{children}</button>
@@ -41,7 +41,7 @@ export function Button({ children, onClick, variant = 'primary', accent = 'pink'
   }
   return (
     <button
-      onClick={disabled ? undefined : onClick}
+      onClick={handleClick}
       className={`${baseClass} bg-white`}
       style={{ color: '#120A32', ...style }}
     >{children}</button>
