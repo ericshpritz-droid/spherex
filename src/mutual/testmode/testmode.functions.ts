@@ -1,17 +1,6 @@
-// Test-mode server functions. DELETE THIS FILE TO REMOVE TEST MODE.
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-
-const SYNTH_DOMAIN = "sphere.test";
-const synthEmail = (pin: string) => `test+${pin}@${SYNTH_DOMAIN}`;
-const synthPhone = (pin: string) => `+1999000${pin}`; // unique-per-PIN synthetic phone
-
-function validPin(pin: string) {
-  return typeof pin === "string" && /^\d{4}$/.test(pin);
-}
-function validCode(code: string) {
-  return typeof code === "string" && /^\d{6}$/.test(code);
-}
+import { isValidTestCode, isValidTestPin, synthEmail, synthPhone } from "./shared";
 
 async function ensureTestModeEnabled() {
   const { data, error } = await supabaseAdmin
@@ -23,13 +12,9 @@ async function ensureTestModeEnabled() {
   if (!data?.test_mode) throw new Error("Test mode is disabled");
 }
 
-/**
- * Returns whether a PIN is already registered. The client uses this to decide
- * whether to show "create your 6-digit code" vs "enter your 6-digit code".
- */
 export const testmodePinStatus = createServerFn({ method: "POST" })
   .inputValidator((input: { pin: string }) => {
-    if (!validPin(input.pin)) throw new Error("PIN must be 4 digits");
+    if (!isValidTestPin(input.pin)) throw new Error("PIN must be 4 digits");
     return input;
   })
   .handler(async ({ data }) => {
@@ -42,14 +27,9 @@ export const testmodePinStatus = createServerFn({ method: "POST" })
     return { exists: !!row };
   });
 
-/**
- * Resolve a 4-digit test PIN to that test account's synthetic E.164 phone
- * (so test users can add each other by PIN instead of full phone number).
- * Errors if test mode is off or the PIN isn't registered yet.
- */
 export const testmodeResolvePin = createServerFn({ method: "POST" })
   .inputValidator((input: { pin: string }) => {
-    if (!validPin(input.pin)) throw new Error("PIN must be 4 digits");
+    if (!isValidTestPin(input.pin)) throw new Error("PIN must be 4 digits");
     return input;
   })
   .handler(async ({ data }) => {
@@ -63,14 +43,10 @@ export const testmodeResolvePin = createServerFn({ method: "POST" })
     return { e164: synthPhone(data.pin) };
   });
 
-/**
- * Sign up (first time) or sign in (returning) with a 4-digit PIN + 6-digit code.
- * Returns a session that the client sets via supabase.auth.setSession().
- */
 export const testmodeLogin = createServerFn({ method: "POST" })
   .inputValidator((input: { pin: string; code: string }) => {
-    if (!validPin(input.pin)) throw new Error("PIN must be 4 digits");
-    if (!validCode(input.code)) throw new Error("Code must be 6 digits");
+    if (!isValidTestPin(input.pin)) throw new Error("PIN must be 4 digits");
+    if (!isValidTestCode(input.code)) throw new Error("Code must be 6 digits");
     return input;
   })
   .handler(async ({ data }) => {
@@ -78,7 +54,6 @@ export const testmodeLogin = createServerFn({ method: "POST" })
     const email = synthEmail(data.pin);
     const phone = synthPhone(data.pin);
 
-    // Does this PIN exist?
     const { data: existing } = await supabaseAdmin
       .from("test_accounts")
       .select("user_id")
@@ -86,7 +61,6 @@ export const testmodeLogin = createServerFn({ method: "POST" })
       .maybeSingle();
 
     if (!existing) {
-      // First use: create the synthetic account with this code as the password.
       const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
         email,
         password: data.code,
@@ -102,13 +76,11 @@ export const testmodeLogin = createServerFn({ method: "POST" })
         .from("test_accounts")
         .insert({ pin: data.pin, user_id: created.user.id });
       if (linkErr) {
-        // Best-effort cleanup so the PIN isn't orphaned
         await supabaseAdmin.auth.admin.deleteUser(created.user.id);
         throw new Error("Could not register PIN");
       }
     }
 
-    // Sign in (works for both freshly-created and returning accounts).
     const { data: session, error: signErr } = await supabaseAdmin.auth.signInWithPassword({
       email,
       password: data.code,
@@ -122,12 +94,6 @@ export const testmodeLogin = createServerFn({ method: "POST" })
     };
   });
 
-/**
- * Returns the synthetic E.164 phones for every registered test PIN.
- * Test users use this to hydrate their local hash cache so seeded mutuals
- * show up as readable numbers (e.g. "+1 (999) 000-2222") instead of
- * "Hidden contact". Only works while test mode is enabled.
- */
 export const testmodeListPhones = createServerFn({ method: "POST" })
   .handler(async () => {
     await ensureTestModeEnabled();
