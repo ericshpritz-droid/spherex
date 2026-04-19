@@ -6,6 +6,7 @@ import { useApp } from "../mutual/AppContext";
 import { ACCENT_PRESETS } from "../mutual/brand.js";
 import { callGetMyPhoneHash } from "../mutual/dataApi.rpc";
 import { toast } from "../mutual/toast";
+import { useContactPhotos } from "../mutual/native/useContactPhotos";
 
 function celebrateMutual(accent: string) {
   const p = (ACCENT_PRESETS as any)[accent] || ACCENT_PRESETS.pink;
