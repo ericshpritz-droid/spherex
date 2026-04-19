@@ -338,93 +338,127 @@ export function ScreenHome({ accent, matches, pending, onOpenMatch, onAdd, onInv
     );
   }
 
+  const accentRotation = ['pink', 'lavender', 'blue'];
   return (
     <div ref={pullRef} className="h-full bg-ink text-white overflow-auto relative pb-[120px]" style={{ overscrollBehaviorY: 'contain' }}>
       <Aura accent={accent} intensity={0.5}/>
       <PullIndicator pull={pull} refreshing={refreshing} accent={accent}/>
       {showPill && <RefreshingPill accent={accent}/>}
       <div className="relative z-[1]" style={{ transform: `translateY(${refreshing ? 56 : pull}px)`, transition: pull === 0 && !refreshing ? 'transform 180ms ease' : 'none' }}>
-        <HomeHeader accent={accent} matchCount={matches.length}/>
-        <div style={{ padding: '16px 24px 0' }}>
-          <div className="text-[15px] font-semibold mb-3">Matched</div>
-          <div className="flex gap-3 overflow-x-auto" style={{ margin: '0 -24px', padding: '0 24px 12px' }}>
+        <HomeHeader accent={accent} matchCount={matches.length} onOpenProfile={onOpenProfile}/>
+        <div style={{ padding: '20px 20px 0' }}>
+          <div className="text-[13px] font-medium text-fg-55 tracking-sora-label uppercase mb-3" style={{ paddingLeft: 4 }}>Matched</div>
+          <div className="flex flex-col gap-4">
             {matches.map((m, i) => {
               const last = lastByHash[m.id];
               const unread = !!unreadByHash[m.id];
               const fromMe = last && myHash && last.sender_phone_hash === myHash;
+              const cardAccent = accentRotation[i % accentRotation.length];
+              const cp = ACCENT_PRESETS[cardAccent];
               return (
-              <div
-                key={i}
-                onClick={() => onOpenMatch(m)}
-                className="rounded-3xl text-white cursor-pointer relative overflow-hidden"
-                style={{
-                  minWidth: 220, padding: 20,
-                  background: gradient(i % 2 === 0 ? accent : (accent === 'pink' ? 'lavender' : 'pink'), '160deg'),
-                  boxShadow: '0 12px 32px rgba(241,63,94,0.25)',
-                }}
-              >
-                <div className="absolute rounded-full" style={{ top: -40, right: -30, width: 140, height: 140, background: 'rgba(255,255,255,0.18)' }}/>
                 <div
-                  className="absolute font-semibold rounded-lg"
-                  style={{ top: 12, right: 16, fontSize: 11, padding: '4px 8px', background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}
-                >{m.matchedAt}</div>
-                <PhoneAvatar phone={m.phone} size={56} accent={m.avatar} style={{ marginBottom: 20, position: 'relative' }}/>
-                <div className="font-bold tracking-sora-tighter relative" style={{ fontSize: 20 }}>{m.name}</div>
-                <div className="text-sm text-fg-75 relative">{m.phone}</div>
-                {last && (
-                  <div className="relative mt-3">
-                    <div className="flex items-center gap-2" style={{ minHeight: 24 }}>
-                      <div
-                        className="rounded-full flex items-center"
-                        style={{
-                          padding: '4px 10px', fontSize: 16, lineHeight: 1,
-                          background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)',
-                          maxWidth: '85%',
-                        }}
-                        title={fromMe ? 'You sent' : 'They sent'}
-                      >
-                        <span style={{ fontSize: 11, opacity: 0.85, marginRight: 6, fontWeight: 600 }}>
-                          {fromMe ? 'You' : '→'}
-                        </span>
-                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {last.body}
-                        </span>
-                      </div>
-                      {unread && (
-                        <span
-                          aria-label="New message"
-                          className="rounded-full"
-                          style={{
-                            width: 10, height: 10, background: '#ffffff',
-                            boxShadow: '0 0 0 2px rgba(0,0,0,0.18)',
-                            animation: 'mutualPulse 1.8s ease-in-out infinite',
-                          }}
-                        />
-                      )}
+                  key={i}
+                  onClick={() => onOpenMatch(m)}
+                  className="rounded-[28px] text-white cursor-pointer relative overflow-hidden"
+                  style={{
+                    padding: 22,
+                    background: gradient(cardAccent, '145deg'),
+                    boxShadow: `0 18px 40px ${cp.a}40, inset 0 1px 0 rgba(255,255,255,0.18)`,
+                    minHeight: 168,
+                  }}
+                >
+                  {/* Decorative orbs */}
+                  <div className="absolute rounded-full pointer-events-none" style={{ top: -60, right: -40, width: 200, height: 200, background: 'rgba(255,255,255,0.16)', filter: 'blur(2px)' }}/>
+                  <div className="absolute rounded-full pointer-events-none" style={{ bottom: -50, left: -30, width: 140, height: 140, background: 'rgba(255,255,255,0.08)' }}/>
+
+                  {/* Top row: avatar + name/phone, timestamp pill */}
+                  <div className="relative flex items-start gap-4">
+                    <PhoneAvatar phone={m.phone} size={64} accent={m.avatar}/>
+                    <div className="flex-1 min-w-0 pt-0.5">
+                      <div className="font-bold tracking-sora-tighter truncate" style={{ fontSize: 22, lineHeight: 1.15 }}>{m.name}</div>
+                      <div className="text-[13px] text-white/75 mt-0.5 truncate">{m.phone}</div>
                     </div>
                     <div
-                      className="text-fg-75"
-                      style={{ fontSize: 11, marginTop: 4, opacity: 0.85, letterSpacing: 0.1 }}
-                    >
-                      · {messageAgo(last.created_at)}
-                    </div>
+                      className="font-semibold rounded-full shrink-0"
+                      style={{ fontSize: 11, padding: '5px 10px', background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+                    >{m.matchedAt}</div>
                   </div>
-                )}
-              </div>
+
+                  {/* Bottom row: last message preview or "Say hi" */}
+                  <div className="relative mt-4 flex items-center gap-2">
+                    {last ? (
+                      <>
+                        <div
+                          className="rounded-full flex items-center min-w-0 flex-1"
+                          style={{
+                            padding: '6px 12px', fontSize: 13, lineHeight: 1.2,
+                            background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                          }}
+                          title={fromMe ? 'You sent' : 'They sent'}
+                        >
+                          <span style={{ fontSize: 11, opacity: 0.85, marginRight: 6, fontWeight: 700 }}>
+                            {fromMe ? 'You' : '→'}
+                          </span>
+                          <span className="truncate">{last.body}</span>
+                        </div>
+                        <div className="text-[11px] text-white/75 shrink-0" style={{ letterSpacing: 0.1 }}>
+                          {messageAgo(last.created_at)}
+                        </div>
+                        {unread && (
+                          <span
+                            aria-label="New message"
+                            className="rounded-full shrink-0"
+                            style={{
+                              width: 10, height: 10, background: '#ffffff',
+                              boxShadow: '0 0 0 2px rgba(0,0,0,0.18)',
+                              animation: 'mutualPulse 1.8s ease-in-out infinite',
+                            }}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <div
+                        className="rounded-full inline-flex items-center"
+                        style={{
+                          padding: '6px 12px', fontSize: 12, fontWeight: 600,
+                          background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                        }}
+                      >
+                        ✨ Say hi
+                      </div>
+                    )}
+                  </div>
+                </div>
               );
             })}
           </div>
         </div>
-        <div style={{ padding: '28px 24px 0' }}>
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-[15px] font-semibold">Pending · {pending.length}</div>
-            <div className="text-[13px] text-fg-55">They haven't added you back yet</div>
+        {pending.length > 0 && (
+          <div style={{ padding: '28px 20px 0' }}>
+            <div className="flex items-center justify-between mb-3" style={{ paddingLeft: 4 }}>
+              <div className="text-[13px] font-medium text-fg-55 tracking-sora-label uppercase">Pending · {pending.length}</div>
+              <div className="text-[12px] text-fg-55">Not mutual yet</div>
+            </div>
+            <div className="flex flex-col gap-2">
+              {pending.map((p, i) => <PendingRow key={i} person={p} accent={accent} invited={!!invitedByHash && String(p.id) === invitedByHash}/>)}
+            </div>
           </div>
-          <div className="flex flex-col gap-2">
-            {pending.map((p, i) => <PendingRow key={i} person={p} accent={accent} invited={!!invitedByHash && String(p.id) === invitedByHash}/>)}
-          </div>
-        </div>
+        )}
       </div>
+
+      {/* Floating action button: add a number */}
+      <button
+        onClick={onAdd}
+        aria-label="Add a number"
+        className="absolute z-20 rounded-full border-0 cursor-pointer text-white flex items-center justify-center font-bold"
+        style={{
+          right: 20, bottom: 28,
+          width: 60, height: 60,
+          fontSize: 30, lineHeight: 1,
+          background: gradient(accent, '135deg'),
+          boxShadow: `0 14px 32px ${ACCENT_PRESETS[accent].a}66, inset 0 1px 0 rgba(255,255,255,0.3)`,
+        }}
+      >+</button>
     </div>
   );
 }
