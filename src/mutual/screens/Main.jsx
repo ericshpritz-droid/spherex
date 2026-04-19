@@ -1147,7 +1147,7 @@ export function ScreenMatchReveal({ accent, match, onBack, onClose, variant = 'b
   );
 }
 
-export function ScreenProfile({ accent, onAccent, phone, onSignOut }) {
+export function ScreenProfile({ accent, onAccent, phone, onSignOut, contactPhotos = null }) {
   const displayPhone = phone || '—';
   const Row = ({ label, value, last, onClick, danger }) => (
     <div
@@ -1163,12 +1163,59 @@ export function ScreenProfile({ accent, onAccent, phone, onSignOut }) {
       <div className="text-sm text-fg-50">{value}</div>
     </div>
   );
+  const ToggleRow = ({ label, sub, checked, onChange, last }) => (
+    <div
+      className="flex items-center justify-between gap-3"
+      style={{
+        padding: '14px 18px',
+        borderBottom: last ? 'none' : '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      <div className="min-w-0">
+        <div className="text-[15px] font-medium text-white">{label}</div>
+        {sub && <div className="text-[12px] text-fg-50 mt-0.5">{sub}</div>}
+      </div>
+      <button
+        onClick={() => onChange(!checked)}
+        role="switch"
+        aria-checked={checked}
+        className="shrink-0 cursor-pointer rounded-full transition-colors"
+        style={{
+          width: 44, height: 26, padding: 2, border: 'none',
+          background: checked ? gradient(accent, '135deg') : 'rgba(255,255,255,0.18)',
+        }}
+      >
+        <span
+          className="block rounded-full bg-white transition-transform"
+          style={{
+            width: 22, height: 22,
+            transform: checked ? 'translateX(18px)' : 'translateX(0)',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+          }}
+        />
+      </button>
+    </div>
+  );
   const Section = ({ title, children }) => (
     <div className="mb-6">
       <div className="font-semibold text-fg-45 uppercase tracking-sora-caps" style={{ padding: '0 24px 8px', fontSize: 11 }}>{title}</div>
       <div className="rounded-[20px] bg-glass-04 border border-hairline-06 overflow-hidden mx-4">{children}</div>
     </div>
   );
+
+  // Contact-photos UX strings depend on the native permission status.
+  // `contactPhotos` is null when the route hasn't wired it up (web preview only).
+  let photosSubtitle = 'Use your iPhone contact photos on cards. Photos stay on your device.';
+  let photosValueLabel = '';
+  if (contactPhotos) {
+    if (contactPhotos.status === 'unsupported') photosValueLabel = 'iOS only';
+    else if (contactPhotos.status === 'denied') photosValueLabel = 'Permission denied';
+    else if (contactPhotos.status === 'loading') photosValueLabel = 'Loading…';
+    else if (contactPhotos.status === 'ready') photosValueLabel = `${contactPhotos.count} matched`;
+    else if (contactPhotos.status === 'disabled') photosValueLabel = 'Off';
+    else if (contactPhotos.status === 'error') photosValueLabel = 'Error';
+  }
+
   return (
     <div className="relative h-full overflow-auto bg-ink text-white pb-[120px]">
       <Aura accent={accent} intensity={0.4}/>
@@ -1197,6 +1244,31 @@ export function ScreenProfile({ accent, onAccent, phone, onSignOut }) {
             ))}
           </div>
         </Section>
+        {contactPhotos && contactPhotos.status !== 'unsupported' && (
+          <Section title="Contact photos">
+            <ToggleRow
+              label="Use contact photos"
+              sub={photosSubtitle}
+              checked={contactPhotos.enabled && contactPhotos.status !== 'denied'}
+              onChange={contactPhotos.onToggle}
+            />
+            <Row
+              label="Status"
+              value={photosValueLabel}
+            />
+            <Row
+              label="Refresh photos"
+              value="↻"
+              onClick={contactPhotos.onRefresh}
+            />
+            <Row
+              label="Open iOS Settings"
+              value="→"
+              onClick={contactPhotos.onOpenSettings}
+              last
+            />
+          </Section>
+        )}
         <Section title="Privacy">
           <Row label="Your number" value={displayPhone}/>
           <Row label="Visible to" value="No one" last/>

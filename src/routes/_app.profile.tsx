@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "../mutual/toast";
 import { ScreenProfile } from "../mutual/screens/Main.jsx";
@@ -7,6 +7,9 @@ import { useApp } from "../mutual/AppContext";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
 import { ShareInviteButton } from "../mutual/components/ShareInviteButton";
 import { getInviteConversionsServer } from "../mutual/invites.functions";
+import { useContactPhotos } from "../mutual/native/useContactPhotos";
+import { getContactPhotosEnabled, setContactPhotosEnabled } from "../mutual/native/contactPhotosPref";
+import { isNative } from "../mutual/native/platform";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
@@ -38,6 +41,41 @@ function ProfileRoute() {
   const isAdmin = useIsAdmin(user?.id);
   const testPin: string | undefined = user?.user_metadata?.test_pin;
 
+  const { photos, status, reload } = useContactPhotos();
+  const [enabled, setEnabled] = useState<boolean>(() => getContactPhotosEnabled());
+
+  const contactPhotos = useMemo(() => ({
+    enabled,
+    status,
+    count: photos.size,
+    onToggle: async (next: boolean) => {
+      setContactPhotosEnabled(next);
+      setEnabled(next);
+      if (next) {
+        toast.success("Contact photos on");
+      } else {
+        toast.success("Contact photos off");
+      }
+    },
+    onRefresh: async () => {
+      await reload();
+      toast.success("Photos refreshed");
+    },
+    onOpenSettings: async () => {
+      if (!isNative()) {
+        toast.message("Available on iOS");
+        return;
+      }
+      try {
+        // Deep-link to the Sphere entry of the iOS Settings app, where the
+        // user can toggle the Contacts permission.
+        window.location.href = "app-settings:";
+      } catch {
+        toast.error("Could not open Settings");
+      }
+    },
+  }), [enabled, status, photos, reload]);
+
   const fetchConversions = useServerFn(getInviteConversionsServer);
   const [invites, setInvites] = useState<{ count: number; lastAt: string | null }>({ count: 0, lastAt: null });
   useEffect(() => {
@@ -54,6 +92,7 @@ function ProfileRoute() {
         accent={accent}
         onAccent={setAccent}
         phone={myPhoneFormatted}
+        contactPhotos={contactPhotos}
         onSignOut={async () => {
           try {
             await doSignOut();
