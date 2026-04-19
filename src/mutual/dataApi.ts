@@ -45,7 +45,10 @@ export async function loadAddsAndMatches(
 
   function makePerson(hash: string, status: "matched" | "pending", matchedAt?: string): Person {
     const raw = hashToRaw?.get(hash);
-    const formatted = raw ? formatE164(raw) : "Hidden contact";
+    // Privacy: we only know the readable phone for people *this device* uploaded.
+    // For everyone else, show a soft placeholder framed by context (matched vs pending).
+    const placeholder = status === "matched" ? "New mutual" : "Someone added you";
+    const formatted = raw ? formatE164(raw) : placeholder;
     return {
       id: hash,
       phone: formatted,
