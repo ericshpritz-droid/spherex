@@ -5,10 +5,10 @@ import { useApp } from "../mutual/AppContext";
 export const Route = createFileRoute("/_app/welcome")({
   head: () => ({
     meta: [
-      { title: "Sphere — Only if they pick you back." },
-      { name: "description", content: "Add a number. If they add yours, it's mutual. No DMs. No maybe." },
-      { property: "og:title", content: "Sphere — Only if they pick you back." },
-      { property: "og:description", content: "Phone-number-based double-opt-in matching." },
+      { title: "Sphere — Your sphere starts with one number." },
+      { name: "description", content: "Add a number. If they add yours back, you're in each other's sphere." },
+      { property: "og:title", content: "Sphere — Your sphere starts with one number." },
+      { property: "og:description", content: "Add a number. If they add yours back, you're in each other's sphere." },
     ],
   }),
   component: WelcomeRoute,
