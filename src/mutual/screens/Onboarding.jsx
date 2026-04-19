@@ -17,10 +17,10 @@ export function ScreenWelcome({ accent, onNext }) {
           </div>
           <div>
             <div className="font-extrabold text-center tracking-sora-mega" style={{ fontSize: 52, lineHeight: 0.95 }}>
-              Only if<br/>they pick<br/>you back.
+              Your sphere<br/>starts with<br/>one number.
             </div>
             <div className="mt-5 text-center text-[17px] text-fg-70 tracking-sora-tight" style={{ lineHeight: 1.45 }}>
-              Add a number. If they add yours too,<br/>it's mutual. No DMs. No maybe.
+              Add a number. If they add yours back,<br/>you're in each other's sphere.
             </div>
           </div>
         </div>
