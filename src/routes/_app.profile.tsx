@@ -11,6 +11,7 @@ import { useContactPhotos } from "../mutual/native/useContactPhotos";
 import { getContactPhotosEnabled, setContactPhotosEnabled } from "../mutual/native/contactPhotosPref";
 import { isNative } from "../mutual/native/platform";
 import { haptics } from "../mutual/native/haptics";
+import { getHapticsEnabled, setHapticsEnabled } from "../mutual/native/hapticsPref";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
@@ -77,6 +78,25 @@ function ProfileRoute() {
     },
   }), [enabled, status, photos, reload]);
 
+  const [hapticsOn, setHapticsOn] = useState<boolean>(() => getHapticsEnabled());
+  const feel = useMemo(() => ({
+    reduced: !hapticsOn,
+    onToggleReduced: (nextReduced: boolean) => {
+      const nextEnabled = !nextReduced;
+      setHapticsEnabled(nextEnabled);
+      setHapticsOn(nextEnabled);
+      // Fire one tick *after* enabling so the user feels the change; stay
+      // silent when muting so we don't contradict their request.
+      if (nextEnabled) {
+        // Defer so the new pref is read by the haptics module.
+        setTimeout(() => haptics.success(), 0);
+        toast.success("Haptics on");
+      } else {
+        toast.message("Haptics off");
+      }
+    },
+  }), [hapticsOn]);
+
   const fetchConversions = useServerFn(getInviteConversionsServer);
   const [invites, setInvites] = useState<{ count: number; lastAt: string | null }>({ count: 0, lastAt: null });
   useEffect(() => {
@@ -94,6 +114,7 @@ function ProfileRoute() {
         onAccent={setAccent}
         phone={myPhoneFormatted}
         contactPhotos={contactPhotos}
+        feel={feel}
         onSignOut={async () => {
           try {
             await doSignOut();
