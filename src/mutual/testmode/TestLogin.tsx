@@ -34,7 +34,7 @@ export function TestLogin({ onCancel }: Props) {
       });
       if (error) {
         if (error.message?.toLowerCase().includes("invalid login credentials")) {
-          throw new Error("Wrong PIN or code. For the seeded account, try 1982 / 111111.");
+          throw new Error("Wrong PIN or code. Please check your credentials and try again.");
         }
         throw error;
       }
