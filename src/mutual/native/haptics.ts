@@ -1,7 +1,11 @@
 // Unified haptics: native iOS taptic engine via Capacitor on device,
 // `navigator.vibrate` fallback on web/Android browser. All calls are
 // fire-and-forget and never throw — UI code can sprinkle them without try/catch.
+//
+// Honors the user's in-app "Reduce haptics" preference: when disabled, every
+// method becomes a no-op (we don't even load the native module).
 import { isNative } from "./platform";
+import { getHapticsEnabled } from "./hapticsPref";
 
 type Native = typeof import("@capacitor/haptics");
 let nativeMod: Native | null = null;
