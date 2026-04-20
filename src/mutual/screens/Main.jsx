@@ -1141,7 +1141,7 @@ export function ScreenMatchReveal({ accent, match, onBack, onClose, variant = 'b
   );
 }
 
-export function ScreenProfile({ accent, onAccent, phone, onSignOut, contactPhotos = null }) {
+export function ScreenProfile({ accent, onAccent, phone, onSignOut, contactPhotos = null, feel = null }) {
   const displayPhone = phone || '—';
   const Row = ({ label, value, last, onClick, danger }) => (
     <div
@@ -1259,6 +1259,17 @@ export function ScreenProfile({ accent, onAccent, phone, onSignOut, contactPhoto
               label="Open iOS Settings"
               value="→"
               onClick={contactPhotos.onOpenSettings}
+              last
+            />
+          </Section>
+        )}
+        {feel && (
+          <Section title="Feel">
+            <ToggleRow
+              label="Reduce haptics"
+              sub="Mute the taptic ticks on buttons, the keypad, and notifications."
+              checked={feel.reduced}
+              onChange={feel.onToggleReduced}
               last
             />
           </Section>
