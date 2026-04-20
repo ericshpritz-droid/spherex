@@ -8,6 +8,7 @@ import { loadLastMessagesServer } from "./messages.functions";
 import { consumeInviteServer } from "./invites.functions";
 import { testmodeListPhones } from "./testmode/testmode.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
 
 type Accent = "pink" | "lavender" | "blue";
 
@@ -276,7 +277,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const refreshLast = useCallback(async () => {
     if (!session || !myHash) return;
     try {
-      const res = await loadLast({ data: undefined as any });
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) return;
+      const res = await loadLast({ data: undefined as any, headers: { Authorization: `Bearer ${token}` } });
       setLastByHash((res as any).lastByHash || {});
     } catch (e) {
       console.warn("loadLastMessages failed", e);
