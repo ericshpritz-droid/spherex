@@ -20,13 +20,15 @@ const config: CapacitorConfig = {
     // 64px from the top on the home header).
     limitsNavigationsToAppBoundDomains: false,
   },
-  server: {
-    // Hot-reload against the Lovable sandbox preview while developing.
-    // Comment this out for production / TestFlight builds so the app loads
-    // bundled assets from `dist/`.
-    url: "https://id-preview--560b357e-2c14-4df9-ba8b-4774650aac2d.lovable.app",
-    cleartext: true,
-  },
+  // NOTE: For TestFlight / App Store builds the WebView must load bundled
+  // assets from `dist/` — do NOT add a `server.url` block here. If you need
+  // hot-reload against the Lovable sandbox during development, temporarily
+  // uncomment the block below, run `npx cap sync ios`, and remove it again
+  // before producing a release build.
+  // server: {
+  //   url: "https://id-preview--560b357e-2c14-4df9-ba8b-4774650aac2d.lovable.app",
+  //   cleartext: true,
+  // },
 };
 
 export default config;
