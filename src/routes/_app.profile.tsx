@@ -119,6 +119,7 @@ function ProfileRoute() {
           </div>
           <button
             onClick={() => {
+              haptics.selection();
               navigator.clipboard?.writeText(testPin).then(
                 () => toast.success("PIN copied"),
                 () => {},

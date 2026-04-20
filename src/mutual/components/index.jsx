@@ -1,5 +1,6 @@
 import React from 'react';
 import { ACCENT_PRESETS } from '../brand.js';
+import { haptics } from '../native/haptics';
 
 export function LinkedRings({ size = 120, accent = 'pink', spin = false }) {
   const p = ACCENT_PRESETS[accent] || ACCENT_PRESETS.pink;
