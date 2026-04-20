@@ -14,6 +14,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as IHashRouteImport } from './routes/i.$hash'
+import { Route as ApiDevPurgeRouteImport } from './routes/api.dev-purge'
 import { Route as AppWelcomeRouteImport } from './routes/_app.welcome'
 import { Route as AppSentRouteImport } from './routes/_app.sent'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
@@ -49,6 +50,11 @@ const IndexRoute = IndexRouteImport.update({
 const IHashRoute = IHashRouteImport.update({
   id: '/i/$hash',
   path: '/i/$hash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDevPurgeRoute = ApiDevPurgeRouteImport.update({
+  id: '/api/dev-purge',
+  path: '/api/dev-purge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppWelcomeRoute = AppWelcomeRouteImport.update({
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
   '/welcome': typeof AppWelcomeRoute
+  '/api/dev-purge': typeof ApiDevPurgeRoute
   '/i/$hash': typeof IHashRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
   '/welcome': typeof AppWelcomeRoute
+  '/api/dev-purge': typeof ApiDevPurgeRoute
   '/i/$hash': typeof IHashRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/sent': typeof AppSentRoute
   '/_app/welcome': typeof AppWelcomeRoute
+  '/api/dev-purge': typeof ApiDevPurgeRoute
   '/i/$hash': typeof IHashRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
 }
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sent'
     | '/welcome'
+    | '/api/dev-purge'
     | '/i/$hash'
     | '/thread/$hash'
   fileRoutesByTo: FileRoutesByTo
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sent'
     | '/welcome'
+    | '/api/dev-purge'
     | '/i/$hash'
     | '/thread/$hash'
   id:
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/sent'
     | '/_app/welcome'
+    | '/api/dev-purge'
     | '/i/$hash'
     | '/_app/thread/$hash'
   fileRoutesById: FileRoutesById
@@ -231,6 +243,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  ApiDevPurgeRoute: typeof ApiDevPurgeRoute
   IHashRoute: typeof IHashRoute
 }
 
@@ -269,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/i/$hash'
       fullPath: '/i/$hash'
       preLoaderRoute: typeof IHashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/dev-purge': {
+      id: '/api/dev-purge'
+      path: '/api/dev-purge'
+      fullPath: '/api/dev-purge'
+      preLoaderRoute: typeof ApiDevPurgeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/welcome': {
@@ -395,8 +415,18 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  ApiDevPurgeRoute: ApiDevPurgeRoute,
   IHashRoute: IHashRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
