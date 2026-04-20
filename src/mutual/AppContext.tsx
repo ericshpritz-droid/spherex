@@ -8,7 +8,6 @@ import { loadLastMessagesServer } from "./messages.functions";
 import { consumeInviteServer } from "./invites.functions";
 import { testmodeListPhones } from "./testmode/testmode.functions";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
 
 type Accent = "pink" | "lavender" | "blue";
 
