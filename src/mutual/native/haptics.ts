@@ -1,7 +1,11 @@
 // Unified haptics: native iOS taptic engine via Capacitor on device,
 // `navigator.vibrate` fallback on web/Android browser. All calls are
 // fire-and-forget and never throw — UI code can sprinkle them without try/catch.
+//
+// Honors the user's in-app "Reduce haptics" preference: when disabled, every
+// method becomes a no-op (we don't even load the native module).
 import { isNative } from "./platform";
+import { getHapticsEnabled } from "./hapticsPref";
 
 type Native = typeof import("@capacitor/haptics");
 let nativeMod: Native | null = null;
@@ -30,54 +34,41 @@ function webVibrate(pattern: number | number[]) {
   }
 }
 
+function fire(nativeFn: (m: Native) => Promise<unknown>, fallback: number | number[]) {
+  if (!getHapticsEnabled()) return;
+  getNative().then((m) => {
+    if (m) nativeFn(m).catch(() => {});
+    else webVibrate(fallback);
+  });
+}
+
 export const haptics = {
   /** Tiny tick. Use for button taps, toggles, selection changes. */
   light() {
-    getNative().then((m) => {
-      if (m) m.Haptics.impact({ style: m.ImpactStyle.Light }).catch(() => {});
-      else webVibrate(8);
-    });
+    fire((m) => m.Haptics.impact({ style: m.ImpactStyle.Light }), 8);
   },
   /** Medium thump. Use for confirming a meaningful action. */
   medium() {
-    getNative().then((m) => {
-      if (m) m.Haptics.impact({ style: m.ImpactStyle.Medium }).catch(() => {});
-      else webVibrate(14);
-    });
+    fire((m) => m.Haptics.impact({ style: m.ImpactStyle.Medium }), 14);
   },
   /** Strong thump. Use sparingly. */
   heavy() {
-    getNative().then((m) => {
-      if (m) m.Haptics.impact({ style: m.ImpactStyle.Heavy }).catch(() => {});
-      else webVibrate(22);
-    });
+    fire((m) => m.Haptics.impact({ style: m.ImpactStyle.Heavy }), 22);
   },
   /** Selection tick — subtler than `light()`, for picker-style UI. */
   selection() {
-    getNative().then((m) => {
-      if (m) m.Haptics.selectionStart().then(() => m.Haptics.selectionEnd()).catch(() => {});
-      else webVibrate(6);
-    });
+    fire((m) => m.Haptics.selectionStart().then(() => m.Haptics.selectionEnd()), 6);
   },
   /** iOS notification: success (rising double tap). */
   success() {
-    getNative().then((m) => {
-      if (m) m.Haptics.notification({ type: m.NotificationType.Success }).catch(() => {});
-      else webVibrate(10);
-    });
+    fire((m) => m.Haptics.notification({ type: m.NotificationType.Success }), 10);
   },
   /** iOS notification: warning. */
   warning() {
-    getNative().then((m) => {
-      if (m) m.Haptics.notification({ type: m.NotificationType.Warning }).catch(() => {});
-      else webVibrate([10, 30, 10]);
-    });
+    fire((m) => m.Haptics.notification({ type: m.NotificationType.Warning }), [10, 30, 10]);
   },
   /** iOS notification: error (sharp triple). */
   error() {
-    getNative().then((m) => {
-      if (m) m.Haptics.notification({ type: m.NotificationType.Error }).catch(() => {});
-      else webVibrate([10, 40, 10]);
-    });
+    fire((m) => m.Haptics.notification({ type: m.NotificationType.Error }), [10, 40, 10]);
   },
 };
