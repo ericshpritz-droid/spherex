@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as IHashRouteImport } from './routes/i.$hash'
 import { Route as AppWelcomeRouteImport } from './routes/_app.welcome'
+import { Route as AppSitemapRouteImport } from './routes/_app.sitemap'
 import { Route as AppSentRouteImport } from './routes/_app.sent'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppPhoneRouteImport } from './routes/_app.phone'
@@ -54,6 +55,11 @@ const IHashRoute = IHashRouteImport.update({
 const AppWelcomeRoute = AppWelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSitemapRoute = AppSitemapRouteImport.update({
+  id: '/sitemap',
+  path: '/sitemap',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSentRoute = AppSentRouteImport.update({
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/phone': typeof AppPhoneRoute
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
+  '/sitemap': typeof AppSitemapRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
   '/thread/$hash': typeof AppThreadHashRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/phone': typeof AppPhoneRoute
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
+  '/sitemap': typeof AppSitemapRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
   '/thread/$hash': typeof AppThreadHashRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/_app/phone': typeof AppPhoneRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/sent': typeof AppSentRoute
+  '/_app/sitemap': typeof AppSitemapRoute
   '/_app/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/phone'
     | '/profile'
     | '/sent'
+    | '/sitemap'
     | '/welcome'
     | '/i/$hash'
     | '/thread/$hash'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/phone'
     | '/profile'
     | '/sent'
+    | '/sitemap'
     | '/welcome'
     | '/i/$hash'
     | '/thread/$hash'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/_app/phone'
     | '/_app/profile'
     | '/_app/sent'
+    | '/_app/sitemap'
     | '/_app/welcome'
     | '/i/$hash'
     | '/_app/thread/$hash'
@@ -276,6 +288,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof AppWelcomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sitemap': {
+      id: '/_app/sitemap'
+      path: '/sitemap'
+      fullPath: '/sitemap'
+      preLoaderRoute: typeof AppSitemapRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/sent': {
@@ -369,6 +388,7 @@ interface AppRouteChildren {
   AppPhoneRoute: typeof AppPhoneRoute
   AppProfileRoute: typeof AppProfileRoute
   AppSentRoute: typeof AppSentRoute
+  AppSitemapRoute: typeof AppSitemapRoute
   AppWelcomeRoute: typeof AppWelcomeRoute
   AppThreadHashRoute: typeof AppThreadHashRoute
 }
@@ -384,6 +404,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPhoneRoute: AppPhoneRoute,
   AppProfileRoute: AppProfileRoute,
   AppSentRoute: AppSentRoute,
+  AppSitemapRoute: AppSitemapRoute,
   AppWelcomeRoute: AppWelcomeRoute,
   AppThreadHashRoute: AppThreadHashRoute,
 }
