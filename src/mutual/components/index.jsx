@@ -63,7 +63,12 @@ export function NumPad({ onKey }) {
         return (
           <button
             key={i}
-            onClick={() => onKey(k)}
+            onClick={() => {
+              // Subtle picker-style tick on every keypress; a stronger thump on delete.
+              if (k === 'del') haptics.light();
+              else haptics.selection();
+              onKey(k);
+            }}
             className="h-14 rounded-[18px] bg-glass-06 border border-hairline-10 text-white cursor-pointer font-semibold tracking-sora-tighter"
             style={{ fontSize: k === 'del' ? 18 : 26 }}
           >{k === 'del' ? '⌫' : k}</button>
