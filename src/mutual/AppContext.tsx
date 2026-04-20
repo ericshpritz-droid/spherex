@@ -244,7 +244,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!session || !myHash) return;
     const channel = supabase
-      .channel(`adds-for-${myHash.slice(0, 12)}`)
+      .channel(`adds-for-${myHash}`)
       .on(
         "postgres_changes",
         {
@@ -300,7 +300,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!session || !myHash) return;
     const channel = supabase
-      .channel(`msgs-for-${myHash.slice(0, 12)}`)
+      .channel(`msgs-for-${myHash}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages" },
