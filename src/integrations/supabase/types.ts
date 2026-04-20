@@ -166,7 +166,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_mutual_match: { Args: { _a: string; _b: string }; Returns: boolean }
+      is_mutual_match: { Args: { _other: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
