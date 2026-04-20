@@ -158,6 +158,7 @@ export type Database = {
       }
     }
     Functions: {
+      current_user_phone_hash: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
