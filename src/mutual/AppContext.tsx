@@ -156,7 +156,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         saveHashCache(user.id, map);
         // Re-render rows that previously rendered as "Hidden contact".
         refreshRef.current?.();
-      } catch (e) {
+      } catch (e: any) {
+        const msg = e?.message || String(e || "");
+        if (/Missing Supabase server environment variables/i.test(msg)) {
+          console.warn("test-mode hydration skipped in local dev until server secrets are loaded");
+          return;
+        }
         console.warn("test-mode hash hydration failed", e);
       }
     })();
