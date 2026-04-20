@@ -10,6 +10,7 @@ import { getInviteConversionsServer } from "../mutual/invites.functions";
 import { useContactPhotos } from "../mutual/native/useContactPhotos";
 import { getContactPhotosEnabled, setContactPhotosEnabled } from "../mutual/native/contactPhotosPref";
 import { isNative } from "../mutual/native/platform";
+import { haptics } from "../mutual/native/haptics";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
