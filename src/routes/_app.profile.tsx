@@ -100,13 +100,14 @@ function ProfileRoute() {
   const fetchConversions = useServerFn(getInviteConversionsServer);
   const [invites, setInvites] = useState<{ count: number; lastAt: string | null }>({ count: 0, lastAt: null });
   useEffect(() => {
-    if (!session) return;
+    const accessToken = session?.access_token;
+    if (!accessToken) return;
     let cancelled = false;
-    fetchConversions({ data: undefined as any })
+    fetchConversions({ data: undefined as any, headers: { Authorization: `Bearer ${accessToken}` } })
       .then((res: any) => { if (!cancelled) setInvites({ count: res.count ?? 0, lastAt: res.lastAt ?? null }); })
       .catch((e) => console.warn("getInviteConversions failed", e));
     return () => { cancelled = true; };
-  }, [session, fetchConversions]);
+  }, [session?.access_token, fetchConversions]);
   return (
     <div className="relative h-full">
       <ScreenProfile

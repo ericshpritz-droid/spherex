@@ -7,6 +7,7 @@ import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
 import { loadLastMessagesServer } from "./messages.functions";
 import { consumeInviteServer } from "./invites.functions";
 import { testmodeListPhones } from "./testmode/testmode.functions";
+import { useTestMode } from "./testmode/useTestMode";
 import { useServerFn } from "@tanstack/react-start";
 
 type Accent = "pink" | "lavender" | "blue";
@@ -106,6 +107,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const { session, loading: sessionLoading, user } = useSession();
+  const { enabled: testModeEnabled } = useTestMode();
   const myPhone = user?.phone ? `+${String(user.phone).replace(/\D/g, "")}` : "";
   const myPhoneFormatted = myPhone ? formatE164(myPhone) : "";
 
@@ -142,6 +144,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const listTestPhones = useServerFn(testmodeListPhones);
   useEffect(() => {
     if (!session || !user) return;
+    if (!testModeEnabled) return;
     const isTest = !!(user.user_metadata as any)?.test_pin;
     if (!isTest) return;
     let cancelled = false;
@@ -166,7 +169,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     })();
     return () => { cancelled = true; };
-  }, [session, user, listTestPhones]);
+  }, [session, user, testModeEnabled, listTestPhones]);
   const refresh = useCallback(async () => {
     if (!myPhone) return;
     setDataLoading(true);
