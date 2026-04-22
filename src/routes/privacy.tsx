@@ -27,11 +27,12 @@ function PrivacyPage() {
         <Section title="1. What we collect">
           <strong>Your phone number</strong>, used solely to send your one-time sign-in code and to identify your account. <br/>
           <strong>Hashed contacts</strong> you add — stored as opaque codes (SHA-256 with a server-side secret pepper). The raw numbers never reach our database. <br/>
+          <strong>Lightweight message data</strong> — the short emoji-only messages you choose to send, along with delivery metadata such as timestamps and sender/recipient hashes, so the service can deliver conversations. <br/>
           <strong>Basic technical data</strong> (timestamps, error logs) needed to operate the service.
         </Section>
 
         <Section title="2. What we don't collect">
-          We don't collect your address book in bulk, your location, your messages, your contacts' names, or any social-graph data beyond the specific numbers you choose to add one at a time.
+          We don't collect your address book in bulk, your location, your contacts' names, or any social-graph data beyond the specific numbers you choose to add one at a time. We also do not store raw added phone numbers in our database.
         </Section>
 
         <Section title="3. How hashing works">
@@ -42,31 +43,39 @@ function PrivacyPage() {
           A match is created when the hash of a number you added equals the hash of the account holder's own phone number, AND they have done the same with yours. The matches view returns only opaque hashes; your device maps those hashes back to readable numbers using the local list of phones you yourself uploaded. We never reveal another user's raw number to you.
         </Section>
 
-        <Section title="5. Who can see your data">
+        <Section title="5. Messaging">
+          Sphere supports lightweight messaging in the form of short emoji-only messages between mutual matches. Those messages are stored so they can be delivered in real time and shown in your thread history. Message records include message content, timestamps, and hashed routing information; they do not expose another user's raw phone number.
+        </Section>
+
+        <Section title="6. Who can see your data">
           Other users can never read your adds or your matches — every row is protected by per-user row-level security in the database. Sphere staff have administrative database access for operational reasons but cannot read who you've added because contact data is stored only as peppered hashes.
         </Section>
 
-        <Section title="6. Service providers">
+        <Section title="7. Service providers">
           We use a backend platform (Supabase, hosted on infrastructure operated by them and their cloud provider) to store account and hashed-contact data, and an SMS provider to deliver login codes. These providers process data on our behalf under their own privacy commitments.
         </Section>
 
-        <Section title="7. Retention and deletion">
-          We keep your account and hashed adds for as long as your account exists. You can delete your account at any time from the profile screen; doing so removes your account record and all hashed adds linked to it. Backups roll off within 30 days.
+        <Section title="8. Retention and deletion">
+          We keep your account, hashed adds, and lightweight message history for as long as your account exists, unless a shorter retention period is required by law or operational necessity. You can delete your account at any time from the profile screen; doing so removes your account record and all hashed adds linked to it. Backups roll off within 30 days.
         </Section>
 
-        <Section title="8. Children">
+        <Section title="9. Children">
           Sphere is not intended for users under 17, and we do not knowingly collect data from children.
         </Section>
 
-        <Section title="9. Your rights">
+        <Section title="10. Your rights">
           Depending on where you live (e.g., GDPR / CCPA jurisdictions), you may have rights to access, correct, port, or delete your personal data. Email <a className="underline" href="mailto:privacy@sphere.app">privacy@sphere.app</a> and we'll respond within 30 days.
         </Section>
 
-        <Section title="10. Changes">
+        <Section title="11. Contact permissions">
+          If you choose to use contact-related features, Sphere uses the phone numbers you explicitly enter or choose to import to help identify mutual matches. Contact names stay on your device unless you separately choose to share them; matching is based on hashed phone numbers, not raw contact records stored in our database.
+        </Section>
+
+        <Section title="12. Changes">
           If we materially change this policy we'll notify you in the app before the changes take effect.
         </Section>
 
-        <Section title="11. Contact">
+        <Section title="13. Contact">
           Questions or requests? Email <a className="underline" href="mailto:privacy@sphere.app">privacy@sphere.app</a>.
         </Section>
 
