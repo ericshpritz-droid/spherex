@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useSession, formatE164, sendOtp, verifyOtp, signOut, toE164 } from "./auth";
+import { useSession, formatE164, applySessionTokens, signOut, toE164 } from "./auth";
 import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
 import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
 import { loadLastMessagesServer } from "./messages.functions";
@@ -9,6 +9,7 @@ import { consumeInviteServer } from "./invites.functions";
 import { testmodeListPhones } from "./testmode/testmode.functions";
 import { useTestMode } from "./testmode/useTestMode";
 import { useServerFn } from "@tanstack/react-start";
+import { startPhoneVerification, verifyPhoneCode } from "./phoneAuth.functions";
 
 type Accent = "pink" | "lavender" | "blue";
 
@@ -108,6 +109,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const { session, loading: sessionLoading, user } = useSession();
   const { enabled: testModeEnabled } = useTestMode();
+  const startPhoneVerificationFn = useServerFn(startPhoneVerification);
+  const verifyPhoneCodeFn = useServerFn(verifyPhoneCode);
   const myPhone = user?.phone ? `+${String(user.phone).replace(/\D/g, "")}` : "";
   const myPhoneFormatted = myPhone ? formatE164(myPhone) : "";
 
@@ -434,19 +437,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const e164 = toE164(digits);
     setPendingPhone(e164);
     try {
-      await sendOtp(e164);
+      await startPhoneVerificationFn({ data: { phoneE164: e164 } });
     } catch (e) {
       throw new Error(friendlyError(e));
     }
-  }, []);
+  }, [startPhoneVerificationFn]);
 
   const verifyCode = useCallback(async (code: string) => {
     try {
-      await verifyOtp(pendingPhone, code);
+      const sessionTokens = await verifyPhoneCodeFn({ data: { phoneE164: pendingPhone, code } });
+      await applySessionTokens(sessionTokens.access_token, sessionTokens.refresh_token);
     } catch (e) {
       throw new Error(friendlyError(e));
     }
-  }, [pendingPhone]);
+  }, [pendingPhone, verifyPhoneCodeFn]);
 
   // After a successful add, ask the server to compute hashes for the just-
   // uploaded raw phones (using its pepper) and remember the mapping locally.

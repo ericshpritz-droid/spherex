@@ -152,17 +152,21 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
         >←</button>
         <div className="font-bold tracking-sora-display" style={{ fontSize: 34, lineHeight: 1.05 }}>What's your<br/>number?</div>
         <div className="mt-3 text-[15px] text-fg-60" style={{ lineHeight: 1.45 }}>
-          We'll send a 6-digit code. Your number is never shown publicly.
+          We'll send a 6-digit code. With Twilio test credentials, enter a Twilio magic test number.
         </div>
         <div className="mt-8">
           <div className="flex items-center gap-3 rounded-[18px] bg-glass-06 border border-hairline-12" style={{ padding: '18px 20px' }}>
             <div className="font-semibold text-[22px] text-fg-50">🇺🇸 +1</div>
             <div className="w-px h-6 bg-hairline-12"/>
             <div className="flex-1 font-semibold text-2xl text-white" style={{ letterSpacing: -0.6 }}>
-              {formatted || <span className="text-fg-30">(555) 123-4567</span>}
+              {formatted || <span className="text-fg-30">(500) 555-0006</span>}
             </div>
           </div>
           {err && <div className="mt-3 text-[13px] text-error" style={{ lineHeight: 1.4 }}>{err}</div>}
+        </div>
+
+        <div className="mt-4 text-[13px] text-fg-60" style={{ lineHeight: 1.5 }}>
+          Try <span className="text-white">+1 500 555 0006</span> for a successful test send or other Twilio magic test numbers to simulate failures.
         </div>
 
         <button
