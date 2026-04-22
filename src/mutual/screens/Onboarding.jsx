@@ -211,7 +211,7 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
   );
 }
 
-export function ScreenCode({ accent, phoneFormatted, onVerify, onBack }) {
+export function ScreenCode({ accent, phoneFormatted, codeHint, onVerify, onBack }) {
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -237,6 +237,11 @@ export function ScreenCode({ accent, phoneFormatted, onVerify, onBack }) {
         <div className="mt-3 text-[15px] text-fg-60" style={{ lineHeight: 1.45 }}>
           Six digits coming to <span className="text-white">{phoneFormatted}</span>.
         </div>
+        {codeHint && (
+          <div className="mt-3 text-[13px] text-fg-60" style={{ lineHeight: 1.45 }}>
+            Twilio test mode code: <span className="text-white font-semibold">{codeHint}</span>
+          </div>
+        )}
         <div className="mt-10 flex gap-2.5 justify-between">
           {[0,1,2,3,4,5].map(i => {
             const d = code[i]; const active = i === code.length;

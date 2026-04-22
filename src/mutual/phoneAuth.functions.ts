@@ -1,7 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createHash, randomInt } from "node:crypto";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
 const TWILIO_TEST_FROM = "+15005550006";
@@ -18,10 +16,16 @@ const verifySchema = z.object({
 });
 
 function hashCode(phoneE164: string, code: string) {
+  const { createHash } = globalThis.process?.versions?.node
+    ? require("node:crypto")
+    : { createHash: null as never };
   return createHash("sha256").update(`${phoneE164}:${code}`).digest("hex");
 }
 
 function generateCode() {
+  const { randomInt } = globalThis.process?.versions?.node
+    ? require("node:crypto")
+    : { randomInt: null as never };
   return String(randomInt(0, 1_000_000)).padStart(6, "0");
 }
 
@@ -59,6 +63,7 @@ async function sendVerificationSms(phoneE164: string, code: string) {
 export const startPhoneVerification = createServerFn({ method: "POST" })
   .inputValidator((input: { phoneE164: string }) => phoneSchema.parse(input))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (!isTwilioTestNumber(data.phoneE164)) {
       throw new Error("With Twilio test credentials, use a Twilio magic test number like +15005550006 or +15005550009.");
     }
@@ -81,12 +86,14 @@ export const startPhoneVerification = createServerFn({ method: "POST" })
       }, { onConflict: "phone_e164" });
 
     if (error) throw new Error("Could not store verification challenge.");
-    return { ok: true };
+    return { ok: true, preview_code: code };
   });
 
 export const verifyPhoneCode = createServerFn({ method: "POST" })
   .inputValidator((input: { phoneE164: string; code: string }) => verifySchema.parse(input))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { randomUUID } = await import("node:crypto");
     const { data: challenge, error } = await supabaseAdmin
       .from("phone_verification_challenges")
       .select("phone_e164, code_hash, expires_at, attempt_count, consumed_at")
@@ -116,7 +123,7 @@ export const verifyPhoneCode = createServerFn({ method: "POST" })
     let userId = existingIdentity?.user_id;
     if (!userId) {
       const email = `phone-${data.phoneE164.replace(/\D/g, "")}@sphere.test`;
-      const password = crypto.randomUUID() + crypto.randomUUID();
+      const password = randomUUID() + randomUUID();
       const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
