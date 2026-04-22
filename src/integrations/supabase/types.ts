@@ -107,6 +107,66 @@ export type Database = {
         }
         Relationships: []
       }
+      phone_auth_identities: {
+        Row: {
+          created_at: string
+          id: string
+          phone_e164: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          phone_e164: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          phone_e164?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      phone_verification_challenges: {
+        Row: {
+          attempt_count: number
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          last_sent_at: string
+          phone_e164: string
+          updated_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          last_sent_at?: string
+          phone_e164: string
+          updated_at?: string
+        }
+        Update: {
+          attempt_count?: number
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_sent_at?: string
+          phone_e164?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       test_accounts: {
         Row: {
           created_at: string
