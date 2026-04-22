@@ -39,16 +39,10 @@ export function formatE164(e164: string): string {
   return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
 }
 
-export async function sendOtp(phoneE164: string) {
-  const { error } = await supabase.auth.signInWithOtp({ phone: phoneE164 });
-  if (error) throw error;
-}
-
-export async function verifyOtp(phoneE164: string, token: string) {
-  const { error } = await supabase.auth.verifyOtp({
-    phone: phoneE164,
-    token,
-    type: "sms",
+export async function applySessionTokens(accessToken: string, refreshToken: string) {
+  const { error } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken,
   });
   if (error) throw error;
 }
