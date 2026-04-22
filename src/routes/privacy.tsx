@@ -56,7 +56,7 @@ function PrivacyPage() {
         </Section>
 
         <Section title="8. Retention and deletion">
-          We keep your account, hashed adds, and lightweight message history for as long as your account exists, unless a shorter retention period is required by law or operational necessity. You can delete your account at any time from the profile screen; doing so removes your account record and all hashed adds linked to it. Backups roll off within 30 days.
+          We keep your account, hashed adds, and lightweight message history for as long as your account exists, unless a shorter retention period is required by law or operational necessity. You can delete your account at any time from the profile screen; doing so removes your account record, hashed adds, and lightweight emoji message history from our active systems. Encrypted backups that may still contain that data automatically expire and roll off within 30 days of deletion.
         </Section>
 
         <Section title="9. Children">
