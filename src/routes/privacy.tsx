@@ -59,27 +59,31 @@ function PrivacyPage() {
           Lightweight messages and hashed contact data are encrypted in transit using HTTPS/TLS and protected at rest by the security controls of our hosting providers and database systems. Internally, access is limited to authorized personnel who need it for operating, securing, or supporting Sphere, and hashed contact data is designed so raw added phone numbers are not available from database records.
         </Section>
 
-        <Section title="9. Retention and deletion">
+        <Section title="9. Hosting and international transfers">
+          Sphere is hosted on infrastructure operated by our backend and communications service providers. Depending on where you use the app and where those providers maintain systems or support personnel, your data may be processed or transferred internationally. When that happens, we rely on provider safeguards and contractual protections intended to protect personal data during those transfers.
+        </Section>
+
+        <Section title="10. Retention and deletion">
           We keep your account, hashed adds, and lightweight message history for as long as your account exists, unless a shorter retention period is required by law or operational necessity. You can delete your account at any time from the profile screen; when you tap delete, we remove your account record, the hashed contacts you added, and your lightweight emoji message history from our active systems. Encrypted backups that may still contain that data automatically expire and roll off within 30 days of deletion.
         </Section>
 
-        <Section title="10. Children">
+        <Section title="11. Children">
           Sphere is not intended for users under 17, and we do not knowingly collect data from children.
         </Section>
 
-        <Section title="11. Your rights">
+        <Section title="12. Your rights">
           Depending on where you live (e.g., GDPR / CCPA jurisdictions), you may have rights to access, correct, port, or delete your personal data. Email <a className="underline" href="mailto:privacy@sphere.app">privacy@sphere.app</a> and we'll respond within 30 days.
         </Section>
 
-        <Section title="12. Contact permissions">
+        <Section title="13. Contact permissions">
           If you choose to use contact-related features, Sphere uses the phone numbers you explicitly enter or choose to import to help identify mutual matches. Contact names stay on your device unless you separately choose to share them; matching is based on hashed phone numbers, not raw contact records stored in our database.
         </Section>
 
-        <Section title="13. Changes">
+        <Section title="14. Changes">
           If we materially change this policy we'll notify you in the app before the changes take effect.
         </Section>
 
-        <Section title="14. Contact">
+        <Section title="15. Contact">
           Questions or requests? Email <a className="underline" href="mailto:privacy@sphere.app">privacy@sphere.app</a>.
         </Section>
 
