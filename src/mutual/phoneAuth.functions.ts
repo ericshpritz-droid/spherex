@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createHash, randomInt, randomUUID } from "node:crypto";
 import { z } from "zod";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
@@ -16,16 +17,10 @@ const verifySchema = z.object({
 });
 
 function hashCode(phoneE164: string, code: string) {
-  const { createHash } = globalThis.process?.versions?.node
-    ? require("node:crypto")
-    : { createHash: null as never };
   return createHash("sha256").update(`${phoneE164}:${code}`).digest("hex");
 }
 
 function generateCode() {
-  const { randomInt } = globalThis.process?.versions?.node
-    ? require("node:crypto")
-    : { randomInt: null as never };
   return String(randomInt(0, 1_000_000)).padStart(6, "0");
 }
 
@@ -93,7 +88,6 @@ export const verifyPhoneCode = createServerFn({ method: "POST" })
   .inputValidator((input: { phoneE164: string; code: string }) => verifySchema.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { randomUUID } = await import("node:crypto");
     const { data: challenge, error } = await supabaseAdmin
       .from("phone_verification_challenges")
       .select("phone_e164, code_hash, expires_at, attempt_count, consumed_at")
