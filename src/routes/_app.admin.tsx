@@ -17,14 +17,14 @@ function AdminRoute() {
   const { user, accent } = useApp();
   const isAdmin = useIsAdmin(user?.id);
   const navigate = useNavigate();
-  const [testMode, setTestMode] = useState<boolean | null>(null);
+  const [testMode, setTestModeState] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const setTestMode = useServerFn(setTestModeServer);
+  const updateTestMode = useServerFn(setTestModeServer);
 
   useEffect(() => {
     supabase.from("app_settings").select("test_mode").eq("id", 1).single()
-      .then(({ data }) => setTestMode(!!data?.test_mode));
+      .then(({ data }) => setTestModeState(!!data?.test_mode));
   }, []);
 
   if (!user) {
@@ -57,11 +57,11 @@ function AdminRoute() {
       const { data } = await supabase.auth.getSession();
       const token = data.session?.access_token;
       if (!token) throw new Error("Your session expired. Please sign in again.");
-      const result = await setTestMode({
+      const result = await updateTestMode({
         data: { enabled: next },
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTestMode(result.testMode);
+      setTestModeState(result.testMode);
     } catch (error: any) {
       setErr(error?.message || "Could not update test mode");
     }
