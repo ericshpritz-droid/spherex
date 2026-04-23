@@ -28,23 +28,55 @@ function isTwilioTestNumber(phoneE164: string) {
   return /^\+1500555\d{4}$/.test(phoneE164);
 }
 
-async function sendVerificationSms(phoneE164: string, code: string) {
+async function getTwilioGatewayHeaders() {
   const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
   const TWILIO_API_KEY = process.env.TWILIO_API_KEY;
   if (!TWILIO_API_KEY) throw new Error("TWILIO_API_KEY is not configured");
 
+  return {
+    Authorization: `Bearer ${LOVABLE_API_KEY}`,
+    "X-Connection-Api-Key": TWILIO_API_KEY,
+  };
+}
+
+async function resolveSmsFromNumber() {
+  const headers = await getTwilioGatewayHeaders();
+  const response = await fetch(`${GATEWAY_URL}/IncomingPhoneNumbers.json?PageSize=20`, {
+    headers,
+  });
+
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(`Twilio sender lookup failed [${response.status}]: ${JSON.stringify(payload)}`);
+  }
+
+  const sender = payload?.incoming_phone_numbers?.find(
+    (entry: { phone_number?: string; capabilities?: { sms?: boolean } }) =>
+      entry?.capabilities?.sms && typeof entry.phone_number === "string",
+  )?.phone_number;
+
+  if (!sender) {
+    throw new Error("No SMS-capable Twilio sender number is configured on the connected account.");
+  }
+
+  return sender;
+}
+
+async function sendVerificationSms(phoneE164: string, code: string) {
+  const headers = await getTwilioGatewayHeaders();
+  const fromNumber = await resolveSmsFromNumber();
+
   const response = await fetch(`${GATEWAY_URL}/Messages.json`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "X-Connection-Api-Key": TWILIO_API_KEY,
+      ...headers,
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams({
       To: phoneE164,
-      From: TWILIO_TEST_FROM,
+      From: fromNumber,
       Body: `Sphere code: ${code}`,
     }),
   });
@@ -60,10 +92,10 @@ export const startPhoneVerification = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.phoneE164 === TWILIO_TEST_FROM) {
-      throw new Error("+1 500 555 0006 is reserved as the Twilio test sender number. Use any other valid number for testing.");
+      throw new Error("Use your own phone number here so you can receive the verification text.");
     }
-    if (!isTwilioTestNumber(data.phoneE164)) {
-      throw new Error("With Twilio test credentials, use a Twilio test number like +15005550009 for an expected failure, or any other valid number except +15005550006.");
+    if (isTwilioTestNumber(data.phoneE164)) {
+      throw new Error("Twilio magic test numbers only work with Twilio test credentials. Use a real phone number with the connected account.");
     }
 
     const code = generateCode();
@@ -84,7 +116,7 @@ export const startPhoneVerification = createServerFn({ method: "POST" })
       }, { onConflict: "phone_e164" });
 
     if (error) throw new Error("Could not store verification challenge.");
-    return { ok: true, preview_code: code };
+    return { ok: true, preview_code: "" };
   });
 
 export const verifyPhoneCode = createServerFn({ method: "POST" })
