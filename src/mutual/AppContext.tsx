@@ -74,6 +74,17 @@ function friendlyError(e: unknown): string {
 }
 
 function sanitizeOtpStartResult(result: any) {
+  if (
+    import.meta.env.DEV &&
+    result &&
+    ("delivery_mode" in result || "delivery_status" in result)
+  ) {
+    console.warn("Ignored OTP delivery metadata in client response", {
+      hasDeliveryMode: "delivery_mode" in result,
+      hasDeliveryStatus: "delivery_status" in result,
+    });
+  }
+
   return {
     previewCode: typeof result?.preview_code === "string" ? result.preview_code : "",
     resendCooldownSeconds:
