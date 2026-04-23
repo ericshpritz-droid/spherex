@@ -247,7 +247,7 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
           <div className="mt-3 flex flex-col gap-1">
             <button
               onClick={async () => {
-                if (busy || resendCountdown > 0) return;
+                if (busy || resendCountdown > 0 || !valid) return;
                 if (!valid) {
                   setShowValidation(true);
                   setErr('');
@@ -259,11 +259,11 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
                 }
                 await send();
               }}
-              disabled={busy || resendCountdown > 0}
+              disabled={busy || resendCountdown > 0 || !valid}
               className="self-start bg-transparent border-0 cursor-pointer text-[13px] font-semibold disabled:cursor-not-allowed"
               style={{
                 padding: 0,
-                color: busy || resendCountdown > 0 ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
+                color: busy || resendCountdown > 0 || !valid ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
               }}
             >
               {busy ? 'Sending…' : resendCountdown > 0 ? `Resend code in ${resendCountdown}s` : 'Resend code'}
