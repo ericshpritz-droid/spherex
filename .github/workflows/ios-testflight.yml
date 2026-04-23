@@ -175,12 +175,28 @@ jobs:
           IPA_PATH: ${{ runner.temp }}/export/App.ipa
         run: |
           set -o pipefail
-          xcrun altool \
-            --upload-app \
-            --type ios \
-            --file "$IPA_PATH" \
-            --apiKey "$APP_STORE_CONNECT_KEY_ID" \
-            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" 2>&1 | tee "$LOG_DIR/testflight-upload.log"
+          rm -f "$LOG_DIR/testflight-upload.log"
+          for attempt in 1 2 3; do
+            echo "TestFlight upload attempt $attempt" | tee -a "$LOG_DIR/testflight-upload.log"
+
+            if xcrun altool \
+              --upload-app \
+              --type ios \
+              --file "$IPA_PATH" \
+              --apiKey "$APP_STORE_CONNECT_KEY_ID" \
+              --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" 2>&1 | tee -a "$LOG_DIR/testflight-upload.log"; then
+              exit 0
+            fi
+
+            if [ "$attempt" -lt 3 ]; then
+              delay=$((attempt * 30))
+              echo "Upload failed, retrying in ${delay}s..." | tee -a "$LOG_DIR/testflight-upload.log"
+              sleep "$delay"
+            fi
+          done
+
+          echo "TestFlight upload failed after 3 attempts." | tee -a "$LOG_DIR/testflight-upload.log"
+          exit 1
 
       - name: Upload iOS debug artifacts
         if: always()
