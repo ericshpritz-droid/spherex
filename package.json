@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "npm run check:phone-flow && vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "check:phone-flow": "node ./scripts/check-phone-flow-delivery.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
