@@ -175,6 +175,13 @@ jobs:
           IPA_PATH: ${{ runner.temp }}/export/App.ipa
         run: |
           set -o pipefail
+          if [ ! -f "$IPA_PATH" ]; then
+            echo "Expected IPA not found at: $IPA_PATH" | tee -a "$LOG_DIR/testflight-upload.log"
+            echo "Contents of export directory:" | tee -a "$LOG_DIR/testflight-upload.log"
+            ls -la "$RUNNER_TEMP/export" | tee -a "$LOG_DIR/testflight-upload.log"
+            exit 1
+          fi
+
           rm -f "$LOG_DIR/testflight-upload.log"
           for attempt in 1 2 3; do
             echo "TestFlight upload attempt $attempt" | tee -a "$LOG_DIR/testflight-upload.log"
