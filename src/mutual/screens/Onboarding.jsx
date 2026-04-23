@@ -314,7 +314,7 @@ export function ScreenPhone({ accent, onSendCode, onBack, resendCooldownSeconds 
   );
 }
 
-export function ScreenCode({ accent, phoneFormatted, codeHint, deliveryMode = 'sms', deliveryStatus = '', onVerify, onBack, onResend, resendCooldownSeconds = 30 }) {
+export function ScreenCode({ accent, phoneFormatted, codeHint, onVerify, onBack, onResend, resendCooldownSeconds = 30 }) {
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -382,33 +382,14 @@ export function ScreenCode({ accent, phoneFormatted, codeHint, deliveryMode = 's
         <div className="mt-3 text-[15px] text-fg-60" style={{ lineHeight: 1.45 }}>
           Six digits coming to <span className="text-white">{phoneFormatted}</span>.
         </div>
-        <div
-          className="mt-4 rounded-[14px] border border-hairline-12 bg-glass-06"
-          style={{ padding: '12px 14px' }}
-        >
-          <div className="flex items-center gap-2 text-[13px] font-semibold text-white">
-            <span
-              className="inline-block h-2.5 w-2.5 rounded-full"
-              style={{ background: deliveryMode === 'preview_fallback' ? '#f59e0b' : ACCENT_PRESETS[accent].a }}
-            />
-            {deliveryMode === 'preview_fallback' ? 'Preview-code fallback active' : 'SMS handed off to Twilio'}
+        {codeHint && (
+          <div
+            className="mt-4 rounded-[14px] border border-hairline-12 bg-glass-06 text-[13px] text-white"
+            style={{ padding: '12px 14px', lineHeight: 1.45 }}
+          >
+            Fallback code: <span className="font-semibold">{codeHint}</span>
           </div>
-          <div className="mt-1 text-[12px] text-fg-60" style={{ lineHeight: 1.45 }}>
-            {deliveryMode === 'preview_fallback'
-              ? 'SMS delivery was not confirmed, so use the on-screen code below for testing.'
-              : 'Twilio accepted the request, but handset delivery can still take a moment.'}
-          </div>
-          {deliveryStatus && (
-            <div className="mt-2 text-[12px] text-fg-55" style={{ lineHeight: 1.45 }}>
-              {deliveryStatus}
-            </div>
-          )}
-          {codeHint && (
-            <div className="mt-2 text-[13px] text-white" style={{ lineHeight: 1.45 }}>
-              Fallback code: <span className="font-semibold">{codeHint}</span>
-            </div>
-          )}
-        </div>
+        )}
         <div className="mt-10 flex gap-2.5 justify-between">
           {[0,1,2,3,4,5].map(i => {
             const d = code[i]; const active = i === code.length;
