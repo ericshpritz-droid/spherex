@@ -234,7 +234,20 @@ export function ScreenCode({ accent, phoneFormatted, codeHint, deliveryMode = 's
     if (code.length === 6 && !busy) {
       setErr(''); setBusy(true);
       onVerify(code)
-        .catch((e) => { setErr(e?.message || 'Invalid code'); setCode(''); })
+        .catch((e) => {
+          const message = e?.message || 'We could not verify that code.';
+          const nextSteps = /expired/i.test(message)
+            ? 'Request a new code and try again.'
+            : /too many attempts/i.test(message)
+              ? 'Wait for the resend timer, request a fresh code, then enter the latest one.'
+              : /already been used/i.test(message)
+                ? 'Request a new code and use the most recent message only.'
+                : /invalid code/i.test(message)
+                  ? 'Double-check the latest code you received, or tap resend when it becomes available.'
+                  : 'Check the latest code you received and try again, or resend a fresh code.';
+          setErr(`${message} ${nextSteps}`);
+          setCode('');
+        })
         .finally(() => setBusy(false));
     }
   }, [code, busy, onVerify]);
@@ -295,7 +308,15 @@ export function ScreenCode({ accent, phoneFormatted, codeHint, deliveryMode = 's
             );
           })}
         </div>
-        {err && <div className="mt-4 text-center text-[13px] text-error">{err}</div>}
+        {err && (
+          <div
+            className="mt-4 rounded-[14px] border border-hairline-12 bg-glass-06 text-left"
+            style={{ padding: '12px 14px' }}
+          >
+            <div className="text-[13px] font-semibold text-error">Verification failed</div>
+            <div className="mt-1 text-[13px] text-fg-70" style={{ lineHeight: 1.45 }}>{err}</div>
+          </div>
+        )}
         {busy && <div className="mt-4 text-center text-sm text-fg-60">Verifying…</div>}
         <div className="mt-5 flex flex-col items-center gap-2">
           <button
