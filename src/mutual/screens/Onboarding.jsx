@@ -152,7 +152,7 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
         >←</button>
         <div className="font-bold tracking-sora-display" style={{ fontSize: 34, lineHeight: 1.05 }}>What's your<br/>number?</div>
         <div className="mt-3 text-[15px] text-fg-60" style={{ lineHeight: 1.45 }}>
-          We'll send a 6-digit code. In Twilio test mode, use any valid number except +1 500 555 0006.
+          We'll send a 6-digit code to your phone so you can test the full sign-in flow.
         </div>
         <div className="mt-8">
           <div className="flex items-center gap-3 rounded-[18px] bg-glass-06 border border-hairline-12" style={{ padding: '18px 20px' }}>
@@ -166,7 +166,7 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
         </div>
 
         <div className="mt-4 text-[13px] text-fg-60" style={{ lineHeight: 1.5 }}>
-          <span className="text-white">+1 500 555 0006</span> is the reserved test sender. Try <span className="text-white">+1 500 555 0009</span> to simulate a delivery failure, or use any other valid number for a successful test request.
+          Enter a real mobile number you can access. Twilio magic test numbers are only for Twilio test credentials, not this connected account.
         </div>
 
         <button
