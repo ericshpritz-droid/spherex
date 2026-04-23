@@ -439,8 +439,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const e164 = toE164(digits);
     setPendingPhone(e164);
     try {
-      const result = await startPhoneVerificationFn({ data: { phoneE164: e164 } });
-      setPendingCodeHint(result.preview_code || "");
+      await startPhoneVerificationFn({ data: { phoneE164: e164 } });
+      setPendingCodeHint("");
     } catch (e) {
       throw new Error(friendlyError(e));
     }
