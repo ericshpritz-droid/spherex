@@ -86,6 +86,11 @@ async function sendVerificationSms(phoneE164: string, code: string) {
   if (!response.ok) {
     throw new Error(`Twilio SMS failed [${response.status}]: ${JSON.stringify(payload)}`);
   }
+
+  return {
+    sid: typeof payload?.sid === "string" ? payload.sid : "",
+    status: typeof payload?.status === "string" ? payload.status : "accepted",
+  };
 }
 
 export const startPhoneVerification = createServerFn({ method: "POST" })
@@ -118,8 +123,18 @@ export const startPhoneVerification = createServerFn({ method: "POST" })
     const code = generateCode();
     const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000).toISOString();
     const codeHash = hashCode(data.phoneE164, code);
+    let deliveryMode: "sms" | "preview_fallback" = "sms";
+    let deliveryStatus = "SMS queued with Twilio.";
 
-    await sendVerificationSms(data.phoneE164, code);
+    try {
+      const smsResult = await sendVerificationSms(data.phoneE164, code);
+      deliveryStatus = smsResult.status === "accepted"
+        ? "SMS accepted by Twilio."
+        : `SMS status: ${smsResult.status}.`;
+    } catch (error) {
+      deliveryMode = "preview_fallback";
+      deliveryStatus = error instanceof Error ? error.message : "SMS send failed.";
+    }
 
     const { error } = await supabaseAdmin
       .from("phone_verification_challenges")
@@ -133,7 +148,12 @@ export const startPhoneVerification = createServerFn({ method: "POST" })
       }, { onConflict: "phone_e164" });
 
     if (error) throw new Error("Could not store verification challenge.");
-    return { ok: true, preview_code: "" };
+    return {
+      ok: true,
+      preview_code: deliveryMode === "preview_fallback" ? code : "",
+      delivery_mode: deliveryMode,
+      delivery_status: deliveryStatus,
+    };
   });
 
 export const verifyPhoneCode = createServerFn({ method: "POST" })
