@@ -93,6 +93,30 @@ jobs:
       - name: Install CocoaPods dependencies
         run: pod install --project-directory=ios/App
 
+      - name: Preflight iOS project checks
+        env:
+          XCODE_SCHEME: App
+        run: |
+          WORKSPACE_PATH="ios/App/App.xcworkspace"
+
+          if [ ! -d "$WORKSPACE_PATH" ]; then
+            echo "Missing required iOS workspace: $WORKSPACE_PATH" >&2
+            echo "Make sure the iOS platform is added and CocoaPods finished successfully before archiving." >&2
+            exit 1
+          fi
+
+          if ! xcodebuild -list -workspace "$WORKSPACE_PATH" > "$LOG_DIR/xcode-project-list.log" 2>&1; then
+            echo "Unable to inspect the Xcode workspace at $WORKSPACE_PATH." >&2
+            echo "See xcode-project-list.log in the workflow artifacts for details." >&2
+            exit 1
+          fi
+
+          if ! grep -Eq "^[[:space:]]+$XCODE_SCHEME$" "$LOG_DIR/xcode-project-list.log"; then
+            echo "Missing required Xcode scheme: $XCODE_SCHEME" >&2
+            echo "Available schemes were captured in xcode-project-list.log." >&2
+            exit 1
+          fi
+
       - name: Prepare signing assets
         run: |
           CERT_PATH="$RUNNER_TEMP/distribution.p12"
