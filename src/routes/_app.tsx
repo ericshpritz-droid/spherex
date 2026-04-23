@@ -24,6 +24,7 @@ function PhoneFrame() {
   const navigate = useNavigate();
   const path = location.pathname;
   const isPublic = PUBLIC_PATHS.has(path);
+  const showShellLoading = sessionLoading && !isPublic;
 
   // Auth-aware redirects (client-side; SSR-safe because we wait for sessionLoading)
   if (!sessionLoading) {
@@ -52,7 +53,7 @@ function PhoneFrame() {
           boxShadow: "0 40px 80px rgba(0,0,0,0.4)",
         }}
       >
-        {sessionLoading ? (
+        {showShellLoading ? (
           <div className="h-full flex flex-col items-center justify-center gap-3 text-white bg-ink">
             <Spinner accent={accent} size={36}/>
             <div className="text-sm text-fg-60">Loading…</div>
