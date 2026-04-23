@@ -15,14 +15,12 @@ export const Route = createFileRoute("/_app/phone")({
 });
 
 function PhoneRoute() {
-  const { accent, pendingOtpCooldownSeconds, pendingOtpDelivery, startOtp } = useApp();
+  const { accent, pendingOtpCooldownSeconds, startOtp } = useApp();
   const navigate = useNavigate();
 
   return (
     <ScreenPhone
       accent={accent}
-      deliveryMode={pendingOtpDelivery.mode}
-      deliveryStatus={pendingOtpDelivery.status}
       resendCooldownSeconds={pendingOtpCooldownSeconds}
       onSendCode={async (digits: string) => {
         await startOtp(digits);
