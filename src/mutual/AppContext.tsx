@@ -73,6 +73,14 @@ function friendlyError(e: unknown): string {
   return msg || "Something went wrong. Please try again.";
 }
 
+function sanitizeOtpStartResult(result: any) {
+  return {
+    previewCode: typeof result?.preview_code === "string" ? result.preview_code : "",
+    resendCooldownSeconds:
+      typeof result?.resend_cooldown_seconds === "number" ? result.resend_cooldown_seconds : 30,
+  };
+}
+
 // ---- Local hash → raw phone cache --------------------------------------
 // We only know the readable form of phones the *current device* has uploaded.
 // The cache is namespaced per user so multiple accounts on one browser don't
@@ -442,9 +450,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const e164 = toE164(digits);
     setPendingPhone(e164);
     try {
-      const result = await startPhoneVerificationFn({ data: { phoneE164: e164 } });
-      setPendingCodeHint(result.preview_code || "");
-      setPendingOtpCooldownSeconds(result.resend_cooldown_seconds || 30);
+      const result = sanitizeOtpStartResult(await startPhoneVerificationFn({ data: { phoneE164: e164 } }));
+      setPendingCodeHint(result.previewCode);
+      setPendingOtpCooldownSeconds(result.resendCooldownSeconds);
     } catch (e) {
       throw new Error(friendlyError(e));
     }
@@ -453,9 +461,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const resendOtp = useCallback(async () => {
     if (!pendingPhone) throw new Error("Enter your phone number first.");
     try {
-      const result = await startPhoneVerificationFn({ data: { phoneE164: pendingPhone } });
-      setPendingCodeHint(result.preview_code || "");
-      setPendingOtpCooldownSeconds(result.resend_cooldown_seconds || 30);
+      const result = sanitizeOtpStartResult(await startPhoneVerificationFn({ data: { phoneE164: pendingPhone } }));
+      setPendingCodeHint(result.previewCode);
+      setPendingOtpCooldownSeconds(result.resendCooldownSeconds);
     } catch (e) {
       throw new Error(friendlyError(e));
     }
