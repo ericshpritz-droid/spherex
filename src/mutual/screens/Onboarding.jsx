@@ -134,7 +134,17 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
   const send = async () => {
     setErr(''); setBusy(true);
     try { await onSendCode(digits); }
-    catch (e) { setErr(e?.message || 'Could not send code'); }
+    catch (e) {
+      const message = e?.message || 'We could not send your code.';
+      const nextSteps = /wait \d+s/i.test(message)
+        ? 'Wait for the timer to finish, then tap send code again.'
+        : /network|connection|fetch/i.test(message)
+          ? 'Check your signal or internet connection and try again.'
+          : /valid phone number|mobile number/i.test(message)
+            ? 'Double-check the number and try again.'
+            : 'Please try again in a moment. If it still fails, confirm this number can receive SMS.';
+      setErr(`${message} ${nextSteps}`);
+    }
     finally { setBusy(false); }
   };
 
@@ -170,7 +180,15 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
             </div>
           </div>
           {phoneError && <div className="mt-3 text-[13px] text-error" style={{ lineHeight: 1.4 }}>{phoneError}</div>}
-          {err && <div className="mt-3 text-[13px] text-error" style={{ lineHeight: 1.4 }}>{err}</div>}
+          {err && (
+            <div
+              className="mt-3 rounded-[14px] bg-glass-06 border border-hairline-12"
+              style={{ padding: 12 }}
+            >
+              <div className="text-[13px] font-semibold text-error">Couldn’t send code</div>
+              <div className="mt-1 text-[13px] text-fg-70" style={{ lineHeight: 1.45 }}>{err}</div>
+            </div>
+          )}
         </div>
 
         <div className="mt-4 text-[13px] text-fg-60" style={{ lineHeight: 1.5 }}>
