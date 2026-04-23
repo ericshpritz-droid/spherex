@@ -5,8 +5,23 @@ on:
     branches:
       - main
     paths:
-      - "src/**"
+      - "src/components/**"
+      - "src/hooks/**"
+      - "src/lib/**"
+      - "src/routes/**"
+      - "src/assets/**"
+      - "src/router.tsx"
+      - "src/styles.css"
+      - "src/mutual/AppContext.tsx"
+      - "src/mutual/auth.ts"
+      - "src/mutual/brand.js"
+      - "src/mutual/components/**"
+      - "src/mutual/data.js"
+      - "src/mutual/native/**"
+      - "src/mutual/screens/**"
+      - "src/mutual/testmode/**"
       - "public/**"
+      - "dist/**"
       - "package.json"
       - "bun.lockb"
       - "package-lock.json"
@@ -14,7 +29,6 @@ on:
       - "vite.config.ts"
       - "tsconfig.json"
       - "components.json"
-      - "src/styles.css"
   workflow_dispatch:
 
 concurrency:
