@@ -59,8 +59,11 @@ export const startPhoneVerification = createServerFn({ method: "POST" })
   .inputValidator((input: { phoneE164: string }) => phoneSchema.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (data.phoneE164 === TWILIO_TEST_FROM) {
+      throw new Error("+1 500 555 0006 is reserved as the Twilio test sender number. Use any other valid number for testing.");
+    }
     if (!isTwilioTestNumber(data.phoneE164)) {
-      throw new Error("With Twilio test credentials, use a Twilio magic test number like +15005550006 or +15005550009.");
+      throw new Error("With Twilio test credentials, use a Twilio test number like +15005550009 for an expected failure, or any other valid number except +15005550006.");
     }
 
     const code = generateCode();
