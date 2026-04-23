@@ -45,6 +45,12 @@ supabase/                    # Backend config and migrations
 .github/workflows/           # CI/TestFlight automation
 ```
 
+### Current route files
+
+The active route files in `src/routes/` are:
+
+`__root.tsx`, `_app.tsx`, `_app.add.tsx`, `_app.admin.tsx`, `_app.code.tsx`, `_app.contacts.tsx`, `_app.home.tsx`, `_app.match.tsx`, `_app.onboarding-import.tsx`, `_app.phone.tsx`, `_app.profile.tsx`, `_app.sent.tsx`, `_app.sitemap.tsx`, `_app.thread.$hash.tsx`, `_app.welcome.tsx`, `i.$hash.tsx`, `index.tsx`, `privacy.tsx`, and `terms.tsx`.
+
 ## Local development
 
 ### Prerequisites
@@ -74,6 +80,7 @@ bun run build:dev   # Development-mode build
 bun run preview     # Preview the production build locally
 bun run lint        # Lint the codebase
 bun run format      # Format files with Prettier
+bun run check:phone-flow  # Validate the phone auth delivery flow script
 ```
 
 ## Backend and secrets
@@ -131,7 +138,7 @@ The GitHub Actions workflow handles automated TestFlight packaging and now inclu
 - iOS workspace and scheme preflight checks
 - signing asset validation before `xcodebuild`
 - retry logic for archive, export, and upload steps
-- automatic IPA discovery
+- IPA existence verification at `runner.temp/export/App.ipa`
 - uploaded debug artifacts including logs, dSYMs, and symbolication details
 
 ### iOS GitHub Actions workflow, step by step
@@ -221,7 +228,7 @@ After a successful archive, the workflow exports the installable IPA:
 
 Once the IPA is available, the workflow uploads it to TestFlight using App Store Connect credentials.
 
-- it verifies the IPA exists before upload starts
+- it checks that `runner.temp/export/App.ipa` exists before upload starts
 - it retries the upload up to 3 times for transient App Store Connect failures
 - upload activity is captured in `testflight-upload.log`
 
