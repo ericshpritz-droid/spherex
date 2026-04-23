@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isValidTestCode, isValidTestPin, synthEmail, synthPhone } from "./shared";
 
 async function ensureTestModeEnabled() {
@@ -10,6 +11,39 @@ async function ensureTestModeEnabled() {
     .single();
   if (error) throw new Error("Could not read app settings");
   if (!data?.test_mode) throw new Error("Test mode is disabled");
+}
+
+async function ensureAdminAccess(context: { supabase: any; userId: string }) {
+  const { data, error } = await context.supabase.rpc("has_role", {
+    _user_id: context.userId,
+    _role: "admin",
+  });
+
+  if (error) throw new Error("Could not verify admin access");
+  if (!data) throw new Error("Not authorized");
+}
+
+async function purgeSyntheticAccounts() {
+  const { data: accounts, error } = await supabaseAdmin
+    .from("test_accounts")
+    .select("user_id");
+
+  if (error) throw new Error("Could not list test accounts");
+  if (!accounts?.length) return;
+
+  for (const account of accounts) {
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(account.user_id);
+    if (deleteError && !/user not found/i.test(deleteError.message || "")) {
+      throw new Error("Could not deactivate test accounts");
+    }
+  }
+
+  const { error: cleanupError } = await supabaseAdmin
+    .from("test_accounts")
+    .delete()
+    .in("user_id", accounts.map((account) => account.user_id));
+
+  if (cleanupError) throw new Error("Could not clean up test accounts");
 }
 
 export const testmodePinStatus = createServerFn({ method: "POST" })
@@ -102,4 +136,27 @@ export const testmodeListPhones = createServerFn({ method: "POST" })
       .select("pin");
     if (error) throw new Error("Could not list test accounts");
     return { phones: (data || []).map((r) => synthPhone(r.pin as string)) };
+  });
+
+export const setTestMode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { enabled: boolean }) => {
+    if (typeof input.enabled !== "boolean") throw new Error("Invalid test mode setting");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    await ensureAdminAccess(context as { supabase: any; userId: string });
+
+    if (!data.enabled) {
+      await purgeSyntheticAccounts();
+    }
+
+    const { error } = await supabaseAdmin
+      .from("app_settings")
+      .update({ test_mode: data.enabled, updated_at: new Date().toISOString() })
+      .eq("id", 1);
+
+    if (error) throw new Error("Could not update test mode");
+
+    return { testMode: data.enabled };
   });
