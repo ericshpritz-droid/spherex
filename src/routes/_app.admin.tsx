@@ -2,7 +2,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
 import { useApp } from "../mutual/AppContext";
+import { setTestMode as setTestModeServer } from "../mutual/testmode/testmode.functions";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
 import { Spinner } from "../mutual/components/Spinner.jsx";
 
@@ -18,6 +20,7 @@ function AdminRoute() {
   const [testMode, setTestMode] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const setTestMode = useServerFn(setTestModeServer);
 
   useEffect(() => {
     supabase.from("app_settings").select("test_mode").eq("id", 1).single()
@@ -50,12 +53,18 @@ function AdminRoute() {
     if (testMode === null) return;
     setBusy(true); setErr("");
     const next = !testMode;
-    const { error } = await supabase
-      .from("app_settings")
-      .update({ test_mode: next, updated_at: new Date().toISOString() })
-      .eq("id", 1);
-    if (error) setErr(error.message);
-    else setTestMode(next);
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) throw new Error("Your session expired. Please sign in again.");
+      const result = await setTestMode({
+        data: { enabled: next },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTestMode(result.testMode);
+    } catch (error: any) {
+      setErr(error?.message || "Could not update test mode");
+    }
     setBusy(false);
   };
 
