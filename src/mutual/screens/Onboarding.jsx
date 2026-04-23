@@ -328,6 +328,21 @@ export function ScreenCode({ accent, phoneFormatted, codeHint, deliveryMode = 's
   const [resendBusy, setResendBusy] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(resendCooldownSeconds);
 
+  const handleResend = async () => {
+    if (resendBusy || resendCountdown > 0) return;
+    setErr('');
+    setResendBusy(true);
+    try {
+      await onResend();
+      setCode('');
+      setResendCountdown(resendCooldownSeconds);
+    } catch (e) {
+      setErr(e?.message || 'Could not resend code');
+    } finally {
+      setResendBusy(false);
+    }
+  };
+
   useEffect(() => {
     setResendCountdown(resendCooldownSeconds);
   }, [phoneFormatted, resendCooldownSeconds]);
@@ -425,25 +440,32 @@ export function ScreenCode({ accent, phoneFormatted, codeHint, deliveryMode = 's
           >
             <div className="text-[13px] font-semibold text-error">Verification failed</div>
             <div className="mt-1 text-[13px] text-fg-70" style={{ lineHeight: 1.45 }}>{err}</div>
+            <div className="mt-3 flex items-center gap-4 text-[13px] font-semibold">
+              <button
+                onClick={onBack}
+                className="bg-transparent border-0 cursor-pointer"
+                style={{ padding: 0, color: ACCENT_PRESETS[accent].a }}
+              >
+                Change number
+              </button>
+              <button
+                onClick={handleResend}
+                disabled={resendBusy || resendCountdown > 0}
+                className="bg-transparent border-0 cursor-pointer disabled:cursor-not-allowed"
+                style={{
+                  padding: 0,
+                  color: resendBusy || resendCountdown > 0 ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
+                }}
+              >
+                {resendBusy ? 'Resending…' : resendCountdown > 0 ? `Resend code in ${resendCountdown}s` : 'Resend code'}
+              </button>
+            </div>
           </div>
         )}
         {busy && <div className="mt-4 text-center text-sm text-fg-60">Verifying…</div>}
         <div className="mt-5 flex flex-col items-center gap-2">
           <button
-            onClick={async () => {
-              if (resendBusy || resendCountdown > 0) return;
-              setErr('');
-              setResendBusy(true);
-              try {
-                await onResend();
-                setCode('');
-                setResendCountdown(resendCooldownSeconds);
-              } catch (e) {
-                setErr(e?.message || 'Could not resend code');
-              } finally {
-                setResendBusy(false);
-              }
-            }}
+            onClick={handleResend}
             disabled={resendBusy || resendCountdown > 0}
             className="bg-transparent border-0 cursor-pointer text-[14px] font-semibold disabled:cursor-not-allowed"
             style={{
