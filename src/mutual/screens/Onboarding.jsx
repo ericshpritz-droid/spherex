@@ -142,15 +142,16 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
   }, [resendCountdown]);
 
   const buildSendErrorMessage = (message) => {
+    const cooldownLabel = `${resendCooldownSeconds} seconds`;
     const nextSteps = /wait \d+s/i.test(message)
-      ? 'Wait for the timer to finish, then tap send code again.'
+      ? `Wait ${cooldownLabel}, then tap send code again.`
       : /network|connection|fetch/i.test(message)
         ? 'Check your signal or internet connection and try again.'
         : /unreachable|invalid destination|undeliverable|cannot receive|landline|not a mobile|destination/i.test(message)
           ? 'Confirm this number can receive SMS messages, then check the number and try again.'
           : /valid phone number|mobile number/i.test(message)
             ? 'Double-check the number and try again.'
-            : 'Please try again in a moment. If it still fails, confirm this number can receive SMS.';
+            : `Please wait ${cooldownLabel} before trying again. If it still fails, confirm this number can receive SMS.`;
 
     return `${message} ${nextSteps}`;
   };
@@ -283,7 +284,7 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
               {resendBusy ? 'Resending…' : resendCountdown > 0 ? `Resend code in ${resendCountdown}s` : 'Resend code'}
             </button>
             <div className="text-[12px] text-fg-55" style={{ lineHeight: 1.45 }}>
-              Retry with the same number once the cooldown finishes.
+              Retry with the same number once the {resendCooldownSeconds}-second cooldown finishes.
             </div>
           </div>
         </div>
