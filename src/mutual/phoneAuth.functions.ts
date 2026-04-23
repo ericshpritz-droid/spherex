@@ -153,6 +153,7 @@ export const startPhoneVerification = createServerFn({ method: "POST" })
       preview_code: deliveryMode === "preview_fallback" ? code : "",
       delivery_mode: deliveryMode,
       delivery_status: deliveryStatus,
+      resend_cooldown_seconds: RESEND_COOLDOWN_SECONDS,
     };
   });
 

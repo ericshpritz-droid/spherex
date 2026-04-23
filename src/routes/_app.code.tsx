@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_app/code")({
 });
 
 function CodeRoute() {
-  const { accent, pendingPhone, pendingCodeHint, pendingOtpDelivery, resendOtp, verifyCode } = useApp();
+  const { accent, pendingPhone, pendingCodeHint, pendingOtpCooldownSeconds, pendingOtpDelivery, resendOtp, verifyCode } = useApp();
   const navigate = useNavigate();
   return (
     <ScreenCode
@@ -26,7 +26,7 @@ function CodeRoute() {
       deliveryMode={pendingOtpDelivery.mode}
       deliveryStatus={pendingOtpDelivery.status}
       onResend={resendOtp}
-      resendCooldownSeconds={30}
+      resendCooldownSeconds={pendingOtpCooldownSeconds}
       onVerify={verifyCode}
       onBack={() => navigate({ to: "/phone" })}
     />
