@@ -126,8 +126,10 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
   const [err, setErr] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
   const formatted = formatPhone(digits);
   const valid = digits.length === 10;
+  const phoneError = showValidation && !valid ? 'Enter a valid 10-digit mobile number.' : '';
 
   const send = async () => {
     setErr(''); setBusy(true);
@@ -137,7 +139,12 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
   };
 
   const submit = async () => {
-    if (!valid || busy) return;
+    if (busy) return;
+    if (!valid) {
+      setShowValidation(true);
+      setErr('');
+      return;
+    }
     if (!agreed) { setShowTerms(true); return; }
     await send();
   };
@@ -162,6 +169,7 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
               {formatted || <span className="text-fg-30">(500) 555-0006</span>}
             </div>
           </div>
+          {phoneError && <div className="mt-3 text-[13px] text-error" style={{ lineHeight: 1.4 }}>{phoneError}</div>}
           {err && <div className="mt-3 text-[13px] text-error" style={{ lineHeight: 1.4 }}>{err}</div>}
         </div>
 
@@ -185,8 +193,13 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
 
         <div className="flex-1"/>
         <NumPad onKey={(k) => {
-          if (k === 'del') setDigits(d => d.slice(0, -1));
-          else if (digits.length < 10) setDigits(d => d + k);
+          setErr('');
+          if (k === 'del') {
+            setDigits(d => d.slice(0, -1));
+            return;
+          }
+          if (digits.length < 10) setDigits(d => d + k);
+          if (showValidation) setShowValidation(true);
         }}/>
         <div className="mt-5">
           <Button accent={accent} disabled={!valid || busy} onClick={submit}>
