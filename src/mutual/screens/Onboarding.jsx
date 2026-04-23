@@ -152,7 +152,7 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
         >←</button>
         <div className="font-bold tracking-sora-display" style={{ fontSize: 34, lineHeight: 1.05 }}>What's your<br/>number?</div>
         <div className="mt-3 text-[15px] text-fg-60" style={{ lineHeight: 1.45 }}>
-          We'll send a 6-digit code to your phone. If your messaging account is in test mode, we'll also show the code on the next screen.
+          We'll send a 6-digit code to your phone so you can sign in.
         </div>
         <div className="mt-8">
           <div className="flex items-center gap-3 rounded-[18px] bg-glass-06 border border-hairline-12" style={{ padding: '18px 20px' }}>
@@ -237,11 +237,6 @@ export function ScreenCode({ accent, phoneFormatted, codeHint, onVerify, onBack 
         <div className="mt-3 text-[15px] text-fg-60" style={{ lineHeight: 1.45 }}>
           Six digits coming to <span className="text-white">{phoneFormatted}</span>.
         </div>
-        {codeHint && (
-          <div className="mt-3 text-[13px] text-fg-60" style={{ lineHeight: 1.45 }}>
-            Twilio test mode code: <span className="text-white font-semibold">{codeHint}</span>
-          </div>
-        )}
         <div className="mt-10 flex gap-2.5 justify-between">
           {[0,1,2,3,4,5].map(i => {
             const d = code[i]; const active = i === code.length;
