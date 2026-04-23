@@ -199,6 +199,20 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
             >
               <div className="text-[13px] font-semibold text-error">Couldn’t send code</div>
               <div className="mt-1 text-[13px] text-fg-70" style={{ lineHeight: 1.45 }}>{err}</div>
+              <button
+                onClick={async () => {
+                  if (busy || !valid) return;
+                  await send();
+                }}
+                disabled={busy || !valid}
+                className="mt-3 bg-transparent border-0 cursor-pointer text-[13px] font-semibold disabled:cursor-not-allowed"
+                style={{
+                  padding: 0,
+                  color: busy || !valid ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
+                }}
+              >
+                {busy ? 'Retrying…' : 'Retry'}
+              </button>
             </div>
           )}
         </div>
