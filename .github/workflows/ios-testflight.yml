@@ -275,6 +275,40 @@ jobs:
           echo "TestFlight upload failed after 3 attempts." | tee -a "$LOG_DIR/testflight-upload.log"
           exit 1
 
+      - name: Collect dSYM and symbolication artifacts
+        if: always()
+        env:
+          ARCHIVE_PATH: ${{ runner.temp }}/Sphere.xcarchive
+        run: |
+          DSYM_SOURCE_DIR="$ARCHIVE_PATH/dSYMs"
+          DSYM_OUTPUT_DIR="$RUNNER_TEMP/debug-symbols"
+          DSYM_ZIP_PATH="$RUNNER_TEMP/export/dSYMs.zip"
+          SYMBOLICATION_LOG="$LOG_DIR/symbolication.log"
+
+          mkdir -p "$DSYM_OUTPUT_DIR" "$RUNNER_TEMP/export"
+          rm -f "$SYMBOLICATION_LOG" "$DSYM_ZIP_PATH"
+
+          if [ ! -d "$DSYM_SOURCE_DIR" ]; then
+            echo "No dSYM directory found at $DSYM_SOURCE_DIR" | tee "$SYMBOLICATION_LOG"
+            exit 0
+          fi
+
+          cp -R "$DSYM_SOURCE_DIR/." "$DSYM_OUTPUT_DIR/"
+          ditto -c -k --sequesterRsrc --keepParent "$DSYM_OUTPUT_DIR" "$DSYM_ZIP_PATH"
+
+          {
+            echo "Archive path: $ARCHIVE_PATH"
+            echo "Collected dSYM bundles:"
+            find "$DSYM_OUTPUT_DIR" -maxdepth 1 -type d -name "*.dSYM" -print | sort
+            echo
+            echo "dSYM UUIDs:"
+            find "$DSYM_OUTPUT_DIR" -type d -name "*.dSYM" -print0 | while IFS= read -r -d '' dsym; do
+              echo "[$dsym]"
+              xcrun dwarfdump --uuid "$dsym"
+              echo
+            done
+          } | tee "$SYMBOLICATION_LOG"
+
       - name: Upload iOS debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -284,3 +318,5 @@ jobs:
           path: |
             ${{ runner.temp }}/ios-build-logs
             ${{ runner.temp }}/export/*.ipa
+            ${{ runner.temp }}/export/dSYMs.zip
+            ${{ runner.temp }}/debug-symbols
