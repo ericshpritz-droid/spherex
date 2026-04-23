@@ -116,7 +116,7 @@ export const startPhoneVerification = createServerFn({ method: "POST" })
       }, { onConflict: "phone_e164" });
 
     if (error) throw new Error("Could not store verification challenge.");
-    return { ok: true, preview_code: "" };
+    return { ok: true, preview_code: code };
   });
 
 export const verifyPhoneCode = createServerFn({ method: "POST" })
