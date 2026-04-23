@@ -120,16 +120,25 @@ function TermItem({ accent, icon, title, children }) {
   );
 }
 
-export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', deliveryStatus = '' }) {
+export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', deliveryStatus = '', resendCooldownSeconds = 30 }) {
   const [digits, setDigits] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(0);
   const formatted = formatPhone(digits);
   const valid = digits.length === 10;
   const phoneError = showValidation && !valid ? 'Enter a valid 10-digit mobile number.' : '';
+
+  useEffect(() => {
+    if (resendCountdown <= 0) return;
+    const id = window.setInterval(() => {
+      setResendCountdown((value) => (value > 0 ? value - 1 : 0));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [resendCountdown]);
 
   const send = async () => {
     setErr(''); setBusy(true);
@@ -145,7 +154,10 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
             : 'Please try again in a moment. If it still fails, confirm this number can receive SMS.';
       setErr(`${message} ${nextSteps}`);
     }
-    finally { setBusy(false); }
+    finally {
+      setBusy(false);
+      setResendCountdown(resendCooldownSeconds);
+    }
   };
 
   const submit = async () => {
@@ -216,6 +228,34 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
               Last send status: {deliveryStatus}
             </div>
           )}
+          <div className="mt-3 flex flex-col gap-1">
+            <button
+              onClick={async () => {
+                if (busy || resendCountdown > 0) return;
+                if (!valid) {
+                  setShowValidation(true);
+                  setErr('');
+                  return;
+                }
+                if (!agreed) {
+                  setShowTerms(true);
+                  return;
+                }
+                await send();
+              }}
+              disabled={busy || resendCountdown > 0}
+              className="self-start bg-transparent border-0 cursor-pointer text-[13px] font-semibold disabled:cursor-not-allowed"
+              style={{
+                padding: 0,
+                color: busy || resendCountdown > 0 ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
+              }}
+            >
+              {busy ? 'Sending…' : resendCountdown > 0 ? `Resend code in ${resendCountdown}s` : 'Resend code'}
+            </button>
+            <div className="text-[12px] text-fg-55" style={{ lineHeight: 1.45 }}>
+              Retry with the same number once the cooldown finishes.
+            </div>
+          </div>
         </div>
 
         <button

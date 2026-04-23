@@ -23,6 +23,7 @@ function PhoneRoute() {
       accent={accent}
       deliveryMode={pendingOtpDelivery.mode}
       deliveryStatus={pendingOtpDelivery.status}
+      resendCooldownSeconds={30}
       onSendCode={async (digits: string) => {
         await startOtp(digits);
         navigate({ to: "/code" });
