@@ -48,7 +48,7 @@ function TermsPage() {
           We may update these Terms. If we make material changes we'll notify you in the app. Continued use after changes take effect means you accept the updated Terms.
         </Section>
         <Section title="10. Contact">
-          Questions? Email <a className="underline" href="mailto:legal@sphere.app">legal@sphere.app</a>.
+          Questions? Email <a className="underline" href="mailto:legal@mysphere.love">legal@mysphere.love</a>.
         </Section>
 
         <div className="mt-10 text-fg-45 text-[13px]">
