@@ -141,6 +141,20 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
     return () => window.clearInterval(id);
   }, [resendCountdown]);
 
+  const buildSendErrorMessage = (message) => {
+    const nextSteps = /wait \d+s/i.test(message)
+      ? 'Wait for the timer to finish, then tap send code again.'
+      : /network|connection|fetch/i.test(message)
+        ? 'Check your signal or internet connection and try again.'
+        : /unreachable|invalid destination|undeliverable|cannot receive|landline|not a mobile|destination/i.test(message)
+          ? 'Confirm this number can receive SMS messages, then check the number and try again.'
+          : /valid phone number|mobile number/i.test(message)
+            ? 'Double-check the number and try again.'
+            : 'Please try again in a moment. If it still fails, confirm this number can receive SMS.';
+
+    return `${message} ${nextSteps}`;
+  };
+
   const send = async ({ isResend = false } = {}) => {
     setErr('');
     if (isResend) setResendBusy(true);
@@ -148,16 +162,7 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
     try { await onSendCode(digits); }
     catch (e) {
       const message = e?.message || 'We could not send your code.';
-      const nextSteps = /wait \d+s/i.test(message)
-        ? 'Wait for the timer to finish, then tap send code again.'
-        : /network|connection|fetch/i.test(message)
-          ? 'Check your signal or internet connection and try again.'
-          : /unreachable|invalid destination|undeliverable|cannot receive|landline|not a mobile|destination/i.test(message)
-            ? 'Confirm this number can receive SMS messages, then check the number and try again.'
-          : /valid phone number|mobile number/i.test(message)
-            ? 'Double-check the number and try again.'
-            : 'Please try again in a moment. If it still fails, confirm this number can receive SMS.';
-      setErr(`${message} ${nextSteps}`);
+      setErr(buildSendErrorMessage(message));
     }
     finally {
       if (isResend) setResendBusy(false);
@@ -219,6 +224,11 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
               >
                 {resendBusy ? 'Retrying…' : 'Retry'}
               </button>
+              <div className="mt-2 text-[12px] text-fg-55" style={{ lineHeight: 1.45 }}>
+                {resendCountdown > 0
+                  ? `You can try again in ${resendCountdown}s.`
+                  : 'You can retry now, or use Resend code below if you need another attempt.'}
+              </div>
             </div>
           )}
         </div>
