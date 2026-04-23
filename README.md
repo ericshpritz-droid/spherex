@@ -82,6 +82,37 @@ This project uses Lovable Cloud for backend services, authentication, and data s
 
 Runtime environment values are managed by the platform. Sensitive values such as phone hashing secrets and provider credentials should be stored as project secrets rather than committed to the repo.
 
+### Environment variables used by this project
+
+The codebase currently references these variables:
+
+| Variable | Source | Where it is used |
+|---|---|---|
+| `VITE_SUPABASE_URL` | Platform-provided client env | Browser/client initialization for the backend client |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Platform-provided client env | Browser/client initialization for the backend client |
+| `SUPABASE_URL` | Platform/runtime secret | Server-side backend client and auth middleware |
+| `SUPABASE_PUBLISHABLE_KEY` | Platform/runtime secret | SSR/auth middleware fallback |
+| `SUPABASE_SERVICE_ROLE_KEY` | Platform/runtime secret | Server-side admin access |
+| `PHONE_PEPPER` | Project runtime secret | Server-side phone hashing |
+| `TWILIO_API_KEY` | Project runtime secret / connector credential | SMS verification requests |
+| `LOVABLE_API_KEY` | Platform-managed runtime secret | Authenticated requests to the Twilio gateway |
+
+The repository also defines these GitHub Actions workflow variables for iOS builds:
+
+| Variable | Source | Where it is used |
+|---|---|---|
+| `BUNDLE_ID` | Repo workflow file | iOS archive/export bundle identifier |
+| `LOG_DIR` | Repo workflow file | Build logs and debug artifacts |
+| `APPLE_TEAM_ID` | GitHub Actions secret | Signing and provisioning validation |
+| `CERTIFICATE_PASSWORD` | GitHub Actions secret | Importing the iOS distribution certificate |
+| `CERTIFICATE_BASE64` | GitHub Actions secret | Decoded `.p12` signing certificate |
+| `PROFILE_BASE64` | GitHub Actions secret | Decoded App Store provisioning profile |
+| `APP_STORE_CONNECT_ISSUER_ID` | GitHub Actions secret | App Store Connect authentication |
+| `APP_STORE_CONNECT_KEY_ID` | GitHub Actions secret | App Store Connect authentication |
+| `APP_STORE_CONNECT_PRIVATE_KEY` | GitHub Actions secret | App Store Connect API key file |
+
+In short: app runtime values come from Lovable Cloud and project secrets, while iOS release-signing values come from the GitHub Actions workflow and its repository secrets.
+
 ## iOS workflow
 
 The project is configured for Capacitor iOS builds and TestFlight delivery.
