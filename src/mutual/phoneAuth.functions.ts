@@ -5,6 +5,7 @@ import { z } from "zod";
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
 const TWILIO_TEST_FROM = "+15005550006";
 const CODE_TTL_MINUTES = 10;
+const RESEND_COOLDOWN_SECONDS = 30;
 const MAX_ATTEMPTS = 5;
 
 const phoneSchema = z.object({
@@ -96,6 +97,22 @@ export const startPhoneVerification = createServerFn({ method: "POST" })
     }
     if (isTwilioTestNumber(data.phoneE164)) {
       throw new Error("Twilio magic test numbers only work with Twilio test credentials. Use a real phone number with the connected account.");
+    }
+
+    const { data: existingChallenge, error: existingChallengeError } = await supabaseAdmin
+      .from("phone_verification_challenges")
+      .select("last_sent_at")
+      .eq("phone_e164", data.phoneE164)
+      .maybeSingle();
+
+    if (existingChallengeError) throw new Error("Could not check resend availability.");
+
+    const lastSentAt = existingChallenge?.last_sent_at ? new Date(existingChallenge.last_sent_at).getTime() : 0;
+    const secondsSinceLastSend = lastSentAt ? Math.floor((Date.now() - lastSentAt) / 1000) : RESEND_COOLDOWN_SECONDS;
+    const remainingSeconds = RESEND_COOLDOWN_SECONDS - secondsSinceLastSend;
+
+    if (remainingSeconds > 0) {
+      throw new Error(`Please wait ${remainingSeconds}s before requesting another code.`);
     }
 
     const code = generateCode();

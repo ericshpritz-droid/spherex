@@ -211,10 +211,24 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
   );
 }
 
-export function ScreenCode({ accent, phoneFormatted, codeHint, onVerify, onBack }) {
+export function ScreenCode({ accent, phoneFormatted, onVerify, onBack, onResend, resendCooldownSeconds = 30 }) {
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [resendBusy, setResendBusy] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(resendCooldownSeconds);
+
+  useEffect(() => {
+    setResendCountdown(resendCooldownSeconds);
+  }, [phoneFormatted, resendCooldownSeconds]);
+
+  useEffect(() => {
+    if (resendCountdown <= 0) return;
+    const id = window.setInterval(() => {
+      setResendCountdown((value) => (value > 0 ? value - 1 : 0));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [resendCountdown]);
 
   useEffect(() => {
     if (code.length === 6 && !busy) {
@@ -256,6 +270,35 @@ export function ScreenCode({ accent, phoneFormatted, codeHint, onVerify, onBack 
         </div>
         {err && <div className="mt-4 text-center text-[13px] text-error">{err}</div>}
         {busy && <div className="mt-4 text-center text-sm text-fg-60">Verifying…</div>}
+        <div className="mt-5 flex flex-col items-center gap-2">
+          <button
+            onClick={async () => {
+              if (resendBusy || resendCountdown > 0) return;
+              setErr('');
+              setResendBusy(true);
+              try {
+                await onResend();
+                setCode('');
+                setResendCountdown(resendCooldownSeconds);
+              } catch (e) {
+                setErr(e?.message || 'Could not resend code');
+              } finally {
+                setResendBusy(false);
+              }
+            }}
+            disabled={resendBusy || resendCountdown > 0}
+            className="bg-transparent border-0 cursor-pointer text-[14px] font-semibold disabled:cursor-not-allowed"
+            style={{
+              padding: 0,
+              color: resendBusy || resendCountdown > 0 ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
+            }}
+          >
+            {resendBusy ? 'Resending…' : resendCountdown > 0 ? `Resend code in ${resendCountdown}s` : 'Resend code'}
+          </button>
+          <div className="text-center text-[12px] text-fg-55" style={{ lineHeight: 1.45 }}>
+            You can request another code after the countdown finishes.
+          </div>
+        </div>
         <div className="flex-1"/>
         <NumPad onKey={(k) => {
           if (busy) return;

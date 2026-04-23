@@ -38,6 +38,7 @@ type Ctx = {
   pendingPhone: string;
   pendingCodeHint: string;
   startOtp: (digits: string) => Promise<void>;
+  resendOtp: () => Promise<void>;
   verifyCode: (code: string) => Promise<void>;
   // Adds
   lastAddedPhone: string;
@@ -446,6 +447,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [startPhoneVerificationFn]);
 
+  const resendOtp = useCallback(async () => {
+    if (!pendingPhone) throw new Error("Enter your phone number first.");
+    try {
+      await startPhoneVerificationFn({ data: { phoneE164: pendingPhone } });
+      setPendingCodeHint("");
+    } catch (e) {
+      throw new Error(friendlyError(e));
+    }
+  }, [pendingPhone, startPhoneVerificationFn]);
+
   const verifyCode = useCallback(async (code: string) => {
     try {
       const sessionTokens = await verifyPhoneCodeFn({ data: { phoneE164: pendingPhone, code } });
@@ -511,7 +522,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     session, sessionLoading, user,
     myPhone, myPhoneFormatted,
     matches, pending, dataLoading, dataError, refresh,
-    pendingPhone, pendingCodeHint, startOtp, verifyCode,
+    pendingPhone, pendingCodeHint, startOtp, resendOtp, verifyCode,
     lastAddedPhone, addOne, addMany,
     activeMatch, setActiveMatch,
     lastByHash, unreadByHash, markThreadRead, myHash,
