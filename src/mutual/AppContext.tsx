@@ -92,6 +92,19 @@ function sanitizeOtpStartResult(result: any) {
   };
 }
 
+function applyOtpStartResult(
+  rawResult: any,
+  updates: {
+    setPendingCodeHint: (value: string) => void;
+    setPendingOtpCooldownSeconds: (value: number) => void;
+  },
+) {
+  const result = sanitizeOtpStartResult(rawResult);
+  updates.setPendingCodeHint(result.previewCode);
+  updates.setPendingOtpCooldownSeconds(result.resendCooldownSeconds);
+  return result;
+}
+
 // ---- Local hash → raw phone cache --------------------------------------
 // We only know the readable form of phones the *current device* has uploaded.
 // The cache is namespaced per user so multiple accounts on one browser don't
@@ -461,9 +474,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const e164 = toE164(digits);
     setPendingPhone(e164);
     try {
-      const result = sanitizeOtpStartResult(await startPhoneVerificationFn({ data: { phoneE164: e164 } }));
-      setPendingCodeHint(result.previewCode);
-      setPendingOtpCooldownSeconds(result.resendCooldownSeconds);
+      applyOtpStartResult(await startPhoneVerificationFn({ data: { phoneE164: e164 } }), {
+        setPendingCodeHint,
+        setPendingOtpCooldownSeconds,
+      });
     } catch (e) {
       throw new Error(friendlyError(e));
     }
@@ -472,9 +486,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const resendOtp = useCallback(async () => {
     if (!pendingPhone) throw new Error("Enter your phone number first.");
     try {
-      const result = sanitizeOtpStartResult(await startPhoneVerificationFn({ data: { phoneE164: pendingPhone } }));
-      setPendingCodeHint(result.previewCode);
-      setPendingOtpCooldownSeconds(result.resendCooldownSeconds);
+      applyOtpStartResult(await startPhoneVerificationFn({ data: { phoneE164: pendingPhone } }), {
+        setPendingCodeHint,
+        setPendingOtpCooldownSeconds,
+      });
     } catch (e) {
       throw new Error(friendlyError(e));
     }
