@@ -55,9 +55,45 @@ The active route files in `src/routes/` are:
 
 ### Prerequisites
 
-- Bun recommended
-- Node.js 20+
-- Lovable Cloud connected for backend-backed flows
+- **Bun:** latest (the CI workflow installs Bun via `oven-sh/setup-bun@v2` with `bun-version: latest`)
+- **Node.js:** 20.x (the CI workflow uses `actions/setup-node@v4` with `node-version: 20`)
+- **iOS toolchain for native builds:** Xcode on macOS with CocoaPods available (`pod install` is run in CI on `macos-15`)
+- **Backend access:** Lovable Cloud connected for backend-backed flows
+
+### Required local commands
+
+For web development:
+
+```bash
+bun install
+bun run dev
+```
+
+For production build verification:
+
+```bash
+bun run build
+```
+
+For local iOS preparation:
+
+```bash
+bun run build
+bunx cap sync ios
+bunx cap open ios
+```
+
+If the `ios` directory has not been added yet, the CI workflow indicates the required bootstrap command is:
+
+```bash
+bunx cap add ios
+```
+
+If you need to mirror the native dependency step used in CI, run:
+
+```bash
+pod install --project-directory=ios/App
+```
 
 ### Install
 
