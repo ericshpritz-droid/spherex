@@ -37,6 +37,7 @@ type Ctx = {
   // OTP flow
   pendingPhone: string;
   pendingCodeHint: string;
+  pendingOtpDelivery: { mode: "sms" | "preview_fallback"; status: string };
   startOtp: (digits: string) => Promise<void>;
   resendOtp: () => Promise<void>;
   verifyCode: (code: string) => Promise<void>;
@@ -122,6 +123,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [dataError, setDataError] = useState<string | null>(null);
   const [pendingPhone, setPendingPhone] = useState("");
   const [pendingCodeHint, setPendingCodeHint] = useState("");
+  const [pendingOtpDelivery, setPendingOtpDelivery] = useState<{ mode: "sms" | "preview_fallback"; status: string }>({
+    mode: "sms",
+    status: "",
+  });
   const [lastAddedPhone, setLastAddedPhone] = useState("");
   const [activeMatch, setActiveMatch] = useState<Person | null>(null);
 
@@ -440,8 +445,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const e164 = toE164(digits);
     setPendingPhone(e164);
     try {
-      await startPhoneVerificationFn({ data: { phoneE164: e164 } });
-      setPendingCodeHint("");
+      const result = await startPhoneVerificationFn({ data: { phoneE164: e164 } });
+      setPendingCodeHint(result.preview_code || "");
+      setPendingOtpDelivery({
+        mode: result.delivery_mode || "sms",
+        status: result.delivery_status || "",
+      });
     } catch (e) {
       throw new Error(friendlyError(e));
     }
@@ -450,8 +459,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const resendOtp = useCallback(async () => {
     if (!pendingPhone) throw new Error("Enter your phone number first.");
     try {
-      await startPhoneVerificationFn({ data: { phoneE164: pendingPhone } });
-      setPendingCodeHint("");
+      const result = await startPhoneVerificationFn({ data: { phoneE164: pendingPhone } });
+      setPendingCodeHint(result.preview_code || "");
+      setPendingOtpDelivery({
+        mode: result.delivery_mode || "sms",
+        status: result.delivery_status || "",
+      });
     } catch (e) {
       throw new Error(friendlyError(e));
     }
@@ -522,7 +535,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     session, sessionLoading, user,
     myPhone, myPhoneFormatted,
     matches, pending, dataLoading, dataError, refresh,
-    pendingPhone, pendingCodeHint, startOtp, resendOtp, verifyCode,
+    pendingPhone, pendingCodeHint, pendingOtpDelivery, startOtp, resendOtp, verifyCode,
     lastAddedPhone, addOne, addMany,
     activeMatch, setActiveMatch,
     lastByHash, unreadByHash, markThreadRead, myHash,
