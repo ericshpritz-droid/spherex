@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - ".github/workflows/ios-testflight.yml"
       - "src/components/**"
       - "src/hooks/**"
       - "src/lib/**"
@@ -36,7 +37,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Check iOS/TestFlight configuration
+        id: check
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
+          PROFILE_BASE64: ${{ secrets.IOS_APPSTORE_PROFILE_BASE64 }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          missing=0
+          for var in APPLE_TEAM_ID CERTIFICATE_PASSWORD CERTIFICATE_BASE64 PROFILE_BASE64 APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_KEY_ID APP_STORE_CONNECT_PRIVATE_KEY; do
+            if [ -z "${!var}" ]; then
+              echo "Missing required GitHub secret: $var"
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -eq 1 ]; then
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping iOS/TestFlight workflow until the required GitHub secrets are configured."
+          else
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "All required iOS/TestFlight secrets are present."
+          fi
+
   build-and-upload:
+    needs: preflight
+    if: needs.preflight.outputs.should_run == 'true'
     runs-on: macos-15
     timeout-minutes: 60
     env:
