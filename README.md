@@ -156,6 +156,22 @@ The repository also defines these GitHub Actions workflow variables for iOS buil
 
 In short: app runtime values come from Lovable Cloud and project secrets, while iOS release-signing values come from the GitHub Actions workflow and its repository secrets.
 
+### Required GitHub secrets for the iOS workflow
+
+The TestFlight workflow requires these GitHub repository secrets:
+
+| Secret name | Used for |
+|---|---|
+| `APPLE_TEAM_ID` | Sets the Apple Developer team for signing, archive validation, and export configuration. |
+| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Unlocks the `.p12` iOS distribution certificate during import into the temporary build keychain. |
+| `IOS_DISTRIBUTION_CERTIFICATE_BASE64` | Stores the base64-encoded distribution signing certificate that the workflow decodes before archiving. |
+| `IOS_APPSTORE_PROFILE_BASE64` | Stores the base64-encoded App Store provisioning profile used for manual signing and bundle ID validation. |
+| `APP_STORE_CONNECT_ISSUER_ID` | Identifies the App Store Connect API issuer for archive/export authentication and TestFlight upload. |
+| `APP_STORE_CONNECT_KEY_ID` | Identifies the App Store Connect API key paired with the private key file. |
+| `APP_STORE_CONNECT_PRIVATE_KEY` | Provides the App Store Connect private key contents used to authenticate archive/export operations and the TestFlight upload. |
+
+If any of these secrets are missing, the workflow fails in its early validation step before the Xcode build begins.
+
 ## iOS workflow
 
 The project is configured for Capacitor iOS builds and TestFlight delivery.
