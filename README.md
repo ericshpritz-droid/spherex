@@ -328,6 +328,65 @@ At the end of the run, the workflow uploads a debug artifact bundle containing t
 
 That means even failed or flaky runs leave behind enough information to diagnose signing issues, export problems, upload failures, and TestFlight crash symbolication needs.
 
+### Troubleshooting checklist for common iOS workflow failures
+
+Use this checklist when the TestFlight workflow fails:
+
+#### Signing identity mismatch
+
+- confirm `IOS_DISTRIBUTION_CERTIFICATE_BASE64` contains the correct App Store distribution certificate
+- confirm `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` matches that `.p12` file
+- check `signing-identities.log` to verify at least one valid code-signing identity was imported
+- make sure the certificate belongs to the same Apple team as `APPLE_TEAM_ID`
+
+#### Provisioning profile errors
+
+- confirm `IOS_APPSTORE_PROFILE_BASE64` is an App Store provisioning profile, not a development profile
+- verify the provisioning profile belongs to the same team as `APPLE_TEAM_ID`
+- verify the profile’s application identifier matches the workflow bundle ID: `app.lovable.sphere`
+- if using a wildcard profile, make sure it still covers the configured bundle identifier
+- review `signing-validation.log` for the exact team ID and application identifier seen by the workflow
+
+#### Workspace or scheme failures
+
+- confirm `ios/App/App.xcworkspace` exists after `bunx cap sync ios`
+- verify CocoaPods installed successfully with `pod install --project-directory=ios/App`
+- make sure the expected Xcode scheme is `App`
+- check `xcode-project-list.log` if the preflight step reports a missing workspace or scheme
+
+#### Archive failures
+
+- review `archive.log` first, since it contains output from all retry attempts
+- confirm the signing certificate, provisioning profile, and team ID all refer to the same Apple account setup
+- confirm the iOS project was synced after the latest web build
+- open the native project in Xcode locally if you need to reproduce a code signing or capability error interactively
+
+#### Export failures
+
+- review `export.log` for export-specific signing or packaging errors
+- verify the archive completed successfully before debugging export settings
+- confirm the provisioning profile name extracted by the workflow still matches the installed profile
+- check that the export method is valid for App Store distribution
+
+#### IPA not found
+
+- verify the export step completed successfully
+- check the contents of the temporary export directory in the workflow logs
+- confirm the workflow still expects the IPA at `runner.temp/export/App.ipa`
+
+#### TestFlight upload issues
+
+- review `testflight-upload.log` for authentication or App Store Connect errors
+- verify `APP_STORE_CONNECT_ISSUER_ID`, `APP_STORE_CONNECT_KEY_ID`, and `APP_STORE_CONNECT_PRIVATE_KEY` belong to the same App Store Connect API key
+- confirm the API key has permission to upload builds for the app
+- retry may resolve transient App Store Connect failures, so check whether the final failure happened after all upload attempts
+
+#### Missing debug artifacts
+
+- confirm the archive step produced a `.xcarchive`
+- check whether the archive contains a `dSYMs` directory before expecting `dSYMs.zip`
+- review `symbolication.log` to see whether symbol bundles were found and processed
+
 ## GitHub sync
 
 This repository is connected to Lovable with bidirectional sync:
