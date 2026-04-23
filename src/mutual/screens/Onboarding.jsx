@@ -123,6 +123,7 @@ function TermItem({ accent, icon, title, children }) {
 export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', deliveryStatus = '', resendCooldownSeconds = 30 }) {
   const [digits, setDigits] = useState('');
   const [busy, setBusy] = useState(false);
+  const [resendBusy, setResendBusy] = useState(false);
   const [err, setErr] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
@@ -140,8 +141,10 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
     return () => window.clearInterval(id);
   }, [resendCountdown]);
 
-  const send = async () => {
-    setErr(''); setBusy(true);
+  const send = async ({ isResend = false } = {}) => {
+    setErr('');
+    if (isResend) setResendBusy(true);
+    else setBusy(true);
     try { await onSendCode(digits); }
     catch (e) {
       const message = e?.message || 'We could not send your code.';
@@ -157,13 +160,14 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
       setErr(`${message} ${nextSteps}`);
     }
     finally {
-      setBusy(false);
+      if (isResend) setResendBusy(false);
+      else setBusy(false);
       setResendCountdown(resendCooldownSeconds);
     }
   };
 
   const submit = async () => {
-    if (busy) return;
+    if (busy || resendBusy) return;
     if (!valid) {
       setShowValidation(true);
       setErr('');
@@ -203,17 +207,17 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
               <div className="mt-1 text-[13px] text-fg-70" style={{ lineHeight: 1.45 }}>{err}</div>
               <button
                 onClick={async () => {
-                  if (busy || !valid) return;
-                  await send();
+                  if (busy || resendBusy || !valid) return;
+                  await send({ isResend: true });
                 }}
-                disabled={busy || !valid}
+                disabled={busy || resendBusy || !valid}
                 className="mt-3 bg-transparent border-0 cursor-pointer text-[13px] font-semibold disabled:cursor-not-allowed"
                 style={{
                   padding: 0,
-                  color: busy || !valid ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
+                  color: busy || resendBusy || !valid ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
                 }}
               >
-                {busy ? 'Retrying…' : 'Retry'}
+                {resendBusy ? 'Retrying…' : 'Retry'}
               </button>
             </div>
           )}
@@ -247,7 +251,7 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
           <div className="mt-3 flex flex-col gap-1">
             <button
               onClick={async () => {
-                if (busy || resendCountdown > 0 || !valid) return;
+                if (busy || resendBusy || resendCountdown > 0 || !valid) return;
                 if (!valid) {
                   setShowValidation(true);
                   setErr('');
@@ -257,16 +261,16 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
                   setShowTerms(true);
                   return;
                 }
-                await send();
+                await send({ isResend: true });
               }}
-              disabled={busy || resendCountdown > 0 || !valid}
+              disabled={busy || resendBusy || resendCountdown > 0 || !valid}
               className="self-start bg-transparent border-0 cursor-pointer text-[13px] font-semibold disabled:cursor-not-allowed"
               style={{
                 padding: 0,
-                color: busy || resendCountdown > 0 || !valid ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
+                color: busy || resendBusy || resendCountdown > 0 || !valid ? 'rgba(255,255,255,0.4)' : ACCENT_PRESETS[accent].a,
               }}
             >
-              {busy ? 'Sending…' : resendCountdown > 0 ? `Resend code in ${resendCountdown}s` : 'Resend code'}
+              {resendBusy ? 'Resending…' : resendCountdown > 0 ? `Resend code in ${resendCountdown}s` : 'Resend code'}
             </button>
             <div className="text-[12px] text-fg-55" style={{ lineHeight: 1.45 }}>
               Retry with the same number once the cooldown finishes.
