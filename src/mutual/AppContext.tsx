@@ -38,6 +38,7 @@ type Ctx = {
   pendingPhone: string;
   pendingCodeHint: string;
   pendingOtpDelivery: { mode: "sms" | "preview_fallback"; status: string };
+  pendingOtpCooldownSeconds: number;
   startOtp: (digits: string) => Promise<void>;
   resendOtp: () => Promise<void>;
   verifyCode: (code: string) => Promise<void>;
@@ -127,6 +128,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     mode: "sms",
     status: "",
   });
+  const [pendingOtpCooldownSeconds, setPendingOtpCooldownSeconds] = useState(30);
   const [lastAddedPhone, setLastAddedPhone] = useState("");
   const [activeMatch, setActiveMatch] = useState<Person | null>(null);
 
@@ -451,6 +453,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         mode: result.delivery_mode || "sms",
         status: result.delivery_status || "",
       });
+      setPendingOtpCooldownSeconds(result.resend_cooldown_seconds || 30);
     } catch (e) {
       throw new Error(friendlyError(e));
     }
@@ -465,6 +468,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         mode: result.delivery_mode || "sms",
         status: result.delivery_status || "",
       });
+      setPendingOtpCooldownSeconds(result.resend_cooldown_seconds || 30);
     } catch (e) {
       throw new Error(friendlyError(e));
     }
@@ -535,7 +539,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     session, sessionLoading, user,
     myPhone, myPhoneFormatted,
     matches, pending, dataLoading, dataError, refresh,
-    pendingPhone, pendingCodeHint, pendingOtpDelivery, startOtp, resendOtp, verifyCode,
+    pendingPhone, pendingCodeHint, pendingOtpDelivery, pendingOtpCooldownSeconds, startOtp, resendOtp, verifyCode,
     lastAddedPhone, addOne, addMany,
     activeMatch, setActiveMatch,
     lastByHash, unreadByHash, markThreadRead, myHash,
