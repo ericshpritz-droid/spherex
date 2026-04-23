@@ -16,12 +16,14 @@ export const Route = createFileRoute("/_app/code")({
 });
 
 function CodeRoute() {
-  const { accent, pendingPhone, verifyCode } = useApp();
+  const { accent, pendingPhone, resendOtp, verifyCode } = useApp();
   const navigate = useNavigate();
   return (
     <ScreenCode
       accent={accent}
       phoneFormatted={pendingPhone ? formatE164(pendingPhone) : ""}
+      onResend={resendOtp}
+      resendCooldownSeconds={30}
       onVerify={verifyCode}
       onBack={() => navigate({ to: "/phone" })}
     />
