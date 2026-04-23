@@ -123,6 +123,7 @@ function TermItem({ accent, icon, title, children }) {
 export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', deliveryStatus = '', resendCooldownSeconds = 30 }) {
   const [digits, setDigits] = useState('');
   const [busy, setBusy] = useState(false);
+  const [resendBusy, setResendBusy] = useState(false);
   const [err, setErr] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
@@ -140,8 +141,10 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
     return () => window.clearInterval(id);
   }, [resendCountdown]);
 
-  const send = async () => {
-    setErr(''); setBusy(true);
+  const send = async ({ isResend = false } = {}) => {
+    setErr('');
+    if (isResend) setResendBusy(true);
+    else setBusy(true);
     try { await onSendCode(digits); }
     catch (e) {
       const message = e?.message || 'We could not send your code.';
@@ -157,13 +160,14 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
       setErr(`${message} ${nextSteps}`);
     }
     finally {
-      setBusy(false);
+      if (isResend) setResendBusy(false);
+      else setBusy(false);
       setResendCountdown(resendCooldownSeconds);
     }
   };
 
   const submit = async () => {
-    if (busy) return;
+    if (busy || resendBusy) return;
     if (!valid) {
       setShowValidation(true);
       setErr('');
