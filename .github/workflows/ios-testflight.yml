@@ -148,6 +148,54 @@ jobs:
             echo "PROFILE_NAME=$PROFILE_NAME"
           } >> "$GITHUB_ENV"
 
+      - name: Validate signing assets
+        env:
+          PROFILE_PATH: ${{ runner.temp }}/appstore.mobileprovision
+        run: |
+          PROFILE_PLIST="$RUNNER_TEMP/profile-validation.plist"
+          security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST"
+
+          if ! security find-identity -v -p codesigning "$KEYCHAIN_PATH" > "$LOG_DIR/signing-identities.log" 2>&1; then
+            echo "Unable to inspect code-signing identities in the temporary keychain." >&2
+            echo "See signing-identities.log in the workflow artifacts for details." >&2
+            exit 1
+          fi
+
+          VALID_IDENTITY_COUNT=$(grep -E '[[:space:]][0-9]+\) [0-9A-F]{40} "' "$LOG_DIR/signing-identities.log" | wc -l | tr -d ' ')
+          if [ "$VALID_IDENTITY_COUNT" -eq 0 ]; then
+            echo "No valid code-signing certificate was imported into the build keychain." >&2
+            echo "Check the distribution certificate secret and password." >&2
+            exit 1
+          fi
+
+          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' "$PROFILE_PLIST")
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$PROFILE_PLIST")
+          PROFILE_TEAM_ID=$(/usr/libexec/PlistBuddy -c 'Print :TeamIdentifier:0' "$PROFILE_PLIST")
+          PROFILE_APP_IDENTIFIER=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$PROFILE_PLIST")
+          EXPECTED_APP_IDENTIFIER="$APPLE_TEAM_ID.$BUNDLE_ID"
+
+          if [ "$PROFILE_TEAM_ID" != "$APPLE_TEAM_ID" ]; then
+            echo "Provisioning profile team ID mismatch: expected $APPLE_TEAM_ID but found $PROFILE_TEAM_ID." >&2
+            exit 1
+          fi
+
+          case "$PROFILE_APP_IDENTIFIER" in
+            "$EXPECTED_APP_IDENTIFIER"|"$APPLE_TEAM_ID.*")
+              ;;
+            *)
+              echo "Provisioning profile does not match bundle identifier $BUNDLE_ID." >&2
+              echo "Expected application-identifier $EXPECTED_APP_IDENTIFIER (or a matching wildcard) but found $PROFILE_APP_IDENTIFIER." >&2
+              exit 1
+              ;;
+          esac
+
+          {
+            echo "Validated provisioning profile: $PROFILE_NAME ($PROFILE_UUID)"
+            echo "Matched bundle identifier: $BUNDLE_ID"
+            echo "Application identifier: $PROFILE_APP_IDENTIFIER"
+            echo "Valid signing identities found: $VALID_IDENTITY_COUNT"
+          } | tee "$LOG_DIR/signing-validation.log"
+
       - name: Archive app
         run: |
           set -o pipefail
