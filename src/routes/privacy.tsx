@@ -72,7 +72,7 @@ function PrivacyPage() {
         </Section>
 
         <Section title="12. Your rights">
-          Depending on where you live (e.g., GDPR / CCPA jurisdictions), you may have rights to access, correct, port, or delete your personal data. Email <a className="underline" href="mailto:privacy@sphere.app">privacy@sphere.app</a> and we'll respond within 30 days.
+          Depending on where you live (e.g., GDPR / CCPA jurisdictions), you may have rights to access, correct, port, or delete your personal data. Email <a className="underline" href="mailto:privacy@mysphere.love">privacy@mysphere.love</a> and we'll respond within 30 days.
         </Section>
 
         <Section title="13. Contact permissions">
@@ -84,7 +84,7 @@ function PrivacyPage() {
         </Section>
 
         <Section title="15. Contact">
-          Questions or requests? Email <a className="underline" href="mailto:privacy@sphere.app">privacy@sphere.app</a>.
+          Questions or requests? Email <a className="underline" href="mailto:privacy@mysphere.love">privacy@mysphere.love</a>.
         </Section>
 
         <div className="mt-10 text-fg-45 text-[13px]">
