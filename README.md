@@ -181,6 +181,29 @@ The GitHub Actions workflow handles automated TestFlight packaging and now inclu
 
 The iOS workflow is designed to run when the app UI changes in ways that affect the shipped mobile build.
 
+```mermaid
+flowchart TD
+    A[Push to main with UI-relevant changes<br/>or manual workflow_dispatch] --> B[Checkout repository]
+    B --> C[Set up Bun and Node.js 20]
+    C --> D[Prepare log and export directories]
+    D --> E[Verify required GitHub Actions secrets]
+    E --> F[Install dependencies with bun install --frozen-lockfile]
+    F --> G[Build production web assets]
+    G --> H[Ensure iOS platform exists]
+    H --> I[Sync Capacitor iOS project]
+    I --> J[Install CocoaPods dependencies]
+    J --> K[Preflight iOS project checks<br/>workspace + scheme]
+    K --> L[Prepare signing assets<br/>certificate, profile, keychain, auth key]
+    L --> M[Validate signing assets<br/>identity, team ID, bundle ID]
+    M --> N[Archive app with retry logic]
+    N --> O[Create export options plist]
+    O --> P[Export IPA with retry logic]
+    P --> Q[Verify IPA exists at runner.temp/export/App.ipa]
+    Q --> R[Upload build to TestFlight with retry logic]
+    R --> S[Collect dSYM and symbolication artifacts]
+    S --> T[Upload logs, IPA, dSYMs, and symbolication artifacts]
+```
+
 #### 1. What triggers the workflow
 
 The workflow starts in two cases:
