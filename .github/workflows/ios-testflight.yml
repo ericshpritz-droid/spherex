@@ -240,22 +240,9 @@ jobs:
             sleep "$delay"
           done
 
-      - name: Resolve exported IPA path
-        run: |
-          rm -f "$LOG_DIR/testflight-upload.log"
-          IPA_PATH=$(find "$RUNNER_TEMP/export" -maxdepth 1 -type f -name "*.ipa" | head -n 1)
-
-          if [ -z "$IPA_PATH" ]; then
-            echo "No .ipa file found in $RUNNER_TEMP/export" | tee -a "$LOG_DIR/testflight-upload.log"
-            echo "Contents of export directory:" | tee -a "$LOG_DIR/testflight-upload.log"
-            ls -la "$RUNNER_TEMP/export" | tee -a "$LOG_DIR/testflight-upload.log"
-            exit 1
-          fi
-
-          echo "Resolved IPA path: $IPA_PATH" | tee -a "$LOG_DIR/testflight-upload.log"
-          echo "IPA_PATH=$IPA_PATH" >> "$GITHUB_ENV"
-
       - name: Upload build to TestFlight
+        env:
+          IPA_PATH: ${{ runner.temp }}/export/App.ipa
         run: |
           set -o pipefail
           if [ ! -f "$IPA_PATH" ]; then
@@ -265,6 +252,7 @@ jobs:
             exit 1
           fi
 
+          rm -f "$LOG_DIR/testflight-upload.log"
           for attempt in 1 2 3; do
             echo "TestFlight upload attempt $attempt" | tee -a "$LOG_DIR/testflight-upload.log"
 
@@ -287,6 +275,40 @@ jobs:
           echo "TestFlight upload failed after 3 attempts." | tee -a "$LOG_DIR/testflight-upload.log"
           exit 1
 
+      - name: Collect dSYM and symbolication artifacts
+        if: always()
+        env:
+          ARCHIVE_PATH: ${{ runner.temp }}/Sphere.xcarchive
+        run: |
+          DSYM_SOURCE_DIR="$ARCHIVE_PATH/dSYMs"
+          DSYM_OUTPUT_DIR="$RUNNER_TEMP/debug-symbols"
+          DSYM_ZIP_PATH="$RUNNER_TEMP/export/dSYMs.zip"
+          SYMBOLICATION_LOG="$LOG_DIR/symbolication.log"
+
+          mkdir -p "$DSYM_OUTPUT_DIR" "$RUNNER_TEMP/export"
+          rm -f "$SYMBOLICATION_LOG" "$DSYM_ZIP_PATH"
+
+          if [ ! -d "$DSYM_SOURCE_DIR" ]; then
+            echo "No dSYM directory found at $DSYM_SOURCE_DIR" | tee "$SYMBOLICATION_LOG"
+            exit 0
+          fi
+
+          cp -R "$DSYM_SOURCE_DIR/." "$DSYM_OUTPUT_DIR/"
+          ditto -c -k --sequesterRsrc --keepParent "$DSYM_OUTPUT_DIR" "$DSYM_ZIP_PATH"
+
+          {
+            echo "Archive path: $ARCHIVE_PATH"
+            echo "Collected dSYM bundles:"
+            find "$DSYM_OUTPUT_DIR" -maxdepth 1 -type d -name "*.dSYM" -print | sort
+            echo
+            echo "dSYM UUIDs:"
+            find "$DSYM_OUTPUT_DIR" -type d -name "*.dSYM" -print0 | while IFS= read -r -d '' dsym; do
+              echo "[$dsym]"
+              xcrun dwarfdump --uuid "$dsym"
+              echo
+            done
+          } | tee "$SYMBOLICATION_LOG"
+
       - name: Upload iOS debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -295,4 +317,6 @@ jobs:
           if-no-files-found: warn
           path: |
             ${{ runner.temp }}/ios-build-logs
-            ${{ env.IPA_PATH }}
+            ${{ runner.temp }}/export/*.ipa
+            ${{ runner.temp }}/export/dSYMs.zip
+            ${{ runner.temp }}/debug-symbols
