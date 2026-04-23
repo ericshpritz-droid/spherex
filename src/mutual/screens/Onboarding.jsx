@@ -152,7 +152,7 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
         >←</button>
         <div className="font-bold tracking-sora-display" style={{ fontSize: 34, lineHeight: 1.05 }}>What's your<br/>number?</div>
         <div className="mt-3 text-[15px] text-fg-60" style={{ lineHeight: 1.45 }}>
-          We'll send a 6-digit code to your phone so you can test the full sign-in flow.
+          We'll send a 6-digit code to your phone. If your messaging account is in test mode, we'll also show the code on the next screen.
         </div>
         <div className="mt-8">
           <div className="flex items-center gap-3 rounded-[18px] bg-glass-06 border border-hairline-12" style={{ padding: '18px 20px' }}>
