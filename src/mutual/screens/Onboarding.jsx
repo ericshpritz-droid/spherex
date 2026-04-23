@@ -166,7 +166,7 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
         </div>
 
         <div className="mt-4 text-[13px] text-fg-60" style={{ lineHeight: 1.5 }}>
-          Enter a real mobile number you can access. Twilio magic test numbers are only for Twilio test credentials, not this connected account.
+          Enter the mobile number you want to sign in with.
         </div>
 
         <button
