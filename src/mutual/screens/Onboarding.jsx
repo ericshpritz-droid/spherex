@@ -120,7 +120,7 @@ function TermItem({ accent, icon, title, children }) {
   );
 }
 
-export function ScreenPhone({ accent, onSendCode, onBack }) {
+export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', deliveryStatus = '' }) {
   const [digits, setDigits] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -193,6 +193,29 @@ export function ScreenPhone({ accent, onSendCode, onBack }) {
 
         <div className="mt-4 text-[13px] text-fg-60" style={{ lineHeight: 1.5 }}>
           Enter the mobile number you want to sign in with.
+        </div>
+
+        <div
+          className="mt-4 rounded-[14px] bg-glass-06 border border-hairline-12"
+          style={{ padding: 12 }}
+        >
+          <div className="flex items-center gap-2 text-[13px] font-semibold text-white">
+            <span
+              className="inline-block h-2.5 w-2.5 rounded-full"
+              style={{ background: deliveryMode === 'preview_fallback' ? '#f59e0b' : ACCENT_PRESETS[accent].a }}
+            />
+            {deliveryMode === 'preview_fallback' ? 'Preview-code fallback active' : 'Real SMS delivery active'}
+          </div>
+          <div className="mt-1 text-[12px] text-fg-60" style={{ lineHeight: 1.45 }}>
+            {deliveryMode === 'preview_fallback'
+              ? 'If SMS delivery is unavailable, the app can fall back to an on-screen code for testing.'
+              : 'Codes are currently being sent through Twilio SMS.'}
+          </div>
+          {deliveryStatus && (
+            <div className="mt-2 text-[12px] text-fg-55" style={{ lineHeight: 1.45 }}>
+              Last send status: {deliveryStatus}
+            </div>
+          )}
         </div>
 
         <button
