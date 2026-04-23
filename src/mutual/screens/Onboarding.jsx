@@ -120,7 +120,7 @@ function TermItem({ accent, icon, title, children }) {
   );
 }
 
-export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', deliveryStatus = '', resendCooldownSeconds = 30 }) {
+export function ScreenPhone({ accent, onSendCode, onBack, resendCooldownSeconds = 30 }) {
   const [digits, setDigits] = useState('');
   const [busy, setBusy] = useState(false);
   const [resendBusy, setResendBusy] = useState(false);
