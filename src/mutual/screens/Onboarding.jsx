@@ -149,6 +149,8 @@ export function ScreenPhone({ accent, onSendCode, onBack, deliveryMode = 'sms', 
         ? 'Wait for the timer to finish, then tap send code again.'
         : /network|connection|fetch/i.test(message)
           ? 'Check your signal or internet connection and try again.'
+          : /unreachable|invalid destination|undeliverable|cannot receive|landline|not a mobile|destination/i.test(message)
+            ? 'Confirm this number can receive SMS messages, then check the number and try again.'
           : /valid phone number|mobile number/i.test(message)
             ? 'Double-check the number and try again.'
             : 'Please try again in a moment. If it still fails, confirm this number can receive SMS.';
