@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { isValidTestCode, isValidTestPin, synthEmail } from "./shared";
+import { useServerFn } from "@tanstack/react-start";
+import { applySessionTokens } from "../auth";
+import { testmodeLogin } from "./testmode.functions";
+import { isValidTestCode, isValidTestPin } from "./shared";
 
 type Props = { onCancel: () => void };
 
@@ -10,6 +12,7 @@ export function TestLogin({ onCancel }: Props) {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const loginWithTestMode = useServerFn(testmodeLogin);
 
   const submitPin = async () => {
     setErr("");
@@ -28,16 +31,8 @@ export function TestLogin({ onCancel }: Props) {
     }
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: synthEmail(pin),
-        password: code,
-      });
-      if (error) {
-        if (error.message?.toLowerCase().includes("invalid login credentials")) {
-          throw new Error("Wrong PIN or code. Please check your credentials and try again.");
-        }
-        throw error;
-      }
+      const session = await loginWithTestMode({ data: { pin, code } });
+      await applySessionTokens(session.access_token, session.refresh_token);
     } catch (e: any) {
       setErr(e?.message || "Login failed");
       setBusy(false);
