@@ -119,6 +119,7 @@ jobs:
       - name: Ensure iOS platform exists
         run: |
           if [ ! -d ios ]; then
+            mkdir -p dist && touch dist/index.html
             bunx cap add ios
           fi
 
