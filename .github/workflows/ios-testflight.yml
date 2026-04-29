@@ -127,7 +127,10 @@ jobs:
         run: bunx cap sync ios
 
       - name: Generate iOS app icons
-        run: bunx @capacitor/assets generate --ios --iconBackgroundColor '#08041C' --icon public/app-icon-1024.png
+        run: |
+          mkdir -p assets
+          cp public/app-icon-1024.png assets/icon-only.png
+          bunx @capacitor/assets generate --ios --iconBackgroundColor '#08041C'
 
       - name: Install CocoaPods dependencies
         run: |
