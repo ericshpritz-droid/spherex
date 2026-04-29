@@ -126,43 +126,38 @@ jobs:
       - name: Sync Capacitor iOS project
         run: bunx cap sync ios
 
-      - name: Debug iOS project structure
-        run: |
-          echo "=== ios/App contents ==="
-          ls -la ios/App/ || echo "ios/App not found"
-          echo "=== Podfile ==="
-          cat ios/App/Podfile 2>/dev/null || echo "No Podfile"
-
       - name: Install CocoaPods dependencies
         run: |
           if [ -f ios/App/Podfile ]; then
             cd ios/App && pod install
           else
-            echo "No Podfile found — cap sync may have failed silently."
-            exit 1
+            echo "No Podfile — Capacitor is using SPM, skipping CocoaPods."
           fi
 
       - name: Preflight iOS project checks
         env:
           XCODE_SCHEME: App
         run: |
-          WORKSPACE_PATH="ios/App/App.xcworkspace"
-
-          if [ ! -d "$WORKSPACE_PATH" ]; then
-            echo "Missing required iOS workspace: $WORKSPACE_PATH" >&2
-            echo "Make sure the iOS platform is added and CocoaPods finished successfully before archiving." >&2
+          # Capacitor 8 uses SPM so there may be no xcworkspace
+          if [ -d "ios/App/App.xcworkspace" ]; then
+            PROJECT_FLAG="-workspace ios/App/App.xcworkspace"
+          elif [ -d "ios/App/App.xcodeproj" ]; then
+            PROJECT_FLAG="-project ios/App/App.xcodeproj"
+          else
+            echo "No Xcode project or workspace found in ios/App/" >&2
+            ls -la ios/App/ >&2
             exit 1
           fi
 
-          if ! xcodebuild -list -workspace "$WORKSPACE_PATH" > "$LOG_DIR/xcode-project-list.log" 2>&1; then
-            echo "Unable to inspect the Xcode workspace at $WORKSPACE_PATH." >&2
-            echo "See xcode-project-list.log in the workflow artifacts for details." >&2
+          if ! xcodebuild -list $PROJECT_FLAG > "$LOG_DIR/xcode-project-list.log" 2>&1; then
+            echo "Unable to inspect the Xcode project." >&2
+            cat "$LOG_DIR/xcode-project-list.log" >&2
             exit 1
           fi
 
           if ! grep -Eq "^[[:space:]]+$XCODE_SCHEME$" "$LOG_DIR/xcode-project-list.log"; then
             echo "Missing required Xcode scheme: $XCODE_SCHEME" >&2
-            echo "Available schemes were captured in xcode-project-list.log." >&2
+            cat "$LOG_DIR/xcode-project-list.log" >&2
             exit 1
           fi
 
@@ -249,11 +244,18 @@ jobs:
         run: |
           set -o pipefail
           rm -f "$LOG_DIR/archive.log"
+
+          if [ -d "ios/App/App.xcworkspace" ]; then
+            PROJECT_FLAG="-workspace ios/App/App.xcworkspace"
+          else
+            PROJECT_FLAG="-project ios/App/App.xcodeproj"
+          fi
+
           for attempt in 1 2 3; do
             echo "Xcode archive attempt $attempt" | tee -a "$LOG_DIR/archive.log"
 
             if xcodebuild \
-              -workspace ios/App/App.xcworkspace \
+              $PROJECT_FLAG \
               -scheme App \
               -configuration Release \
               -sdk iphoneos \
