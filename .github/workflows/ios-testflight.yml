@@ -76,7 +76,7 @@ jobs:
     timeout-minutes: 60
     env:
       BUNDLE_ID: app.lovable.sphere
-      LOG_DIR: ${{ runner.temp }}/ios-build-logs
+      LOG_DIR: /tmp/ios-build-logs
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
       CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
