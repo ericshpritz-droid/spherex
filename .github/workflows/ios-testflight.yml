@@ -126,6 +126,9 @@ jobs:
       - name: Sync Capacitor iOS project
         run: bunx cap sync ios
 
+      - name: Generate iOS app icons
+        run: bunx @capacitor/assets generate --ios --iconBackgroundColor '#08041C' --icon public/app-icon-1024.png
+
       - name: Install CocoaPods dependencies
         run: |
           if [ -f ios/App/Podfile ]; then
