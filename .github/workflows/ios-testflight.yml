@@ -127,7 +127,12 @@ jobs:
         run: bunx cap sync ios
 
       - name: Install CocoaPods dependencies
-        run: pod install --project-directory=ios/App
+        run: |
+          if [ -f ios/App/Podfile ]; then
+            pod install --project-directory=ios/App
+          else
+            echo "No Podfile found, skipping CocoaPods install."
+          fi
 
       - name: Preflight iOS project checks
         env:
