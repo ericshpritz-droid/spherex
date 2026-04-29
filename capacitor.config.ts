@@ -23,7 +23,7 @@ const config: CapacitorConfig = {
   // Point the WebView at the hosted Lovable server so SSR and server
   // functions work correctly inside the native iOS shell.
   server: {
-    url: "https://id-preview--560b357e-2c14-4df9-ba8b-4774650aac2d.lovable.app",
+    url: "https://mysphere.love",
     cleartext: false,
   },
 };
