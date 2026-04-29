@@ -126,12 +126,20 @@ jobs:
       - name: Sync Capacitor iOS project
         run: bunx cap sync ios
 
+      - name: Debug iOS project structure
+        run: |
+          echo "=== ios/App contents ==="
+          ls -la ios/App/ || echo "ios/App not found"
+          echo "=== Podfile ==="
+          cat ios/App/Podfile 2>/dev/null || echo "No Podfile"
+
       - name: Install CocoaPods dependencies
         run: |
           if [ -f ios/App/Podfile ]; then
-            pod install --project-directory=ios/App
+            cd ios/App && pod install
           else
-            echo "No Podfile found, skipping CocoaPods install."
+            echo "No Podfile found — cap sync may have failed silently."
+            exit 1
           fi
 
       - name: Preflight iOS project checks
