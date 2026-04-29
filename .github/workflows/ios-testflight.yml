@@ -72,7 +72,7 @@ jobs:
   build-and-upload:
     needs: preflight
     if: needs.preflight.outputs.should_run == 'true'
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
     env:
       BUNDLE_ID: app.lovable.sphere
