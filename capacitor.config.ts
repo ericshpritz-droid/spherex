@@ -15,17 +15,26 @@ const config: CapacitorConfig = {
   appName: "Sphere",
   webDir: "dist",
   ios: {
-    contentInset: "always",
-    // Tell the WebView the safe-area is handled by our CSS (we already pad
-    // 64px from the top on the home header).
+    // "never" stops the WebView from auto-padding for the status bar; our CSS
+    // already handles safe areas.
+    contentInset: "never",
     limitsNavigationsToAppBoundDomains: false,
+    // Disable the rubber-band overscroll bounce so the app feels native, not
+    // like a Safari tab.
+    scrollEnabled: false,
+    // Match the app background so there's no white flash on launch / during
+    // navigation.
+    backgroundColor: "#08041C",
+    // Hide the WKWebView scroll indicators.
+    preferredContentMode: "mobile",
   },
-  // Point the WebView at the hosted Lovable server so SSR and server
-  // functions work correctly inside the native iOS shell.
+  // SSR + server functions require the live server. Keep pointing at prod.
   server: {
     url: "https://mysphere.love",
     cleartext: false,
+    iosScheme: "https",
   },
+  backgroundColor: "#08041C",
 };
 
 export default config;
