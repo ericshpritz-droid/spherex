@@ -1,0 +1,57 @@
+// One-shot native shell initialization. Called from __root.tsx after we
+// confirm we're inside Capacitor. Safe no-ops on web.
+import { isNative } from "./platform";
+
+let initialized = false;
+
+export async function initNativeShell(): Promise<void> {
+  if (initialized || !isNative()) return;
+  initialized = true;
+
+  // Tag <html> so CSS can lock the viewport.
+  document.documentElement.classList.add("capacitor-native");
+
+  // Status bar: dark content area, our background, overlay so safe-area CSS
+  // controls spacing.
+  try {
+    const { StatusBar, Style } = await import("@capacitor/status-bar");
+    await StatusBar.setStyle({ style: Style.Dark });
+    await StatusBar.setOverlaysWebView({ overlay: true });
+  } catch {}
+
+  // Keyboard: native resize so inputs lift the view, plus class hooks for CSS.
+  try {
+    const { Keyboard, KeyboardResize } = await import("@capacitor/keyboard");
+    await Keyboard.setResizeMode({ mode: KeyboardResize.Native });
+    await Keyboard.setScroll({ isDisabled: true });
+    Keyboard.addListener("keyboardWillShow", () => {
+      document.documentElement.classList.add("kb-open");
+    });
+    Keyboard.addListener("keyboardWillHide", () => {
+      document.documentElement.classList.remove("kb-open");
+    });
+  } catch {}
+
+  // Hardware/system back button — let the router handle it on Android, no-op iOS.
+  try {
+    const { App } = await import("@capacitor/app");
+    App.addListener("backButton", () => {
+      if (window.history.length > 1) window.history.back();
+    });
+  } catch {}
+
+  // Belt & suspenders: kill any document-level touchmove that would scroll
+  // the WebView itself. Inner scroll containers (data-scroll) still work.
+  document.addEventListener(
+    "touchmove",
+    (e) => {
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest("[data-scroll], input, textarea, [contenteditable]")) return;
+      if (e.cancelable) e.preventDefault();
+    },
+    { passive: false },
+  );
+
+  // Disable iOS double-tap-to-zoom & pinch-zoom gestures globally.
+  document.addEventListener("gesturestart", (e) => e.preventDefault());
+}
