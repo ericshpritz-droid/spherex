@@ -204,6 +204,30 @@
     overflow: hidden;
     overscroll-behavior: none;
     touch-action: manipulation;
+    -webkit-overflow-scrolling: auto;
+  }
+
+  /* Inner scrollers must opt in via [data-scroll] so the page itself never
+     bounces, but lists/threads still scroll smoothly. */
+  html.capacitor-native [data-scroll] {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  /* Respect the iOS safe areas — status bar overlays the WebView. */
+  html.capacitor-native body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    background: var(--ink-deep);
+  }
+
+  /* Slight tightening when the keyboard is up so inputs aren't clipped. */
+  html.capacitor-native.kb-open body {
+    padding-bottom: 0;
   }
 
   ::-webkit-scrollbar { width: 0; height: 0; }
