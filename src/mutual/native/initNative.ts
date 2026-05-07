@@ -40,13 +40,28 @@ export async function initNativeShell(): Promise<void> {
     });
   } catch {}
 
-  // Belt & suspenders: kill any document-level touchmove that would scroll
-  // the WebView itself. Inner scroll containers (data-scroll) still work.
+  // Belt & suspenders: kill document-level touchmove that would bounce the
+  // WebView itself, but allow scroll inside any element that *can* scroll
+  // (overflow auto/scroll, inputs, contenteditable, opt-in [data-scroll]).
+  const isScrollable = (el: HTMLElement): boolean => {
+    let node: HTMLElement | null = el;
+    while (node && node !== document.body) {
+      const s = getComputedStyle(node);
+      const oy = s.overflowY;
+      if ((oy === "auto" || oy === "scroll") && node.scrollHeight > node.clientHeight) {
+        return true;
+      }
+      node = node.parentElement;
+    }
+    return false;
+  };
   document.addEventListener(
     "touchmove",
     (e) => {
       const t = e.target as HTMLElement | null;
-      if (t && t.closest("[data-scroll], input, textarea, [contenteditable]")) return;
+      if (!t) return;
+      if (t.closest("input, textarea, [contenteditable], [data-scroll]")) return;
+      if (isScrollable(t)) return;
       if (e.cancelable) e.preventDefault();
     },
     { passive: false },

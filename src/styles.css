@@ -207,10 +207,14 @@
     -webkit-overflow-scrolling: auto;
   }
 
-  /* Inner scrollers must opt in via [data-scroll] so the page itself never
-     bounces, but lists/threads still scroll smoothly. */
-  html.capacitor-native [data-scroll] {
-    overflow-y: auto;
+  /* Inner scrollers: any element with overflow auto/scroll OR opt-in
+     [data-scroll] gets momentum + contained bounce so the page itself
+     never rubber-bands, but lists/threads scroll smoothly. */
+  html.capacitor-native [data-scroll],
+  html.capacitor-native .overflow-auto,
+  html.capacitor-native .overflow-y-auto,
+  html.capacitor-native .overflow-scroll,
+  html.capacitor-native .overflow-y-scroll {
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
