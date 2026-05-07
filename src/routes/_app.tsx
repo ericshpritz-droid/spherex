@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/rea
 import { AppProvider, useApp } from "../mutual/AppContext";
 import { Spinner } from "../mutual/components/Spinner.jsx";
 import { TestModeBanner } from "../mutual/testmode/TestModeBanner";
+import { isNative } from "../mutual/native/platform";
 
 const PUBLIC_PATHS = new Set(["/welcome", "/phone", "/code"]);
 const ONBOARDED_KEY = (uid: string) => `mutual.onboarded.${uid}`;
@@ -41,18 +42,29 @@ function PhoneFrame() {
     }
   }
 
+  const native = isNative();
+  // On real iOS/Android, fill the screen (no faux phone-frame).
+  // On the web preview, keep the rounded "phone" frame.
+  const wrapperClass = native
+    ? "h-[100dvh] w-screen bg-black"
+    : "min-h-screen bg-frame flex justify-center items-center";
+  const wrapperStyle: React.CSSProperties = native ? {} : { padding: "20px 0" };
+  const innerClass = native
+    ? "h-full w-full overflow-hidden relative bg-black"
+    : "overflow-hidden relative bg-black";
+  const innerStyle: React.CSSProperties = native
+    ? {}
+    : {
+        width: "min(402px, 100vw)", height: "min(874px, 100vh)",
+        maxWidth: 402, maxHeight: 874,
+        borderRadius: 48,
+        boxShadow: "0 40px 80px rgba(0,0,0,0.4)",
+      };
+
   return (
-    <div className="min-h-screen bg-frame flex justify-center items-center" style={{ padding: "20px 0" }}>
+    <div className={wrapperClass} style={wrapperStyle}>
       <TestModeBanner />
-      <div
-        className="overflow-hidden relative bg-black"
-        style={{
-          width: "min(402px, 100vw)", height: "min(874px, 100vh)",
-          maxWidth: 402, maxHeight: 874,
-          borderRadius: 48,
-          boxShadow: "0 40px 80px rgba(0,0,0,0.4)",
-        }}
-      >
+      <div className={innerClass} style={innerStyle}>
         {showShellLoading ? (
           <div className="h-full flex flex-col items-center justify-center gap-3 text-white bg-ink">
             <Spinner accent={accent} size={36}/>
