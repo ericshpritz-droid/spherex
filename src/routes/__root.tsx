@@ -73,13 +73,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  // Tag <html> when running inside Capacitor so CSS can lock the viewport
-  // (no rubber-band scroll, fixed sizing) — web stays unaffected.
+  // Initialize native shell (status bar, keyboard, viewport lock, gesture guards)
+  // exactly once when running inside Capacitor. No-op on web.
   if (typeof window !== "undefined") {
-    import("../mutual/native/platform").then(({ isNative }) => {
-      if (isNative()) {
-        document.documentElement.classList.add("capacitor-native");
-      }
+    import("../mutual/native/initNative").then(({ initNativeShell }) => {
+      initNativeShell();
     }).catch(() => {});
   }
   return <Outlet />;
