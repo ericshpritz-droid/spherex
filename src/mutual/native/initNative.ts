@@ -69,4 +69,26 @@ export async function initNativeShell(): Promise<void> {
 
   // Disable iOS double-tap-to-zoom & pinch-zoom gestures globally.
   document.addEventListener("gesturestart", (e) => e.preventDefault());
+
+  // Kill iOS form-zoom on focus (any input < 16px font triggers zoom).
+  // Belt: viewport meta is also locked to maximum-scale=1 in __root.tsx.
+  document.addEventListener(
+    "touchend",
+    (e) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+    },
+    { passive: true },
+  );
+
+  // Hide the launch splash once React has painted. Small delay so the first
+  // frame is real content, not a white flash.
+  try {
+    const { SplashScreen } = await import("@capacitor/splash-screen");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        void SplashScreen.hide({ fadeOutDuration: 250 });
+      });
+    });
+  } catch {}
 }
