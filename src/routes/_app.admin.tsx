@@ -120,6 +120,26 @@ function AdminRoute() {
           Status: <span className="text-white font-semibold">{testMode === null ? "loading…" : testMode ? "ON" : "OFF"}</span>
         </div>
       </div>
+
+      <div className="mt-5 rounded-[18px] bg-glass-06 border border-hairline-12" style={{ padding: 18 }}>
+        <div className="text-[15px] font-semibold">Demo testers</div>
+        <div className="text-[13px] text-fg-60 mt-1">
+          Seed Ava, Marcus, Jordan, and Priya so TestFlight users can one-tap into a ready-made identity and immediately match each other. They all share code <span className="text-white font-semibold">111111</span>.
+        </div>
+        <button
+          onClick={seedDemoTesters}
+          disabled={seedBusy || !testMode}
+          className="mt-4 rounded-[14px] bg-white text-black font-semibold disabled:opacity-40"
+          style={{ padding: "12px 18px", border: 0, cursor: "pointer" }}
+        >
+          {seedBusy ? "Seeding…" : "Seed demo testers"}
+        </button>
+        {!testMode && (
+          <div className="mt-2 text-[12px] text-fg-45">Turn Test mode ON first.</div>
+        )}
+        {seedMsg && <div className="mt-3 text-[13px] text-fg-70">{seedMsg}</div>}
+      </div>
     </div>
   );
 }
+
