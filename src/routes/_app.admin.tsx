@@ -20,7 +20,10 @@ function AdminRoute() {
   const [testMode, setTestModeState] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [seedBusy, setSeedBusy] = useState(false);
+  const [seedMsg, setSeedMsg] = useState("");
   const updateTestMode = useServerFn(setTestModeServer);
+  const seedDemo = useServerFn(testmodeSeedDemoTesters);
 
   useEffect(() => {
     supabase.from("app_settings").select("test_mode").eq("id", 1).single()
