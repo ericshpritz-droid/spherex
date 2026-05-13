@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { useApp } from "../mutual/AppContext";
-import { setTestMode as setTestModeServer } from "../mutual/testmode/testmode.functions";
+import { setTestMode as setTestModeServer, testmodeSeedDemoTesters } from "../mutual/testmode/testmode.functions";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
 import { Spinner } from "../mutual/components/Spinner.jsx";
 
