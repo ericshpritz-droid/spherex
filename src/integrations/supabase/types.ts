@@ -188,6 +188,36 @@ export type Database = {
         }
         Relationships: []
       }
+      test_share_codes: {
+        Row: {
+          code: string
+          consumed_at: string | null
+          consumed_by_user_id: string | null
+          created_at: string
+          expires_at: string
+          owner_phone_hash: string
+          owner_user_id: string
+        }
+        Insert: {
+          code: string
+          consumed_at?: string | null
+          consumed_by_user_id?: string | null
+          created_at?: string
+          expires_at: string
+          owner_phone_hash: string
+          owner_user_id: string
+        }
+        Update: {
+          code?: string
+          consumed_at?: string | null
+          consumed_by_user_id?: string | null
+          created_at?: string
+          expires_at?: string
+          owner_phone_hash?: string
+          owner_user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
