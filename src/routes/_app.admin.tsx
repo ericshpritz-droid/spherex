@@ -71,6 +71,23 @@ function AdminRoute() {
     setBusy(false);
   };
 
+  const seedDemoTesters = async () => {
+    setSeedBusy(true); setSeedMsg("");
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) throw new Error("Your session expired. Please sign in again.");
+      const result = await seedDemo({
+        data: undefined as any,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSeedMsg(`Seeded ${result.total} demo testers (${result.created} new, ${result.updated} updated). Code: 111111`);
+    } catch (error: any) {
+      setSeedMsg(error?.message || "Could not seed demo testers");
+    }
+    setSeedBusy(false);
+  };
+
   return (
     <div className="h-full bg-ink text-white overflow-y-auto" style={{ padding: "72px 28px 40px" }}>
       <button
