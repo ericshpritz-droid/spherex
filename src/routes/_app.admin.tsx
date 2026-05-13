@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { useApp } from "../mutual/AppContext";
-import { setTestMode as setTestModeServer } from "../mutual/testmode/testmode.functions";
+import { setTestMode as setTestModeServer, testmodeSeedDemoTesters } from "../mutual/testmode/testmode.functions";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
 import { Spinner } from "../mutual/components/Spinner.jsx";
 
@@ -20,7 +20,10 @@ function AdminRoute() {
   const [testMode, setTestModeState] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [seedBusy, setSeedBusy] = useState(false);
+  const [seedMsg, setSeedMsg] = useState("");
   const updateTestMode = useServerFn(setTestModeServer);
+  const seedDemo = useServerFn(testmodeSeedDemoTesters);
 
   useEffect(() => {
     supabase.from("app_settings").select("test_mode").eq("id", 1).single()
@@ -66,6 +69,23 @@ function AdminRoute() {
       setErr(error?.message || "Could not update test mode");
     }
     setBusy(false);
+  };
+
+  const seedDemoTesters = async () => {
+    setSeedBusy(true); setSeedMsg("");
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) throw new Error("Your session expired. Please sign in again.");
+      const result = await seedDemo({
+        data: undefined as any,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSeedMsg(`Seeded ${result.total} demo testers (${result.created} new, ${result.updated} updated). Code: 111111`);
+    } catch (error: any) {
+      setSeedMsg(error?.message || "Could not seed demo testers");
+    }
+    setSeedBusy(false);
   };
 
   return (
@@ -117,6 +137,26 @@ function AdminRoute() {
           Status: <span className="text-white font-semibold">{testMode === null ? "loading…" : testMode ? "ON" : "OFF"}</span>
         </div>
       </div>
+
+      <div className="mt-5 rounded-[18px] bg-glass-06 border border-hairline-12" style={{ padding: 18 }}>
+        <div className="text-[15px] font-semibold">Demo testers</div>
+        <div className="text-[13px] text-fg-60 mt-1">
+          Seed Ava, Marcus, Jordan, and Priya so TestFlight users can one-tap into a ready-made identity and immediately match each other. They all share code <span className="text-white font-semibold">111111</span>.
+        </div>
+        <button
+          onClick={seedDemoTesters}
+          disabled={seedBusy || !testMode}
+          className="mt-4 rounded-[14px] bg-white text-black font-semibold disabled:opacity-40"
+          style={{ padding: "12px 18px", border: 0, cursor: "pointer" }}
+        >
+          {seedBusy ? "Seeding…" : "Seed demo testers"}
+        </button>
+        {!testMode && (
+          <div className="mt-2 text-[12px] text-fg-45">Turn Test mode ON first.</div>
+        )}
+        {seedMsg && <div className="mt-3 text-[13px] text-fg-70">{seedMsg}</div>}
+      </div>
     </div>
   );
 }
+

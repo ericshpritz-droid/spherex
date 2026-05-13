@@ -138,6 +138,85 @@ export const testmodeListPhones = createServerFn({ method: "POST" })
     return { phones: (data || []).map((r) => synthPhone(r.pin as string)) };
   });
 
+// Demo testers — pre-seeded synthetic accounts that share a known passcode so
+// TestFlight users can one-tap into a ready-made identity and immediately
+// match with the other demo testers.
+export const DEMO_TESTER_CODE = "111111";
+const DEMO_TESTERS: Array<{ pin: string; display_name: string }> = [
+  { pin: "1111", display_name: "Ava" },
+  { pin: "2222", display_name: "Marcus" },
+  { pin: "3333", display_name: "Jordan" },
+  { pin: "4444", display_name: "Priya" },
+];
+
+export const testmodeListDemoTesters = createServerFn({ method: "POST" })
+  .handler(async () => {
+    await ensureTestModeEnabled();
+    const { data, error } = await supabaseAdmin
+      .from("test_accounts")
+      .select("pin, display_name")
+      .not("display_name", "is", null)
+      .order("pin", { ascending: true });
+    if (error) throw new Error("Could not list demo testers");
+    return {
+      code: DEMO_TESTER_CODE,
+      testers: (data || []).map((r) => ({
+        pin: r.pin as string,
+        display_name: (r.display_name as string) || "",
+      })),
+    };
+  });
+
+export const testmodeSeedDemoTesters = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdminAccess(context as { supabase: any; userId: string });
+    await ensureTestModeEnabled();
+
+    let created = 0;
+    let updated = 0;
+    for (const tester of DEMO_TESTERS) {
+      const email = synthEmail(tester.pin);
+      const phone = synthPhone(tester.pin);
+
+      const { data: existing } = await supabaseAdmin
+        .from("test_accounts")
+        .select("user_id, display_name")
+        .eq("pin", tester.pin)
+        .maybeSingle();
+
+      if (!existing) {
+        const { data: createdUser, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+          email,
+          password: DEMO_TESTER_CODE,
+          email_confirm: true,
+          phone,
+          phone_confirm: true,
+          user_metadata: { test_pin: tester.pin, synthetic: true, demo: true, display_name: tester.display_name },
+        });
+        if (createErr || !createdUser.user) {
+          throw new Error(createErr?.message || `Could not create demo tester ${tester.pin}`);
+        }
+        const { error: linkErr } = await supabaseAdmin
+          .from("test_accounts")
+          .insert({ pin: tester.pin, user_id: createdUser.user.id, display_name: tester.display_name });
+        if (linkErr) {
+          await supabaseAdmin.auth.admin.deleteUser(createdUser.user.id);
+          throw new Error(linkErr.message || "Could not register demo tester");
+        }
+        created += 1;
+      } else if (existing.display_name !== tester.display_name) {
+        const { error: updErr } = await supabaseAdmin
+          .from("test_accounts")
+          .update({ display_name: tester.display_name })
+          .eq("pin", tester.pin);
+        if (updErr) throw new Error("Could not update demo tester name");
+        updated += 1;
+      }
+    }
+    return { created, updated, total: DEMO_TESTERS.length };
+  });
+
 export const setTestMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { enabled: boolean }) => {
