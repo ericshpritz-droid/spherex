@@ -155,6 +155,18 @@ function ProfileRoute() {
             {testPin}
           </button>
           <div className="text-[10px] text-white/50">Share this so others can add you</div>
+          <button
+            onClick={() => navigate({ to: "/test-share" })}
+            className="mt-2 rounded-full text-[11px] font-semibold tracking-wide cursor-pointer"
+            style={{
+              padding: "6px 14px",
+              background: "rgba(255,255,255,0.18)",
+              color: "white",
+              border: "1px solid rgba(255,255,255,0.25)",
+            }}
+          >
+            One-time share code →
+          </button>
         </div>
       )}
       {isAdmin && (

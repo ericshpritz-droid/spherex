@@ -217,6 +217,122 @@ export const testmodeSeedDemoTesters = createServerFn({ method: "POST" })
     return { created, updated, total: DEMO_TESTERS.length };
   });
 
+// ----- One-time share codes -----
+// A signed-in tester generates a short code, sends it to a friend.
+// The friend (also signed in via test mode) redeems it and the two accounts
+// are mutually added — no manual contact picking needed.
+
+const SHARE_CODE_TTL_MIN = 30;
+const SHARE_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
+
+function generateShareCode(): string {
+  let out = "";
+  const buf = new Uint8Array(6);
+  crypto.getRandomValues(buf);
+  for (let i = 0; i < 6; i++) {
+    out += SHARE_CODE_ALPHABET[buf[i] % SHARE_CODE_ALPHABET.length];
+  }
+  return out;
+}
+
+async function getCallerPhoneHash(claims: { phone?: string }): Promise<string> {
+  const raw = claims?.phone ? `+${String(claims.phone).replace(/\D/g, "")}` : "";
+  if (!raw || raw.length < 8) {
+    throw new Error("Your account is missing a verified phone number.");
+  }
+  const { hashPhone } = await import("@/integrations/phone/hash.server");
+  return hashPhone(raw);
+}
+
+export const testmodeIssueShareCode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureTestModeEnabled();
+    const ctx = context as { userId: string; claims: { phone?: string } };
+    const ownerHash = await getCallerPhoneHash(ctx.claims);
+
+    // Invalidate any prior unconsumed codes from this user.
+    await supabaseAdmin
+      .from("test_share_codes")
+      .update({ consumed_at: new Date().toISOString() })
+      .eq("owner_user_id", ctx.userId)
+      .is("consumed_at", null);
+
+    // Try a few times in the (vanishingly unlikely) collision case.
+    let lastErr: unknown = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = generateShareCode();
+      const expiresAt = new Date(Date.now() + SHARE_CODE_TTL_MIN * 60_000).toISOString();
+      const { error } = await supabaseAdmin
+        .from("test_share_codes")
+        .insert({
+          code,
+          owner_user_id: ctx.userId,
+          owner_phone_hash: ownerHash,
+          expires_at: expiresAt,
+        });
+      if (!error) {
+        return { code, expiresAt, ttlMinutes: SHARE_CODE_TTL_MIN };
+      }
+      lastErr = error;
+    }
+    throw new Error((lastErr as any)?.message || "Could not issue share code");
+  });
+
+export const testmodeRedeemShareCode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { code: string }) => {
+    const code = String(input?.code ?? "").toUpperCase().trim();
+    if (!/^[A-Z0-9]{6}$/.test(code)) throw new Error("Code must be 6 characters");
+    return { code };
+  })
+  .handler(async ({ data, context }) => {
+    await ensureTestModeEnabled();
+    const ctx = context as { userId: string; claims: { phone?: string } };
+    const myHash = await getCallerPhoneHash(ctx.claims);
+
+    const { data: row, error: lookupErr } = await supabaseAdmin
+      .from("test_share_codes")
+      .select("code, owner_user_id, owner_phone_hash, expires_at, consumed_at")
+      .eq("code", data.code)
+      .maybeSingle();
+
+    if (lookupErr) throw new Error("Could not look up code");
+    if (!row) throw new Error("That code doesn't exist");
+    if (row.consumed_at) throw new Error("That code was already used");
+    if (new Date(row.expires_at).getTime() < Date.now()) throw new Error("That code has expired");
+    if (row.owner_user_id === ctx.userId) throw new Error("You can't redeem your own code");
+
+    // Mutual add — insert both directions, ignoring duplicates.
+    const rows = [
+      {
+        adder_id: ctx.userId,
+        adder_phone_hash: myHash,
+        added_phone_hash: row.owner_phone_hash,
+      },
+      {
+        adder_id: row.owner_user_id,
+        adder_phone_hash: row.owner_phone_hash,
+        added_phone_hash: myHash,
+      },
+    ];
+    for (const r of rows) {
+      const { error: insErr } = await supabaseAdmin.from("adds").insert(r);
+      // Ignore unique-violation style "already added" errors so the redeem
+      // is idempotent and a previously-added pair still "matches".
+      if (insErr && !/duplicate|unique|already/i.test(insErr.message || "")) {
+        throw new Error(insErr.message || "Could not record match");
+      }
+    }
+
+    await supabaseAdmin
+      .from("test_share_codes")
+      .update({ consumed_at: new Date().toISOString(), consumed_by_user_id: ctx.userId })
+      .eq("code", data.code);
+
+    return { matched: true };
+  });
+
 export const setTestMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { enabled: boolean }) => {

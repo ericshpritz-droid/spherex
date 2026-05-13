@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as IHashRouteImport } from './routes/i.$hash'
 import { Route as AppWelcomeRouteImport } from './routes/_app.welcome'
+import { Route as AppTestShareRouteImport } from './routes/_app.test-share'
 import { Route as AppSitemapRouteImport } from './routes/_app.sitemap'
 import { Route as AppSentRouteImport } from './routes/_app.sent'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
@@ -55,6 +56,11 @@ const IHashRoute = IHashRouteImport.update({
 const AppWelcomeRoute = AppWelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTestShareRoute = AppTestShareRouteImport.update({
+  id: '/test-share',
+  path: '/test-share',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSitemapRoute = AppSitemapRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
   '/sitemap': typeof AppSitemapRoute
+  '/test-share': typeof AppTestShareRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
   '/thread/$hash': typeof AppThreadHashRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/sent': typeof AppSentRoute
   '/sitemap': typeof AppSitemapRoute
+  '/test-share': typeof AppTestShareRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
   '/thread/$hash': typeof AppThreadHashRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/sent': typeof AppSentRoute
   '/_app/sitemap': typeof AppSitemapRoute
+  '/_app/test-share': typeof AppTestShareRoute
   '/_app/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sent'
     | '/sitemap'
+    | '/test-share'
     | '/welcome'
     | '/i/$hash'
     | '/thread/$hash'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/sent'
     | '/sitemap'
+    | '/test-share'
     | '/welcome'
     | '/i/$hash'
     | '/thread/$hash'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/sent'
     | '/_app/sitemap'
+    | '/_app/test-share'
     | '/_app/welcome'
     | '/i/$hash'
     | '/_app/thread/$hash'
@@ -288,6 +300,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof AppWelcomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/test-share': {
+      id: '/_app/test-share'
+      path: '/test-share'
+      fullPath: '/test-share'
+      preLoaderRoute: typeof AppTestShareRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/sitemap': {
@@ -389,6 +408,7 @@ interface AppRouteChildren {
   AppProfileRoute: typeof AppProfileRoute
   AppSentRoute: typeof AppSentRoute
   AppSitemapRoute: typeof AppSitemapRoute
+  AppTestShareRoute: typeof AppTestShareRoute
   AppWelcomeRoute: typeof AppWelcomeRoute
   AppThreadHashRoute: typeof AppThreadHashRoute
 }
@@ -405,6 +425,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProfileRoute: AppProfileRoute,
   AppSentRoute: AppSentRoute,
   AppSitemapRoute: AppSitemapRoute,
+  AppTestShareRoute: AppTestShareRoute,
   AppWelcomeRoute: AppWelcomeRoute,
   AppThreadHashRoute: AppThreadHashRoute,
 }
@@ -421,12 +442,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
