@@ -134,7 +134,7 @@ function HomeRoute() {
               return (
                 <div
                   key={id}
-                  className="rounded-2xl bg-white border border-line p-4 flex items-center gap-4"
+                  className="rounded-2xl bg-surface border border-line p-4 flex items-center gap-4"
                 >
                   <AvatarMono initials={initials} size={44} />
                   <div className="flex-1 min-w-0">

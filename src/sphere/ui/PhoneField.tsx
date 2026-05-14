@@ -37,7 +37,7 @@ export function PhoneField({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-2xl bg-white border border-line",
+        "flex items-center gap-3 rounded-2xl bg-surface border border-line",
         "h-16 px-4",
         className,
       )}

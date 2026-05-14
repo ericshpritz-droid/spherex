@@ -16,7 +16,7 @@ export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(
       "active:scale-[0.95]",
       on
         ? "bg-ink text-paper border-ink"
-        : "bg-white text-ink border-[#E8E6E1] hover:bg-[#FAF8F4]",
+        : "bg-surface text-ink border-line hover:bg-surface-2",
       className,
     );
     if (as === "span") {

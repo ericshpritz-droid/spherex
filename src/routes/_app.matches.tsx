@@ -56,7 +56,7 @@ function MatchesRoute() {
                 <button
                   key={id}
                   onClick={() => navigate({ to: "/thread/$hash", params: { hash: id } })}
-                  className="w-full text-left rounded-2xl bg-white border border-line p-4 flex items-center gap-4 hover:border-ink/40 transition-colors"
+                  className="w-full text-left rounded-2xl bg-surface border border-line p-4 flex items-center gap-4 hover:border-ink/40 transition-colors"
                 >
                   <AvatarMono initials={initials} size={44} />
                   <div className="flex-1 min-w-0">

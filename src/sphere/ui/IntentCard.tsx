@@ -25,7 +25,7 @@ export function IntentCard({
         "w-full text-left rounded-2xl border p-5 transition-colors",
         dark
           ? "bg-ink text-paper border-ink"
-          : "bg-white text-ink border-line hover:border-[#D8D5D0]",
+          : "bg-surface text-ink border-line hover:border-[#D8D5D0]",
         className,
       )}
     >
