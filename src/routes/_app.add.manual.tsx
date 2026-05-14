@@ -95,7 +95,10 @@ function ManualAdd() {
               onChange={setPhone}
               autoFocus={search.focus !== "ig"}
             />
-            {search.prefilled && (
+            {phoneError && (
+              <div className="mt-2 text-[12px] text-danger">{phoneError}</div>
+            )}
+            {search.prefilled && !phoneError && (
               <div className="mt-1 text-[12px] text-mute">From your contacts.</div>
             )}
           </div>
