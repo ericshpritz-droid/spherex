@@ -18,7 +18,6 @@ async function bearerHeaders(): Promise<Record<string, string>> {
 export type InboxCompliment = {
   id: string;
   body: string;
-  frame_id: string;
   adverb: string;
   adjective: string;
   created_at: string;
@@ -33,11 +32,11 @@ export const callSendCompliment = createClientOnlyFn(
   async (args: {
     recipientPhone?: string;
     recipientPhoneHash?: string;
-    frameId: string;
     adverb: string;
     adjective: string;
     body: string;
     intent?: "compliment" | "both";
+    pickId?: string;
   }) => {
     const headers = await bearerHeaders();
     return await sendComplimentServer({ data: args, headers });

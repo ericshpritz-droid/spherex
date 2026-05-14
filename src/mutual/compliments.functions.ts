@@ -5,14 +5,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const FRAME_IDS = ["smile", "energy", "mind", "laugh", "presence"] as const;
-const ADVERBS = [
-  "quietly", "unreasonably", "genuinely", "dangerously",
-  "softly", "completely", "annoyingly", "honestly",
-] as const;
+const ADVERBS = ["Incredibly", "So", "Kinda", ""] as const;
 const ADJECTIVES = [
-  "magnetic", "disarming", "lovely", "rare",
-  "steady", "kind", "electric", "warm", "sharp",
+  "Beautiful", "Handsome", "Talented", "Stunning",
+  "Radiant", "Brilliant", "Hilarious", "Captivating",
 ] as const;
 
 function validHash(h: string) {
@@ -29,13 +25,12 @@ export const sendComplimentServer = createServerFn({ method: "POST" })
     (input: {
       recipientPhone?: string;
       recipientPhoneHash?: string;
-      frameId: string;
       adverb: string;
       adjective: string;
       body: string;
       intent?: "compliment" | "both";
+      pickId?: string;
     }) => {
-      if (!FRAME_IDS.includes(input.frameId as any)) throw new Error("Invalid frame");
       if (!ADVERBS.includes(input.adverb as any)) throw new Error("Invalid adverb");
       if (!ADJECTIVES.includes(input.adjective as any)) throw new Error("Invalid adjective");
       if (typeof input.body !== "string" || input.body.length < 4 || input.body.length > 200) {
@@ -52,6 +47,9 @@ export const sendComplimentServer = createServerFn({ method: "POST" })
       }
       if (input.intent && input.intent !== "compliment" && input.intent !== "both") {
         throw new Error("Invalid intent");
+      }
+      if (input.pickId && (typeof input.pickId !== "string" || input.pickId.length < 10)) {
+        throw new Error("Invalid pick id");
       }
       return input;
     },
@@ -76,13 +74,13 @@ export const sendComplimentServer = createServerFn({ method: "POST" })
         sender_id: userId,
         sender_phone_hash: myHash,
         recipient_phone_hash: recipientHash,
-        frame_id: data.frameId,
         adverb: data.adverb,
         adjective: data.adjective,
         body: data.body,
         intent: data.intent ?? "compliment",
+        pick_id: data.pickId ?? null,
       })
-      .select("id, body, frame_id, adverb, adjective, created_at")
+      .select("id, body, adverb, adjective, created_at")
       .single();
 
     if (error) throw new Error(error.message || "Could not send compliment");
@@ -104,7 +102,7 @@ export const loadInboxComplimentsServer = createServerFn({ method: "POST" })
 
     const { data: rows, error } = await supabase
       .from("compliments")
-      .select("id, body, frame_id, adverb, adjective, created_at")
+      .select("id, body, adverb, adjective, created_at")
       .eq("recipient_phone_hash", myHash)
       .order("created_at", { ascending: false })
       .limit(100);
@@ -119,7 +117,7 @@ export const loadSentComplimentsServer = createServerFn({ method: "POST" })
     const { supabase, userId } = context as { supabase: any; userId: string };
     const { data: rows, error } = await supabase
       .from("compliments")
-      .select("id, recipient_phone_hash, body, frame_id, adverb, adjective, intent, created_at")
+      .select("id, recipient_phone_hash, body, adverb, adjective, intent, created_at")
       .eq("sender_id", userId)
       .order("created_at", { ascending: false })
       .limit(100);

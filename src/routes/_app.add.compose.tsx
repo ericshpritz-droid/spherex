@@ -2,15 +2,18 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, GhostButton, Eyebrow, ComplimentBubble } from "@/sphere/ui";
+import { useApp } from "@/mutual/AppContext";
+import { toast } from "@/mutual/toast";
+import { callSendCompliment } from "@/mutual/compliments.rpc";
 import {
   ADJECTIVES,
   ADVERBS,
   COMPLIMENT_KEY,
   DRAFT_KEY,
-  FRAMES,
   renderCompliment,
+  type AdjectiveValue,
+  type AdverbValue,
   type ComplimentDraft,
-  type FrameId,
 } from "@/sphere/compliments/words";
 
 export const Route = createFileRoute("/_app/add/compose")({
@@ -23,12 +26,15 @@ export const Route = createFileRoute("/_app/add/compose")({
   component: ComposeRoute,
 });
 
+type AddDraft = { phone: string; ig: string; intent?: "romantic" | "compliment" | "both" };
+
 function ComposeRoute() {
   const navigate = useNavigate();
-  const [hasDraft, setHasDraft] = useState(false);
-  const [frameId, setFrameId] = useState<FrameId>(FRAMES[0].id);
-  const [adverb, setAdverb] = useState<string>(ADVERBS[0]);
-  const [adjective, setAdjective] = useState<string>(ADJECTIVES[0]);
+  const { addOne } = useApp();
+  const [draft, setDraft] = useState<AddDraft | null>(null);
+  const [adverb, setAdverb] = useState<AdverbValue>(ADVERBS[0].value);
+  const [adjective, setAdjective] = useState<AdjectiveValue>(ADJECTIVES[0]);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     try {
@@ -37,34 +43,51 @@ function ComposeRoute() {
         navigate({ to: "/add/manual" as any, replace: true });
         return;
       }
-      setHasDraft(true);
-      // Restore prior compliment draft if user steps back from preview.
+      setDraft(JSON.parse(raw));
       const prior = sessionStorage.getItem(COMPLIMENT_KEY);
       if (prior) {
         const d = JSON.parse(prior) as ComplimentDraft;
-        if (FRAMES.some((f) => f.id === d.frameId)) setFrameId(d.frameId);
-        if (ADVERBS.includes(d.adverb as any)) setAdverb(d.adverb);
-        if (ADJECTIVES.includes(d.adjective as any)) setAdjective(d.adjective);
+        if (ADVERBS.some((a) => a.value === d.adverb)) setAdverb(d.adverb);
+        if (ADJECTIVES.includes(d.adjective)) setAdjective(d.adjective);
       }
     } catch {
       navigate({ to: "/add/manual" as any, replace: true });
     }
   }, [navigate]);
 
-  const preview = useMemo(
-    () => renderCompliment({ frameId, adverb, adjective }),
-    [frameId, adverb, adjective],
+  const body = useMemo(
+    () => renderCompliment({ adverb, adjective }),
+    [adverb, adjective],
   );
 
-  function next() {
-    const draft: ComplimentDraft = { frameId, adverb, adjective };
+  async function send() {
+    if (!draft || busy) return;
+    setBusy(true);
     try {
-      sessionStorage.setItem(COMPLIMENT_KEY, JSON.stringify(draft));
-    } catch {}
-    navigate({ to: "/add/preview" as any });
+      const intent = (draft.intent ?? "both") as "compliment" | "both";
+      // For "both", record the romantic add first so a mutual match can ignite later.
+      if (intent === "both") {
+        try { await addOne(draft.phone, "both"); } catch { /* non-fatal */ }
+      }
+      await callSendCompliment({
+        recipientPhone: draft.phone,
+        adverb,
+        adjective,
+        body,
+        intent,
+      });
+      try {
+        sessionStorage.removeItem(DRAFT_KEY);
+        sessionStorage.removeItem(COMPLIMENT_KEY);
+      } catch {}
+      navigate({ to: "/add/patience" as any, replace: true });
+    } catch (e: any) {
+      toast(e?.message || "Could not send.");
+      setBusy(false);
+    }
   }
 
-  if (!hasDraft) return <SphereScreen>{null}</SphereScreen>;
+  if (!draft) return <SphereScreen>{null}</SphereScreen>;
 
   return (
     <SphereScreen>
@@ -83,29 +106,21 @@ function ComposeRoute() {
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" data-scroll>
         <Eyebrow>Compose a compliment</Eyebrow>
         <h1 className="mt-2 font-serif italic text-[34px] leading-[1.05] tracking-tight">
-          Three small words.
+          Two small words.
         </h1>
         <p className="mt-3 text-[14px] text-mute">
-          They'll see this anonymously. Sealed unless they pick you back.
+          Anonymous to them. Sealed unless they pick you back.
         </p>
 
         <div className="mt-6">
-          <ComplimentBubble body={preview} caption="Anonymous · preview" />
+          <ComplimentBubble body={body} caption="Anonymous · preview" />
         </div>
-
-        <Section label="Frame">
-          <ChipRow
-            options={FRAMES.map((f) => ({ value: f.id, label: f.label }))}
-            value={frameId}
-            onChange={(v) => setFrameId(v as FrameId)}
-          />
-        </Section>
 
         <Section label="Adverb">
           <ChipRow
-            options={ADVERBS.map((w) => ({ value: w, label: w }))}
+            options={ADVERBS.map((a) => ({ value: a.value, label: a.label }))}
             value={adverb}
-            onChange={setAdverb}
+            onChange={(v) => setAdverb(v as AdverbValue)}
           />
         </Section>
 
@@ -113,13 +128,15 @@ function ComposeRoute() {
           <ChipRow
             options={ADJECTIVES.map((w) => ({ value: w, label: w }))}
             value={adjective}
-            onChange={setAdjective}
+            onChange={(v) => setAdjective(v as AdjectiveValue)}
           />
         </Section>
       </div>
 
       <div className="px-6 pb-8 pt-4 space-y-3">
-        <PrimaryButton onClick={next}>Preview anonymously</PrimaryButton>
+        <PrimaryButton onClick={send} disabled={busy}>
+          {busy ? "Sending…" : "Send anonymously"}
+        </PrimaryButton>
         <GhostButton onClick={() => navigate({ to: "/add/intent" as any })}>
           Back
         </GhostButton>
@@ -157,7 +174,7 @@ function ChipRow({
         const selected = o.value === value;
         return (
           <button
-            key={o.value}
+            key={o.value || "skip"}
             type="button"
             onClick={() => onChange(o.value)}
             className={[

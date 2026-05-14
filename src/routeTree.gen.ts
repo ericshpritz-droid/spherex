@@ -25,14 +25,12 @@ import { Route as AppOnboardingImportRouteImport } from './routes/_app.onboardin
 import { Route as AppOnboardingExplainerRouteImport } from './routes/_app.onboarding-explainer'
 import { Route as AppMatchRouteImport } from './routes/_app.match'
 import { Route as AppInstagramRouteImport } from './routes/_app.instagram'
-import { Route as AppInboxRouteImport } from './routes/_app.inbox'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppAddRouteImport } from './routes/_app.add'
 import { Route as AppThreadHashRouteImport } from './routes/_app.thread.$hash'
-import { Route as AppAddPreviewRouteImport } from './routes/_app.add.preview'
 import { Route as AppAddPatienceRouteImport } from './routes/_app.add.patience'
 import { Route as AppAddManualRouteImport } from './routes/_app.add.manual'
 import { Route as AppAddIntentRouteImport } from './routes/_app.add.intent'
@@ -118,11 +116,6 @@ const AppInstagramRoute = AppInstagramRouteImport.update({
   path: '/instagram',
   getParentRoute: () => AppRoute,
 } as any)
-const AppInboxRoute = AppInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -152,11 +145,6 @@ const AppThreadHashRoute = AppThreadHashRouteImport.update({
   id: '/thread/$hash',
   path: '/thread/$hash',
   getParentRoute: () => AppRoute,
-} as any)
-const AppAddPreviewRoute = AppAddPreviewRouteImport.update({
-  id: '/preview',
-  path: '/preview',
-  getParentRoute: () => AppAddRoute,
 } as any)
 const AppAddPatienceRoute = AppAddPatienceRouteImport.update({
   id: '/patience',
@@ -194,7 +182,6 @@ export interface FileRoutesByFullPath {
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
-  '/inbox': typeof AppInboxRoute
   '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
   '/onboarding-explainer': typeof AppOnboardingExplainerRoute
@@ -211,7 +198,6 @@ export interface FileRoutesByFullPath {
   '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
-  '/add/preview': typeof AppAddPreviewRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesByTo {
@@ -224,7 +210,6 @@ export interface FileRoutesByTo {
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
-  '/inbox': typeof AppInboxRoute
   '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
   '/onboarding-explainer': typeof AppOnboardingExplainerRoute
@@ -241,7 +226,6 @@ export interface FileRoutesByTo {
   '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
-  '/add/preview': typeof AppAddPreviewRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesById {
@@ -256,7 +240,6 @@ export interface FileRoutesById {
   '/_app/code': typeof AppCodeRoute
   '/_app/contacts': typeof AppContactsRoute
   '/_app/home': typeof AppHomeRoute
-  '/_app/inbox': typeof AppInboxRoute
   '/_app/instagram': typeof AppInstagramRoute
   '/_app/match': typeof AppMatchRoute
   '/_app/onboarding-explainer': typeof AppOnboardingExplainerRoute
@@ -273,7 +256,6 @@ export interface FileRoutesById {
   '/_app/add/intent': typeof AppAddIntentRoute
   '/_app/add/manual': typeof AppAddManualRoute
   '/_app/add/patience': typeof AppAddPatienceRoute
-  '/_app/add/preview': typeof AppAddPreviewRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRouteTypes {
@@ -288,7 +270,6 @@ export interface FileRouteTypes {
     | '/code'
     | '/contacts'
     | '/home'
-    | '/inbox'
     | '/instagram'
     | '/match'
     | '/onboarding-explainer'
@@ -305,7 +286,6 @@ export interface FileRouteTypes {
     | '/add/intent'
     | '/add/manual'
     | '/add/patience'
-    | '/add/preview'
     | '/thread/$hash'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -318,7 +298,6 @@ export interface FileRouteTypes {
     | '/code'
     | '/contacts'
     | '/home'
-    | '/inbox'
     | '/instagram'
     | '/match'
     | '/onboarding-explainer'
@@ -335,7 +314,6 @@ export interface FileRouteTypes {
     | '/add/intent'
     | '/add/manual'
     | '/add/patience'
-    | '/add/preview'
     | '/thread/$hash'
   id:
     | '__root__'
@@ -349,7 +327,6 @@ export interface FileRouteTypes {
     | '/_app/code'
     | '/_app/contacts'
     | '/_app/home'
-    | '/_app/inbox'
     | '/_app/instagram'
     | '/_app/match'
     | '/_app/onboarding-explainer'
@@ -366,7 +343,6 @@ export interface FileRouteTypes {
     | '/_app/add/intent'
     | '/_app/add/manual'
     | '/_app/add/patience'
-    | '/_app/add/preview'
     | '/_app/thread/$hash'
   fileRoutesById: FileRoutesById
 }
@@ -493,13 +469,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstagramRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/inbox': {
-      id: '/_app/inbox'
-      path: '/inbox'
-      fullPath: '/inbox'
-      preLoaderRoute: typeof AppInboxRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/home': {
       id: '/_app/home'
       path: '/home'
@@ -541,13 +510,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/thread/$hash'
       preLoaderRoute: typeof AppThreadHashRouteImport
       parentRoute: typeof AppRoute
-    }
-    '/_app/add/preview': {
-      id: '/_app/add/preview'
-      path: '/preview'
-      fullPath: '/add/preview'
-      preLoaderRoute: typeof AppAddPreviewRouteImport
-      parentRoute: typeof AppAddRoute
     }
     '/_app/add/patience': {
       id: '/_app/add/patience'
@@ -593,7 +555,6 @@ interface AppAddRouteChildren {
   AppAddIntentRoute: typeof AppAddIntentRoute
   AppAddManualRoute: typeof AppAddManualRoute
   AppAddPatienceRoute: typeof AppAddPatienceRoute
-  AppAddPreviewRoute: typeof AppAddPreviewRoute
 }
 
 const AppAddRouteChildren: AppAddRouteChildren = {
@@ -602,7 +563,6 @@ const AppAddRouteChildren: AppAddRouteChildren = {
   AppAddIntentRoute: AppAddIntentRoute,
   AppAddManualRoute: AppAddManualRoute,
   AppAddPatienceRoute: AppAddPatienceRoute,
-  AppAddPreviewRoute: AppAddPreviewRoute,
 }
 
 const AppAddRouteWithChildren =
@@ -614,7 +574,6 @@ interface AppRouteChildren {
   AppCodeRoute: typeof AppCodeRoute
   AppContactsRoute: typeof AppContactsRoute
   AppHomeRoute: typeof AppHomeRoute
-  AppInboxRoute: typeof AppInboxRoute
   AppInstagramRoute: typeof AppInstagramRoute
   AppMatchRoute: typeof AppMatchRoute
   AppOnboardingExplainerRoute: typeof AppOnboardingExplainerRoute
@@ -634,7 +593,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppCodeRoute: AppCodeRoute,
   AppContactsRoute: AppContactsRoute,
   AppHomeRoute: AppHomeRoute,
-  AppInboxRoute: AppInboxRoute,
   AppInstagramRoute: AppInstagramRoute,
   AppMatchRoute: AppMatchRoute,
   AppOnboardingExplainerRoute: AppOnboardingExplainerRoute,
@@ -661,3 +619,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
