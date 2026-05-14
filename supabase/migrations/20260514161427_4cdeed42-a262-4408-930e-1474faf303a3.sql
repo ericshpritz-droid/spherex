@@ -1,0 +1,1 @@
+UPDATE public.app_settings SET test_mode = true, updated_at = now() WHERE id = 1;
