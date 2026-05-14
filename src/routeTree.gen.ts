@@ -31,7 +31,7 @@ import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
-import { Route as AppAddRouteImport } from './routes/_app.add'
+import { Route as AppAddIndexRouteImport } from './routes/_app.add.index'
 import { Route as AppThreadHashRouteImport } from './routes/_app.thread.$hash'
 import { Route as AppProfileInviteRouteImport } from './routes/_app.profile.invite'
 import { Route as AppProfileDeleteRouteImport } from './routes/_app.profile.delete'
@@ -150,9 +150,9 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAddRoute = AppAddRouteImport.update({
-  id: '/add',
-  path: '/add',
+const AppAddIndexRoute = AppAddIndexRouteImport.update({
+  id: '/add/',
+  path: '/add/',
   getParentRoute: () => AppRoute,
 } as any)
 const AppThreadHashRoute = AppThreadHashRouteImport.update({
@@ -171,29 +171,29 @@ const AppProfileDeleteRoute = AppProfileDeleteRouteImport.update({
   getParentRoute: () => AppProfileRoute,
 } as any)
 const AppAddPatienceRoute = AppAddPatienceRouteImport.update({
-  id: '/patience',
-  path: '/patience',
-  getParentRoute: () => AppAddRoute,
+  id: '/add/patience',
+  path: '/add/patience',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAddManualRoute = AppAddManualRouteImport.update({
-  id: '/manual',
-  path: '/manual',
-  getParentRoute: () => AppAddRoute,
+  id: '/add/manual',
+  path: '/add/manual',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAddIntentRoute = AppAddIntentRouteImport.update({
-  id: '/intent',
-  path: '/intent',
-  getParentRoute: () => AppAddRoute,
+  id: '/add/intent',
+  path: '/add/intent',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAddConfirmRoute = AppAddConfirmRouteImport.update({
-  id: '/confirm',
-  path: '/confirm',
-  getParentRoute: () => AppAddRoute,
+  id: '/add/confirm',
+  path: '/add/confirm',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAddComposeRoute = AppAddComposeRouteImport.update({
-  id: '/compose',
-  path: '/compose',
-  getParentRoute: () => AppAddRoute,
+  id: '/add/compose',
+  path: '/add/compose',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -201,7 +201,6 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
-  '/add': typeof AppAddRouteWithChildren
   '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
@@ -227,13 +226,13 @@ export interface FileRoutesByFullPath {
   '/profile/delete': typeof AppProfileDeleteRoute
   '/profile/invite': typeof AppProfileInviteRoute
   '/thread/$hash': typeof AppThreadHashRoute
+  '/add/': typeof AppAddIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
   '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
-  '/add': typeof AppAddRouteWithChildren
   '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
@@ -259,6 +258,7 @@ export interface FileRoutesByTo {
   '/profile/delete': typeof AppProfileDeleteRoute
   '/profile/invite': typeof AppProfileInviteRoute
   '/thread/$hash': typeof AppThreadHashRoute
+  '/add': typeof AppAddIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -267,7 +267,6 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
-  '/_app/add': typeof AppAddRouteWithChildren
   '/_app/admin': typeof AppAdminRoute
   '/_app/code': typeof AppCodeRoute
   '/_app/contacts': typeof AppContactsRoute
@@ -293,6 +292,7 @@ export interface FileRoutesById {
   '/_app/profile/delete': typeof AppProfileDeleteRoute
   '/_app/profile/invite': typeof AppProfileInviteRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
+  '/_app/add/': typeof AppAddIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -301,7 +301,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sphere-preview'
     | '/terms'
-    | '/add'
     | '/admin'
     | '/code'
     | '/contacts'
@@ -327,13 +326,13 @@ export interface FileRouteTypes {
     | '/profile/delete'
     | '/profile/invite'
     | '/thread/$hash'
+    | '/add/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/privacy'
     | '/sphere-preview'
     | '/terms'
-    | '/add'
     | '/admin'
     | '/code'
     | '/contacts'
@@ -359,6 +358,7 @@ export interface FileRouteTypes {
     | '/profile/delete'
     | '/profile/invite'
     | '/thread/$hash'
+    | '/add'
   id:
     | '__root__'
     | '/'
@@ -366,7 +366,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sphere-preview'
     | '/terms'
-    | '/_app/add'
     | '/_app/admin'
     | '/_app/code'
     | '/_app/contacts'
@@ -392,6 +391,7 @@ export interface FileRouteTypes {
     | '/_app/profile/delete'
     | '/_app/profile/invite'
     | '/_app/thread/$hash'
+    | '/_app/add/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -559,11 +559,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/add': {
-      id: '/_app/add'
+    '/_app/add/': {
+      id: '/_app/add/'
       path: '/add'
-      fullPath: '/add'
-      preLoaderRoute: typeof AppAddRouteImport
+      fullPath: '/add/'
+      preLoaderRoute: typeof AppAddIndexRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/thread/$hash': {
@@ -589,60 +589,41 @@ declare module '@tanstack/react-router' {
     }
     '/_app/add/patience': {
       id: '/_app/add/patience'
-      path: '/patience'
+      path: '/add/patience'
       fullPath: '/add/patience'
       preLoaderRoute: typeof AppAddPatienceRouteImport
-      parentRoute: typeof AppAddRoute
+      parentRoute: typeof AppRoute
     }
     '/_app/add/manual': {
       id: '/_app/add/manual'
-      path: '/manual'
+      path: '/add/manual'
       fullPath: '/add/manual'
       preLoaderRoute: typeof AppAddManualRouteImport
-      parentRoute: typeof AppAddRoute
+      parentRoute: typeof AppRoute
     }
     '/_app/add/intent': {
       id: '/_app/add/intent'
-      path: '/intent'
+      path: '/add/intent'
       fullPath: '/add/intent'
       preLoaderRoute: typeof AppAddIntentRouteImport
-      parentRoute: typeof AppAddRoute
+      parentRoute: typeof AppRoute
     }
     '/_app/add/confirm': {
       id: '/_app/add/confirm'
-      path: '/confirm'
+      path: '/add/confirm'
       fullPath: '/add/confirm'
       preLoaderRoute: typeof AppAddConfirmRouteImport
-      parentRoute: typeof AppAddRoute
+      parentRoute: typeof AppRoute
     }
     '/_app/add/compose': {
       id: '/_app/add/compose'
-      path: '/compose'
+      path: '/add/compose'
       fullPath: '/add/compose'
       preLoaderRoute: typeof AppAddComposeRouteImport
-      parentRoute: typeof AppAddRoute
+      parentRoute: typeof AppRoute
     }
   }
 }
-
-interface AppAddRouteChildren {
-  AppAddComposeRoute: typeof AppAddComposeRoute
-  AppAddConfirmRoute: typeof AppAddConfirmRoute
-  AppAddIntentRoute: typeof AppAddIntentRoute
-  AppAddManualRoute: typeof AppAddManualRoute
-  AppAddPatienceRoute: typeof AppAddPatienceRoute
-}
-
-const AppAddRouteChildren: AppAddRouteChildren = {
-  AppAddComposeRoute: AppAddComposeRoute,
-  AppAddConfirmRoute: AppAddConfirmRoute,
-  AppAddIntentRoute: AppAddIntentRoute,
-  AppAddManualRoute: AppAddManualRoute,
-  AppAddPatienceRoute: AppAddPatienceRoute,
-}
-
-const AppAddRouteWithChildren =
-  AppAddRoute._addFileChildren(AppAddRouteChildren)
 
 interface AppProfileRouteChildren {
   AppProfileDeleteRoute: typeof AppProfileDeleteRoute
@@ -659,7 +640,6 @@ const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
-  AppAddRoute: typeof AppAddRouteWithChildren
   AppAdminRoute: typeof AppAdminRoute
   AppCodeRoute: typeof AppCodeRoute
   AppContactsRoute: typeof AppContactsRoute
@@ -676,11 +656,16 @@ interface AppRouteChildren {
   AppTestShareRoute: typeof AppTestShareRoute
   AppUpgradeRoute: typeof AppUpgradeRoute
   AppWelcomeRoute: typeof AppWelcomeRoute
+  AppAddComposeRoute: typeof AppAddComposeRoute
+  AppAddConfirmRoute: typeof AppAddConfirmRoute
+  AppAddIntentRoute: typeof AppAddIntentRoute
+  AppAddManualRoute: typeof AppAddManualRoute
+  AppAddPatienceRoute: typeof AppAddPatienceRoute
   AppThreadHashRoute: typeof AppThreadHashRoute
+  AppAddIndexRoute: typeof AppAddIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAddRoute: AppAddRouteWithChildren,
   AppAdminRoute: AppAdminRoute,
   AppCodeRoute: AppCodeRoute,
   AppContactsRoute: AppContactsRoute,
@@ -697,7 +682,13 @@ const AppRouteChildren: AppRouteChildren = {
   AppTestShareRoute: AppTestShareRoute,
   AppUpgradeRoute: AppUpgradeRoute,
   AppWelcomeRoute: AppWelcomeRoute,
+  AppAddComposeRoute: AppAddComposeRoute,
+  AppAddConfirmRoute: AppAddConfirmRoute,
+  AppAddIntentRoute: AppAddIntentRoute,
+  AppAddManualRoute: AppAddManualRoute,
+  AppAddPatienceRoute: AppAddPatienceRoute,
   AppThreadHashRoute: AppThreadHashRoute,
+  AppAddIndexRoute: AppAddIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
