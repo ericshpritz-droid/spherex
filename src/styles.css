@@ -25,6 +25,17 @@
   --color-ink-card: var(--ink-card);
   --color-frame: var(--frame);
   --color-error: var(--error);
+
+  /* Sphere B&W editorial palette */
+  --color-paper: var(--paper);
+  --color-line: var(--line);
+  --color-mute: var(--mute);
+  --color-danger: var(--danger);
+
+  /* Sphere typography */
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+  --font-sans: 'Geist', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   /* Glass surface alphas on white */
   --color-glass-04: rgb(255 255 255 / 0.04);
   --color-glass-06: rgb(255 255 255 / 0.06);
