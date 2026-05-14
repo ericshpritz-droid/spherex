@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, PhoneField, Eyebrow } from "@/sphere/ui";
 import { useApp } from "@/mutual/AppContext";
+import { useTestMode } from "@/mutual/testmode/useTestMode";
 import { toast } from "@/mutual/toast";
 
 export const Route = createFileRoute("/_app/phone")({
