@@ -53,7 +53,7 @@ export function PhoneField({
         inputMode="numeric"
         autoFocus={autoFocus}
         value={formatUS(value)}
-        onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, 10))}
+        onChange={(e) => onChange(normalizeNanp(e.target.value))}
         placeholder={placeholder}
         className="flex-1 bg-transparent font-sans text-[17px] text-ink placeholder:text-mute outline-none border-0"
       />
