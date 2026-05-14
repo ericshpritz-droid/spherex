@@ -25,14 +25,18 @@ function toE164Server(input: string): string {
  */
 export const addPhonesServer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { phones: string[] }) => {
+  .inputValidator((input: { phones: string[]; intent?: "romantic" | "compliment" | "both" }) => {
     if (!input || !Array.isArray(input.phones)) {
       throw new Error("phones must be an array");
     }
     if (input.phones.length === 0 || input.phones.length > 500) {
       throw new Error("phones must contain 1–500 entries");
     }
-    return { phones: input.phones };
+    const intent = input.intent ?? "romantic";
+    if (!["romantic", "compliment", "both"].includes(intent)) {
+      throw new Error("intent must be romantic, compliment, or both");
+    }
+    return { phones: input.phones, intent };
   })
   .handler(async ({ data, context }) => {
     const { hashPhone, hashPhones } = await import("@/integrations/phone/hash.server");
@@ -62,6 +66,7 @@ export const addPhonesServer = createServerFn({ method: "POST" })
       adder_id: userId,
       adder_phone_hash: myHash,
       added_phone_hash: h,
+      intent: data.intent,
     }));
 
     const { supabase } = context as any;

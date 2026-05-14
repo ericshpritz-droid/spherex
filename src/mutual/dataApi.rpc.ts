@@ -23,9 +23,12 @@ async function bearerHeaders(): Promise<Record<string, string>> {
 }
 
 export const callAddPhones = createClientOnlyFn(
-  async (phones: string[]): Promise<{ inserted: number }> => {
+  async (
+    phones: string[],
+    intent: "romantic" | "compliment" | "both" = "romantic",
+  ): Promise<{ inserted: number }> => {
     const headers = await bearerHeaders();
-    return await addPhonesServer({ data: { phones }, headers });
+    return await addPhonesServer({ data: { phones, intent }, headers });
   },
 );
 

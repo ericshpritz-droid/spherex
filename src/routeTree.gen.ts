@@ -31,6 +31,10 @@ import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppAddRouteImport } from './routes/_app.add'
 import { Route as AppThreadHashRouteImport } from './routes/_app.thread.$hash'
+import { Route as AppAddPatienceRouteImport } from './routes/_app.add.patience'
+import { Route as AppAddManualRouteImport } from './routes/_app.add.manual'
+import { Route as AppAddIntentRouteImport } from './routes/_app.add.intent'
+import { Route as AppAddConfirmRouteImport } from './routes/_app.add.confirm'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -141,13 +145,33 @@ const AppThreadHashRoute = AppThreadHashRouteImport.update({
   path: '/thread/$hash',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAddPatienceRoute = AppAddPatienceRouteImport.update({
+  id: '/patience',
+  path: '/patience',
+  getParentRoute: () => AppAddRoute,
+} as any)
+const AppAddManualRoute = AppAddManualRouteImport.update({
+  id: '/manual',
+  path: '/manual',
+  getParentRoute: () => AppAddRoute,
+} as any)
+const AppAddIntentRoute = AppAddIntentRouteImport.update({
+  id: '/intent',
+  path: '/intent',
+  getParentRoute: () => AppAddRoute,
+} as any)
+const AppAddConfirmRoute = AppAddConfirmRouteImport.update({
+  id: '/confirm',
+  path: '/confirm',
+  getParentRoute: () => AppAddRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
   '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
-  '/add': typeof AppAddRoute
+  '/add': typeof AppAddRouteWithChildren
   '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
@@ -163,6 +187,10 @@ export interface FileRoutesByFullPath {
   '/test-share': typeof AppTestShareRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
+  '/add/confirm': typeof AppAddConfirmRoute
+  '/add/intent': typeof AppAddIntentRoute
+  '/add/manual': typeof AppAddManualRoute
+  '/add/patience': typeof AppAddPatienceRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesByTo {
@@ -170,7 +198,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
-  '/add': typeof AppAddRoute
+  '/add': typeof AppAddRouteWithChildren
   '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
@@ -186,6 +214,10 @@ export interface FileRoutesByTo {
   '/test-share': typeof AppTestShareRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
+  '/add/confirm': typeof AppAddConfirmRoute
+  '/add/intent': typeof AppAddIntentRoute
+  '/add/manual': typeof AppAddManualRoute
+  '/add/patience': typeof AppAddPatienceRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesById {
@@ -195,7 +227,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
-  '/_app/add': typeof AppAddRoute
+  '/_app/add': typeof AppAddRouteWithChildren
   '/_app/admin': typeof AppAdminRoute
   '/_app/code': typeof AppCodeRoute
   '/_app/contacts': typeof AppContactsRoute
@@ -211,6 +243,10 @@ export interface FileRoutesById {
   '/_app/test-share': typeof AppTestShareRoute
   '/_app/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
+  '/_app/add/confirm': typeof AppAddConfirmRoute
+  '/_app/add/intent': typeof AppAddIntentRoute
+  '/_app/add/manual': typeof AppAddManualRoute
+  '/_app/add/patience': typeof AppAddPatienceRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRouteTypes {
@@ -236,6 +272,10 @@ export interface FileRouteTypes {
     | '/test-share'
     | '/welcome'
     | '/i/$hash'
+    | '/add/confirm'
+    | '/add/intent'
+    | '/add/manual'
+    | '/add/patience'
     | '/thread/$hash'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -259,6 +299,10 @@ export interface FileRouteTypes {
     | '/test-share'
     | '/welcome'
     | '/i/$hash'
+    | '/add/confirm'
+    | '/add/intent'
+    | '/add/manual'
+    | '/add/patience'
     | '/thread/$hash'
   id:
     | '__root__'
@@ -283,6 +327,10 @@ export interface FileRouteTypes {
     | '/_app/test-share'
     | '/_app/welcome'
     | '/i/$hash'
+    | '/_app/add/confirm'
+    | '/_app/add/intent'
+    | '/_app/add/manual'
+    | '/_app/add/patience'
     | '/_app/thread/$hash'
   fileRoutesById: FileRoutesById
 }
@@ -451,11 +499,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppThreadHashRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/add/patience': {
+      id: '/_app/add/patience'
+      path: '/patience'
+      fullPath: '/add/patience'
+      preLoaderRoute: typeof AppAddPatienceRouteImport
+      parentRoute: typeof AppAddRoute
+    }
+    '/_app/add/manual': {
+      id: '/_app/add/manual'
+      path: '/manual'
+      fullPath: '/add/manual'
+      preLoaderRoute: typeof AppAddManualRouteImport
+      parentRoute: typeof AppAddRoute
+    }
+    '/_app/add/intent': {
+      id: '/_app/add/intent'
+      path: '/intent'
+      fullPath: '/add/intent'
+      preLoaderRoute: typeof AppAddIntentRouteImport
+      parentRoute: typeof AppAddRoute
+    }
+    '/_app/add/confirm': {
+      id: '/_app/add/confirm'
+      path: '/confirm'
+      fullPath: '/add/confirm'
+      preLoaderRoute: typeof AppAddConfirmRouteImport
+      parentRoute: typeof AppAddRoute
+    }
   }
 }
 
+interface AppAddRouteChildren {
+  AppAddConfirmRoute: typeof AppAddConfirmRoute
+  AppAddIntentRoute: typeof AppAddIntentRoute
+  AppAddManualRoute: typeof AppAddManualRoute
+  AppAddPatienceRoute: typeof AppAddPatienceRoute
+}
+
+const AppAddRouteChildren: AppAddRouteChildren = {
+  AppAddConfirmRoute: AppAddConfirmRoute,
+  AppAddIntentRoute: AppAddIntentRoute,
+  AppAddManualRoute: AppAddManualRoute,
+  AppAddPatienceRoute: AppAddPatienceRoute,
+}
+
+const AppAddRouteWithChildren =
+  AppAddRoute._addFileChildren(AppAddRouteChildren)
+
 interface AppRouteChildren {
-  AppAddRoute: typeof AppAddRoute
+  AppAddRoute: typeof AppAddRouteWithChildren
   AppAdminRoute: typeof AppAdminRoute
   AppCodeRoute: typeof AppCodeRoute
   AppContactsRoute: typeof AppContactsRoute
@@ -474,7 +567,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAddRoute: AppAddRoute,
+  AppAddRoute: AppAddRouteWithChildren,
   AppAdminRoute: AppAdminRoute,
   AppCodeRoute: AppCodeRoute,
   AppContactsRoute: AppContactsRoute,

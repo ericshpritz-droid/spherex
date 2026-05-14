@@ -43,8 +43,8 @@ type Ctx = {
   verifyCode: (code: string) => Promise<void>;
   // Adds
   lastAddedPhone: string;
-  addOne: (digits: string) => Promise<void>;
-  addMany: (formattedPhones: string[]) => Promise<void>;
+  addOne: (digits: string, intent?: "romantic" | "compliment" | "both") => Promise<void>;
+  addMany: (formattedPhones: string[], intent?: "romantic" | "compliment" | "both") => Promise<void>;
   // Active match (for /match)
   activeMatch: Person | null;
   setActiveMatch: (m: Person | null) => void;
@@ -521,11 +521,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user?.id]);
 
-  const addOne = useCallback(async (digits: string) => {
+  const addOne = useCallback(async (digits: string, intent: "romantic" | "compliment" | "both" = "romantic") => {
     const e164 = toE164(digits);
     let added: string[] = [];
     try {
-      added = await addPhones(myPhone, [e164]);
+      added = await addPhones(myPhone, [e164], intent);
     } catch (e) {
       throw new Error(friendlyError(e));
     }
@@ -534,11 +534,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     refresh();
   }, [myPhone, refresh, rememberLocally]);
 
-  const addMany = useCallback(async (formattedPhones: string[]) => {
+  const addMany = useCallback(async (formattedPhones: string[], intent: "romantic" | "compliment" | "both" = "romantic") => {
     const e164s = formattedPhones.map((p) => toE164(p));
     let added: string[] = [];
     try {
-      added = await addPhones(myPhone, e164s);
+      added = await addPhones(myPhone, e164s, intent);
     } catch (e) {
       throw new Error(friendlyError(e));
     }
