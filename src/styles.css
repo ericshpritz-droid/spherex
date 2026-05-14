@@ -262,6 +262,67 @@
   .tracking-sora-label  { letter-spacing: 0.5px; }
   .tracking-sora-caps   { letter-spacing: 1.5px; }
   .tracking-sora-eyebrow { letter-spacing: 3px; }
+  /* iOS safe-area helpers — apply to screens, headers, footers, tab bars. */
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pl-safe { padding-left: env(safe-area-inset-left); }
+  .pr-safe { padding-right: env(safe-area-inset-right); }
+  .min-h-safe { min-height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+  /* Lift bottom CTAs above the on-screen keyboard. */
+  .pb-kb { padding-bottom: var(--kb-inset, 0px); }
+  .mb-kb { margin-bottom: var(--kb-inset, 0px); }
+}
+
+/* iOS-style stack transitions: forward = slide-in from right + parallax;
+   back = slide-out to right; modal = slide-up from bottom.
+   Wrappers are .ios-stack > [data-route]; direction set on .ios-stack. */
+.ios-stack {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+.ios-stack > [data-route] {
+  position: absolute;
+  inset: 0;
+  background: var(--paper);
+  will-change: transform, opacity;
+}
+.ios-stack[data-dir="forward"] > [data-route].is-enter {
+  animation: iosPushIn 320ms cubic-bezier(.32,.72,0,1) both;
+}
+.ios-stack[data-dir="forward"] > [data-route].is-exit {
+  animation: iosPushOutBack 320ms cubic-bezier(.32,.72,0,1) both;
+}
+.ios-stack[data-dir="back"] > [data-route].is-enter {
+  animation: iosPopIn 300ms cubic-bezier(.32,.72,0,1) both;
+}
+.ios-stack[data-dir="back"] > [data-route].is-exit {
+  animation: iosPopOut 300ms cubic-bezier(.32,.72,0,1) both;
+}
+
+@keyframes iosPushIn {
+  from { transform: translate3d(100%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+@keyframes iosPushOutBack {
+  from { transform: translate3d(0, 0, 0); filter: brightness(1); }
+  to   { transform: translate3d(-30%, 0, 0); filter: brightness(0.92); }
+}
+@keyframes iosPopIn {
+  from { transform: translate3d(-30%, 0, 0); filter: brightness(0.92); }
+  to   { transform: translate3d(0, 0, 0); filter: brightness(1); }
+}
+@keyframes iosPopOut {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(100%, 0, 0); }
+}
+
+/* Tab bar blur (iOS-style frosted) */
+.ios-tabbar {
+  background: color-mix(in srgb, var(--paper) 78%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
 }
 
 @keyframes mutualSpin  { to { transform: rotate(360deg); } }
