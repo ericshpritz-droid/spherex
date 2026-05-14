@@ -31,6 +31,7 @@ import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
+import { Route as AppAddRouteImport } from './routes/_app.add'
 import { Route as AppAddIndexRouteImport } from './routes/_app.add.index'
 import { Route as AppThreadHashRouteImport } from './routes/_app.thread.$hash'
 import { Route as AppProfileInviteRouteImport } from './routes/_app.profile.invite'
@@ -150,10 +151,15 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAddIndexRoute = AppAddIndexRouteImport.update({
-  id: '/add/',
-  path: '/add/',
+const AppAddRoute = AppAddRouteImport.update({
+  id: '/add',
+  path: '/add',
   getParentRoute: () => AppRoute,
+} as any)
+const AppAddIndexRoute = AppAddIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAddRoute,
 } as any)
 const AppThreadHashRoute = AppThreadHashRouteImport.update({
   id: '/thread/$hash',
@@ -171,29 +177,29 @@ const AppProfileDeleteRoute = AppProfileDeleteRouteImport.update({
   getParentRoute: () => AppProfileRoute,
 } as any)
 const AppAddPatienceRoute = AppAddPatienceRouteImport.update({
-  id: '/add/patience',
-  path: '/add/patience',
-  getParentRoute: () => AppRoute,
+  id: '/patience',
+  path: '/patience',
+  getParentRoute: () => AppAddRoute,
 } as any)
 const AppAddManualRoute = AppAddManualRouteImport.update({
-  id: '/add/manual',
-  path: '/add/manual',
-  getParentRoute: () => AppRoute,
+  id: '/manual',
+  path: '/manual',
+  getParentRoute: () => AppAddRoute,
 } as any)
 const AppAddIntentRoute = AppAddIntentRouteImport.update({
-  id: '/add/intent',
-  path: '/add/intent',
-  getParentRoute: () => AppRoute,
+  id: '/intent',
+  path: '/intent',
+  getParentRoute: () => AppAddRoute,
 } as any)
 const AppAddConfirmRoute = AppAddConfirmRouteImport.update({
-  id: '/add/confirm',
-  path: '/add/confirm',
-  getParentRoute: () => AppRoute,
+  id: '/confirm',
+  path: '/confirm',
+  getParentRoute: () => AppAddRoute,
 } as any)
 const AppAddComposeRoute = AppAddComposeRouteImport.update({
-  id: '/add/compose',
-  path: '/add/compose',
-  getParentRoute: () => AppRoute,
+  id: '/compose',
+  path: '/compose',
+  getParentRoute: () => AppAddRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
+  '/add': typeof AppAddRouteWithChildren
   '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
@@ -267,6 +274,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
+  '/_app/add': typeof AppAddRouteWithChildren
   '/_app/admin': typeof AppAdminRoute
   '/_app/code': typeof AppCodeRoute
   '/_app/contacts': typeof AppContactsRoute
@@ -301,6 +309,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sphere-preview'
     | '/terms'
+    | '/add'
     | '/admin'
     | '/code'
     | '/contacts'
@@ -366,6 +375,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sphere-preview'
     | '/terms'
+    | '/_app/add'
     | '/_app/admin'
     | '/_app/code'
     | '/_app/contacts'
@@ -559,12 +569,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/add': {
+      id: '/_app/add'
+      path: '/add'
+      fullPath: '/add'
+      preLoaderRoute: typeof AppAddRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/add/': {
       id: '/_app/add/'
-      path: '/add'
+      path: '/'
       fullPath: '/add/'
       preLoaderRoute: typeof AppAddIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppAddRoute
     }
     '/_app/thread/$hash': {
       id: '/_app/thread/$hash'
@@ -589,41 +606,62 @@ declare module '@tanstack/react-router' {
     }
     '/_app/add/patience': {
       id: '/_app/add/patience'
-      path: '/add/patience'
+      path: '/patience'
       fullPath: '/add/patience'
       preLoaderRoute: typeof AppAddPatienceRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppAddRoute
     }
     '/_app/add/manual': {
       id: '/_app/add/manual'
-      path: '/add/manual'
+      path: '/manual'
       fullPath: '/add/manual'
       preLoaderRoute: typeof AppAddManualRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppAddRoute
     }
     '/_app/add/intent': {
       id: '/_app/add/intent'
-      path: '/add/intent'
+      path: '/intent'
       fullPath: '/add/intent'
       preLoaderRoute: typeof AppAddIntentRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppAddRoute
     }
     '/_app/add/confirm': {
       id: '/_app/add/confirm'
-      path: '/add/confirm'
+      path: '/confirm'
       fullPath: '/add/confirm'
       preLoaderRoute: typeof AppAddConfirmRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppAddRoute
     }
     '/_app/add/compose': {
       id: '/_app/add/compose'
-      path: '/add/compose'
+      path: '/compose'
       fullPath: '/add/compose'
       preLoaderRoute: typeof AppAddComposeRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppAddRoute
     }
   }
 }
+
+interface AppAddRouteChildren {
+  AppAddComposeRoute: typeof AppAddComposeRoute
+  AppAddConfirmRoute: typeof AppAddConfirmRoute
+  AppAddIntentRoute: typeof AppAddIntentRoute
+  AppAddManualRoute: typeof AppAddManualRoute
+  AppAddPatienceRoute: typeof AppAddPatienceRoute
+  AppAddIndexRoute: typeof AppAddIndexRoute
+}
+
+const AppAddRouteChildren: AppAddRouteChildren = {
+  AppAddComposeRoute: AppAddComposeRoute,
+  AppAddConfirmRoute: AppAddConfirmRoute,
+  AppAddIntentRoute: AppAddIntentRoute,
+  AppAddManualRoute: AppAddManualRoute,
+  AppAddPatienceRoute: AppAddPatienceRoute,
+  AppAddIndexRoute: AppAddIndexRoute,
+}
+
+const AppAddRouteWithChildren =
+  AppAddRoute._addFileChildren(AppAddRouteChildren)
 
 interface AppProfileRouteChildren {
   AppProfileDeleteRoute: typeof AppProfileDeleteRoute
@@ -640,6 +678,7 @@ const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppAddRoute: typeof AppAddRouteWithChildren
   AppAdminRoute: typeof AppAdminRoute
   AppCodeRoute: typeof AppCodeRoute
   AppContactsRoute: typeof AppContactsRoute
@@ -656,16 +695,11 @@ interface AppRouteChildren {
   AppTestShareRoute: typeof AppTestShareRoute
   AppUpgradeRoute: typeof AppUpgradeRoute
   AppWelcomeRoute: typeof AppWelcomeRoute
-  AppAddComposeRoute: typeof AppAddComposeRoute
-  AppAddConfirmRoute: typeof AppAddConfirmRoute
-  AppAddIntentRoute: typeof AppAddIntentRoute
-  AppAddManualRoute: typeof AppAddManualRoute
-  AppAddPatienceRoute: typeof AppAddPatienceRoute
   AppThreadHashRoute: typeof AppThreadHashRoute
-  AppAddIndexRoute: typeof AppAddIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAddRoute: AppAddRouteWithChildren,
   AppAdminRoute: AppAdminRoute,
   AppCodeRoute: AppCodeRoute,
   AppContactsRoute: AppContactsRoute,
@@ -682,13 +716,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTestShareRoute: AppTestShareRoute,
   AppUpgradeRoute: AppUpgradeRoute,
   AppWelcomeRoute: AppWelcomeRoute,
-  AppAddComposeRoute: AppAddComposeRoute,
-  AppAddConfirmRoute: AppAddConfirmRoute,
-  AppAddIntentRoute: AppAddIntentRoute,
-  AppAddManualRoute: AppAddManualRoute,
-  AppAddPatienceRoute: AppAddPatienceRoute,
   AppThreadHashRoute: AppThreadHashRoute,
-  AppAddIndexRoute: AppAddIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
