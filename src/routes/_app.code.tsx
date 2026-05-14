@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, Eyebrow } from "@/sphere/ui";
 import { useApp } from "@/mutual/AppContext";
+import { useTestMode } from "@/mutual/testmode/useTestMode";
 import { formatE164 } from "@/mutual/auth";
 import { toast } from "@/mutual/toast";
 import { cn } from "@/lib/utils";
