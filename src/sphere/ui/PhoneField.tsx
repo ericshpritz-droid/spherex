@@ -14,6 +14,16 @@ function formatUS(digits: string) {
 // Re-exported for callers that want the parenthesized display form.
 export { formatNanp };
 
+interface PhoneFieldProps {
+  value: string;
+  onChange: (digits: string) => void;
+  countryCode?: string;
+  flag?: string;
+  placeholder?: string;
+  autoFocus?: boolean;
+  className?: string;
+}
+
 export function PhoneField({
   value,
   onChange,
