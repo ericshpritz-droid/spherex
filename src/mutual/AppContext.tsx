@@ -154,6 +154,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const { enabled: testModeEnabled } = useTestMode();
   const startPhoneVerificationFn = useServerFn(startPhoneVerification);
   const verifyPhoneCodeFn = useServerFn(verifyPhoneCode);
+  const testmodeLoginFn = useServerFn(testmodeLogin);
   const myPhone = user?.phone ? `+${String(user.phone).replace(/\D/g, "")}` : "";
   const myPhoneFormatted = myPhone ? formatE164(myPhone) : "";
 
