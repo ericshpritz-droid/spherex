@@ -96,7 +96,7 @@ export async function pickContacts(): Promise<PickedContact[]> {
         [c.name?.given, c.name?.family].filter(Boolean).join(" ").trim();
       const phones = (c.phones ?? [])
         .map((p) => normalizePhone(p?.number ?? ""))
-        .filter((p) => p.length === 10);
+        .filter(isValidNanp);
       // De-duplicate
       const seen = new Set<string>();
       const out: PickedContact[] = [];
