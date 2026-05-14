@@ -3,8 +3,29 @@
 SphereX is a privacy-first social app built around mutual intent: add someone by phone number, and only when they add you back do you unlock the connection.
 
 - **Live app:** [spherex.lovable.app](https://spherex.lovable.app)
+- **Custom domain:** [mysphere.love](https://mysphere.love)
 - **Platform:** Web + Capacitor iOS shell
 - **Status:** Active Lovable project with GitHub sync and TestFlight automation
+
+## Recent changes (this build)
+
+This build prepares the app for the next TestFlight push. Notable changes since the last release:
+
+- **App icon refresh** — new artwork wired into `public/app-icon-1024.png`, `public/app-icon-512.png`, `public/apple-touch-icon.png`, and `src/assets/app-icon.png`. The native iOS `AppIcon.appiconset` still needs to be regenerated in Xcode from the 1024px source before archiving.
+- **Auto-reciprocate (test mode only)** — new server function `testmodeAutoReciprocateLatest` that lets a tester instantly create a reverse-add for their most recent outbound add, producing a mutual match for end-to-end testing.
+  - Hard environment guard: refuses to run unless `AUTORECIPROCATE_ALLOWED=1` is set as a runtime secret. Production deployments do not share preview secrets, so the function is locked off in prod by default.
+  - Idempotent: repeated taps cannot create duplicate `adds` rows or duplicate matches.
+  - UI: button on the patience screen now shows a loading state, success toast, and an error retry message.
+- **Security memory updated** — the standard Supabase RLS helper functions (`has_role`, `current_user_phone_hash`, `is_mutual_match`) are documented as accepted `SECURITY DEFINER` patterns so the linter stops re-flagging them.
+
+### Pre-flight checklist before archiving
+
+- [ ] Confirm `app_settings.test_mode = false` in production Supabase before cutting the build (PIN login and Auto-reciprocate UI key off this).
+- [ ] Confirm `AUTORECIPROCATE_ALLOWED` is **not** set in production secrets.
+- [ ] Confirm `PHONE_PEPPER` and `TWILIO_API_KEY` are present in the production environment and unchanged (rotating `PHONE_PEPPER` invalidates every existing match).
+- [ ] Drop the new 1024px app icon into `ios/App/App/Assets.xcassets/AppIcon.appiconset/` and let Xcode regenerate variants.
+- [ ] Bump `CFBundleShortVersionString` and `CFBundleVersion` in `ios/App/App/Info.plist` (or via Xcode) so TestFlight accepts the upload.
+- [ ] Run `bun run build && bunx cap sync ios` locally before pushing, or rely on the GitHub Actions TestFlight workflow.
 
 ## What the app does
 
