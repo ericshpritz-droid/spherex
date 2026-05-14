@@ -38,7 +38,7 @@ function PhoneRoute() {
 
   return (
     <SphereScreen>
-      {/* Top bar */}
+      {/* Top bar — back arrow · STEP 1 OF 3 · spacer */}
       <div className="flex items-center justify-between px-6 pt-12 pb-2">
         <button
           aria-label="Back"
@@ -47,30 +47,44 @@ function PhoneRoute() {
         >
           ←
         </button>
-        <div className="font-serif italic text-[18px]">sphere</div>
+        <div
+          className="font-mono text-[11px] uppercase text-mute"
+          style={{ letterSpacing: "0.22em" }}
+        >
+          Step 1 of 3
+        </div>
         <div className="w-6" />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pt-10 pb-4" data-scroll>
-        <Eyebrow>Step 1 of 2</Eyebrow>
+      <div className="flex-1 overflow-y-auto px-6 pt-8 pb-4" data-scroll>
+        <Eyebrow>Verify your number</Eyebrow>
         <h1 className="mt-3 font-serif italic text-[40px] leading-[1.02] tracking-tight">
           What's your number?
         </h1>
-        <p className="mt-3 text-[14px] text-mute leading-snug">
-          We'll text you a 6-digit code. Your number is hashed on device — we never store the raw value.
+        <p className="mt-3 text-[15px] text-mute leading-snug">
+          We'll text you a 6-digit code. Nothing else.
         </p>
 
-        <div className="mt-8">
+        <div className="mt-7">
           <PhoneField value={digits} onChange={setDigits} autoFocus />
+          <p className="mt-3 text-[13px] text-mute leading-snug">
+            Hashed on this device. Used only to find your matches — never shared.
+          </p>
         </div>
       </div>
 
-      <div className="px-6 pb-8 pt-4">
+      <div
+        className="px-6 pt-4"
+        style={{ paddingBottom: `calc(env(safe-area-inset-bottom) + 2rem + var(--kb-inset, 0px))` }}
+      >
         <PrimaryButton onClick={send} disabled={!valid || busy}>
           {busy ? "Sending…" : "Send code"}
         </PrimaryButton>
+        <div className="mt-4 text-center text-[12px] text-mute">
+          We'll text a 6-digit code to confirm.
+        </div>
         <div
-          className="mt-4 text-center font-mono text-[10px] uppercase text-mute"
+          className="mt-3 text-center font-mono text-[10px] uppercase text-mute"
           style={{ letterSpacing: "0.22em" }}
         >
           · Hashed on device ·
