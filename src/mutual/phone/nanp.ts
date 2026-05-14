@@ -85,6 +85,13 @@ export function validateNanp(raw: string | null | undefined): NanpValidation {
     return { ok: false, digits, reason: "too-long", message: "Too many digits" };
   }
 
+  // Test-mode synthetic phones (`+1 999 000 XXXX`) are non-routable and
+  // reserved for in-app demo accounts. Allow them through validation so
+  // testers can add each other by typing a number.
+  if (/^999000\d{4}$/.test(digits)) {
+    return { ok: true, digits };
+  }
+
   const npa = digits.slice(0, 3);
   const nxx = digits.slice(3, 6);
 
