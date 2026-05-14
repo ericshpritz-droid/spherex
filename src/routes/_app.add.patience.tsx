@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, Eyebrow } from "@/sphere/ui";
+import { Spinner } from "@/mutual/components/Spinner.jsx";
 import { useTestMode } from "@/mutual/testmode/useTestMode";
 import { testmodeAutoReciprocateLatest } from "@/mutual/testmode/testmode.functions";
 import { useApp } from "@/mutual/AppContext";
@@ -40,20 +42,28 @@ function PatienceRoute() {
   const { enabled: testMode } = useTestMode();
   const { refresh } = useApp();
   const autoReciprocate = useServerFn(testmodeAutoReciprocateLatest);
-  const [reciprocating, setReciprocating] = useState(false);
-  const [reciprocateMsg, setReciprocateMsg] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleAutoReciprocate = async () => {
-    setReciprocating(true);
-    setReciprocateMsg("");
+    if (status === "loading") return;
+    setStatus("loading");
+    setErrorMsg("");
+    const toastId = toast.loading("Reciprocating…");
     try {
-      await autoReciprocate({ data: undefined as any });
+      const res = await autoReciprocate({ data: undefined as any });
       await refresh?.();
-      setReciprocateMsg("Matched! Heading to your sphere…");
-      setTimeout(() => navigate({ to: "/home", replace: true }), 600);
+      setStatus("success");
+      toast.success(
+        res?.alreadyMatched ? "Already matched" : "Matched!",
+        { id: toastId, description: "Heading to your sphere…" },
+      );
+      setTimeout(() => navigate({ to: "/home", replace: true }), 700);
     } catch (e: any) {
-      setReciprocateMsg(e?.message || "Could not reciprocate");
-      setReciprocating(false);
+      const msg = e?.message || "Could not reciprocate";
+      setErrorMsg(msg);
+      setStatus("error");
+      toast.error("Auto-reciprocate failed", { id: toastId, description: msg });
     }
   };
 
@@ -96,14 +106,28 @@ function PatienceRoute() {
           <div>
             <button
               onClick={handleAutoReciprocate}
-              disabled={reciprocating}
-              className="w-full rounded-[14px] border border-dashed border-hairline-12 bg-glass-06 text-white text-[13px] font-mono disabled:opacity-50"
-              style={{ padding: "10px 14px", letterSpacing: "0.04em" }}
+              disabled={status === "loading" || status === "success"}
+              aria-busy={status === "loading"}
+              className="w-full rounded-[14px] border border-dashed border-hairline-12 bg-glass-06 text-white text-[13px] font-mono disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              style={{
+                padding: "10px 14px",
+                letterSpacing: "0.04em",
+                borderColor: status === "error" ? "rgba(255,90,90,0.5)" : undefined,
+              }}
             >
-              {reciprocating ? "Reciprocating…" : "⚙︎ Auto-reciprocate (test mode)"}
+              {status === "loading" && <Spinner size={14} />}
+              {status === "loading"
+                ? "Reciprocating…"
+                : status === "success"
+                ? "✓ Matched"
+                : status === "error"
+                ? "↻ Retry auto-reciprocate"
+                : "⚙︎ Auto-reciprocate (test mode)"}
             </button>
-            {reciprocateMsg && (
-              <div className="mt-2 text-center text-[12px] text-mute">{reciprocateMsg}</div>
+            {status === "error" && errorMsg && (
+              <div className="mt-2 text-center text-[12px]" style={{ color: "rgba(255,140,140,0.9)" }}>
+                {errorMsg} — tap retry.
+              </div>
             )}
           </div>
         )}
