@@ -1,8 +1,12 @@
 import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { AppProvider, useApp } from "../mutual/AppContext";
 import { Spinner } from "../mutual/components/Spinner.jsx";
 import { TestModeBanner } from "../mutual/testmode/TestModeBanner";
 import { isNative } from "../mutual/native/platform";
+import { useKeyboardInset } from "@/sphere/native/useKeyboardInset";
+import { useRouteDirection } from "@/sphere/native/useRouteDirection";
+import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
 
 const PUBLIC_PATHS = new Set(["/welcome", "/phone", "/code"]);
 const ONBOARDED_KEY = (uid: string) => `mutual.onboarded.${uid}`;
