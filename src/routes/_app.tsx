@@ -2,7 +2,6 @@ import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/rea
 import { useEffect, useRef, useState } from "react";
 import { AppProvider, useApp } from "../mutual/AppContext";
 import { Spinner } from "../mutual/components/Spinner.jsx";
-import { TestModeBanner } from "../mutual/testmode/TestModeBanner";
 import { isNative } from "../mutual/native/platform";
 import { useKeyboardInset } from "@/sphere/native/useKeyboardInset";
 import { useRouteDirection } from "@/sphere/native/useRouteDirection";
@@ -48,17 +47,31 @@ function PhoneFrame() {
     }
   }
 
+  // Detect "phone-sized" viewport so the faux phone-frame ONLY shows on
+  // desktop preview. On any mobile-sized viewport — real native shell, the
+  // iframe preview at mobile sizes, or a real iPhone Safari — fill the screen.
   const native = isNative();
-  // On real iOS/Android, fill the screen (no faux phone-frame).
-  // On the web preview, keep the rounded "phone" frame.
-  const wrapperClass = native
+  const [isPhoneViewport, setIsPhoneViewport] = useState(() => {
+    if (typeof window === "undefined") return true; // SSR-safe default: fill
+    return window.matchMedia("(max-width: 640px)").matches;
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 640px)");
+    const onChange = () => setIsPhoneViewport(mq.matches);
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
+  const fullBleed = native || isPhoneViewport;
+
+  const wrapperClass = fullBleed
     ? "h-[100dvh] w-screen bg-black"
     : "min-h-screen bg-frame flex justify-center items-center";
-  const wrapperStyle: React.CSSProperties = native ? {} : { padding: "20px 0" };
-  const innerClass = native
+  const wrapperStyle: React.CSSProperties = fullBleed ? {} : { padding: "20px 0" };
+  const innerClass = fullBleed
     ? "h-full w-full overflow-hidden relative bg-black"
     : "overflow-hidden relative bg-black";
-  const innerStyle: React.CSSProperties = native
+  const innerStyle: React.CSSProperties = fullBleed
     ? {}
     : {
         width: "min(402px, 100vw)", height: "min(874px, 100vh)",
@@ -69,7 +82,6 @@ function PhoneFrame() {
 
   return (
     <div className={wrapperClass} style={wrapperStyle}>
-      <TestModeBanner />
       <div className={innerClass} style={innerStyle}>
         {showShellLoading ? (
           <div className="h-full flex flex-col items-center justify-center gap-3 text-white bg-ink">
