@@ -4,6 +4,23 @@
 // browser that supports it. Returns a normalized list of { name, phone }.
 import { isNative, nativePlatform } from "./platform";
 
+/**
+ * Open the platform's app settings page so the user can grant Contacts
+ * permission after they previously denied it. iOS uses the `app-settings:`
+ * URL scheme; the web has no equivalent and resolves false.
+ */
+export async function openAppSettings(): Promise<boolean> {
+  if (!isNative()) return false;
+  try {
+    const { App } = await import("@capacitor/app");
+    const url = nativePlatform() === "ios" ? "app-settings:" : "package:";
+    await App.openUrl({ url });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export interface PickedContact {
   name: string;
   phone: string;
