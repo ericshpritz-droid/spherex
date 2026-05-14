@@ -47,9 +47,10 @@ function ManualAdd() {
   const [ig, setIg] = useState(draft.ig);
 
   const cleanedIg = ig.replace(/^@/, "").trim().toLowerCase();
-  const validPhone = phone.length === 10;
+  const phoneCheck = validateNanp(phone);
   const validIg = cleanedIg ? /^[a-z0-9._]{1,30}$/.test(cleanedIg) : true;
-  const canContinue = validPhone && validIg;
+  const canContinue = phoneCheck.ok && validIg;
+  const phoneError = phone.length > 0 && !phoneCheck.ok ? phoneCheck.message : "";
 
   function next() {
     if (!canContinue) return;
