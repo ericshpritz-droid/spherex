@@ -1,24 +1,29 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ScreenWelcome } from "../mutual/screens/Onboarding.jsx";
-import { useApp } from "../mutual/AppContext";
-import { useTestMode } from "../mutual/testmode/useTestMode";
-import { TestLogin } from "../mutual/testmode/TestLogin";
+import { SphereScreen } from "@/sphere/components/SphereScreen";
+import { PrimaryButton, Chip, Eyebrow } from "@/sphere/ui";
+import { useTestMode } from "@/mutual/testmode/useTestMode";
+import { TestLogin } from "@/mutual/testmode/TestLogin";
 
 export const Route = createFileRoute("/_app/welcome")({
   head: () => ({
     meta: [
-      { title: "Sphere — Your sphere starts with one number." },
-      { name: "description", content: "Add a number. If they add yours back, you're in each other's sphere." },
-      { property: "og:title", content: "Sphere — Your sphere starts with one number." },
-      { property: "og:description", content: "Add a number. If they add yours back, you're in each other's sphere." },
+      { title: "sphere — There's someone you can't stop thinking about." },
+      { name: "description", content: "Anonymous unless mutual. Add their number — if they add yours back, you're in each other's sphere." },
+      { property: "og:title", content: "sphere — There's someone you can't stop thinking about." },
+      { property: "og:description", content: "Anonymous unless mutual." },
     ],
   }),
   component: WelcomeRoute,
 });
 
+const CHIPS = [
+  "A classmate", "A co-worker", "A family friend",
+  "A neighbor", "An ex you can't shake",
+  "Your gym crush", "A friend-of-a-friend",
+];
+
 function WelcomeRoute() {
-  const { accent } = useApp();
   const navigate = useNavigate();
   const { enabled: testModeEnabled } = useTestMode();
   const [showTestLogin, setShowTestLogin] = useState(false);
@@ -28,26 +33,65 @@ function WelcomeRoute() {
   }
 
   return (
-    <div className="relative h-full">
-      <ScreenWelcome accent={accent} onNext={() => navigate({ to: "/phone" })} />
+    <SphereScreen>
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-6 pt-12 pb-2">
+        <div className="font-serif italic text-[22px]">sphere</div>
+        <button
+          onClick={() => navigate({ to: "/phone" })}
+          className="font-sans text-[14px] text-ink/80"
+        >
+          Sign in
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" data-scroll>
+        <h1 className="font-serif italic text-[44px] leading-[1.02] tracking-tight">
+          There's someone you can't stop thinking about.
+        </h1>
+        <Eyebrow className="mt-5">But it's been too awkward to ask</Eyebrow>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {CHIPS.map((c) => (
+            <Chip key={c} as="span">{c}</Chip>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 pb-8 pt-4">
+        <PrimaryButton onClick={() => navigate({ to: "/phone" })}>
+          Verify your number to start
+        </PrimaryButton>
+        <div className="mt-4 text-center font-serif italic text-[13px] text-mute">
+          Anonymous unless mutual. Always.
+        </div>
+        <div className="mt-1 text-center font-sans text-[12px] text-mute">
+          By continuing you agree to our{" "}
+          <a href="/terms" className="underline text-ink/70">Terms</a> and{" "}
+          <a href="/privacy" className="underline text-ink/70">Privacy</a>.
+        </div>
+      </div>
+
       {testModeEnabled && (
         <button
           onClick={() => setShowTestLogin(true)}
-          className="absolute z-[2] rounded-full text-[12px] font-semibold tracking-wide cursor-pointer"
+          className="absolute z-[2] rounded-full text-[11px] font-mono uppercase cursor-pointer"
           style={{
-            top: 36,
+            top: 14,
             right: 16,
-            padding: "6px 12px",
-            border: "1px solid rgba(255,255,255,0.18)",
-            background: "rgba(255,255,255,0.10)",
-            color: "white",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
+            padding: "5px 10px",
+            border: "1px solid rgba(10,10,10,0.18)",
+            background: "rgba(255,255,255,0.6)",
+            color: "#0A0A0A",
+            letterSpacing: "0.18em",
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
           }}
         >
-          🧪 Test mode
+          Test mode
         </button>
       )}
-    </div>
+    </SphereScreen>
   );
 }
