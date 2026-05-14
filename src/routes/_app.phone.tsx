@@ -74,7 +74,7 @@ function PhoneRoute() {
           </p>
           {testModeEnabled && (
             <div
-              className="mt-4 rounded-xl border border-line bg-white px-3 py-2 text-[12px] font-mono text-mute"
+              className="mt-4 rounded-xl border border-line bg-surface px-3 py-2 text-[12px] font-mono text-mute"
               style={{ letterSpacing: "0.04em" }}
             >
               <span className="text-ink font-semibold">TEST MODE</span> · No SMS will be sent. Use any 10-digit number; the next-screen code is <span className="text-ink font-semibold">111111</span>.
