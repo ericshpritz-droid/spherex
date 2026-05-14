@@ -20,7 +20,7 @@ function AppLayout() {
 }
 
 function PhoneFrame() {
-  const { session, sessionLoading, accent, user, matches, pending, dataLoading } = useApp();
+  const { session, sessionLoading, accent, user } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname;
