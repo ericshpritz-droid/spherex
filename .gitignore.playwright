@@ -1,0 +1,3 @@
+# Append to .gitignore manually if desired
+test-results/
+playwright-report/
