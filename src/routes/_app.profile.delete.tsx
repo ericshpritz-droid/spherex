@@ -83,7 +83,7 @@ function DeleteRoute() {
         <PrimaryButton
           onClick={execute}
           disabled={!ready || busy}
-          variant="danger"
+          className="bg-danger"
         >
           {busy ? "Erasing…" : "Delete forever"}
         </PrimaryButton>
