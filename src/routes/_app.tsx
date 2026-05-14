@@ -36,8 +36,9 @@ function PhoneFrame() {
       const onboarded = typeof window !== "undefined" && uid
         ? !!localStorage.getItem(ONBOARDED_KEY(uid))
         : true;
-      const empty = !dataLoading && matches.length === 0 && pending.length === 0;
-      const dest = !onboarded && empty ? "/onboarding-import" : "/home";
+      // New users go through the Sphere onboarding (instagram → explainer).
+      // Existing users land on /home directly.
+      const dest = !onboarded ? "/instagram" : "/home";
       queueMicrotask(() => navigate({ to: dest, replace: true }));
     }
   }

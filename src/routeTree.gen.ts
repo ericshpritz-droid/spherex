@@ -22,7 +22,9 @@ import { Route as AppSentRouteImport } from './routes/_app.sent'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppPhoneRouteImport } from './routes/_app.phone'
 import { Route as AppOnboardingImportRouteImport } from './routes/_app.onboarding-import'
+import { Route as AppOnboardingExplainerRouteImport } from './routes/_app.onboarding-explainer'
 import { Route as AppMatchRouteImport } from './routes/_app.match'
+import { Route as AppInstagramRouteImport } from './routes/_app.instagram'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
@@ -94,9 +96,19 @@ const AppOnboardingImportRoute = AppOnboardingImportRouteImport.update({
   path: '/onboarding-import',
   getParentRoute: () => AppRoute,
 } as any)
+const AppOnboardingExplainerRoute = AppOnboardingExplainerRouteImport.update({
+  id: '/onboarding-explainer',
+  path: '/onboarding-explainer',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMatchRoute = AppMatchRouteImport.update({
   id: '/match',
   path: '/match',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInstagramRoute = AppInstagramRouteImport.update({
+  id: '/instagram',
+  path: '/instagram',
   getParentRoute: () => AppRoute,
 } as any)
 const AppHomeRoute = AppHomeRouteImport.update({
@@ -140,7 +152,9 @@ export interface FileRoutesByFullPath {
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
+  '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
+  '/onboarding-explainer': typeof AppOnboardingExplainerRoute
   '/onboarding-import': typeof AppOnboardingImportRoute
   '/phone': typeof AppPhoneRoute
   '/profile': typeof AppProfileRoute
@@ -161,7 +175,9 @@ export interface FileRoutesByTo {
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
+  '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
+  '/onboarding-explainer': typeof AppOnboardingExplainerRoute
   '/onboarding-import': typeof AppOnboardingImportRoute
   '/phone': typeof AppPhoneRoute
   '/profile': typeof AppProfileRoute
@@ -184,7 +200,9 @@ export interface FileRoutesById {
   '/_app/code': typeof AppCodeRoute
   '/_app/contacts': typeof AppContactsRoute
   '/_app/home': typeof AppHomeRoute
+  '/_app/instagram': typeof AppInstagramRoute
   '/_app/match': typeof AppMatchRoute
+  '/_app/onboarding-explainer': typeof AppOnboardingExplainerRoute
   '/_app/onboarding-import': typeof AppOnboardingImportRoute
   '/_app/phone': typeof AppPhoneRoute
   '/_app/profile': typeof AppProfileRoute
@@ -207,7 +225,9 @@ export interface FileRouteTypes {
     | '/code'
     | '/contacts'
     | '/home'
+    | '/instagram'
     | '/match'
+    | '/onboarding-explainer'
     | '/onboarding-import'
     | '/phone'
     | '/profile'
@@ -228,7 +248,9 @@ export interface FileRouteTypes {
     | '/code'
     | '/contacts'
     | '/home'
+    | '/instagram'
     | '/match'
+    | '/onboarding-explainer'
     | '/onboarding-import'
     | '/phone'
     | '/profile'
@@ -250,7 +272,9 @@ export interface FileRouteTypes {
     | '/_app/code'
     | '/_app/contacts'
     | '/_app/home'
+    | '/_app/instagram'
     | '/_app/match'
+    | '/_app/onboarding-explainer'
     | '/_app/onboarding-import'
     | '/_app/phone'
     | '/_app/profile'
@@ -364,11 +388,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOnboardingImportRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/onboarding-explainer': {
+      id: '/_app/onboarding-explainer'
+      path: '/onboarding-explainer'
+      fullPath: '/onboarding-explainer'
+      preLoaderRoute: typeof AppOnboardingExplainerRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/match': {
       id: '/_app/match'
       path: '/match'
       fullPath: '/match'
       preLoaderRoute: typeof AppMatchRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/instagram': {
+      id: '/_app/instagram'
+      path: '/instagram'
+      fullPath: '/instagram'
+      preLoaderRoute: typeof AppInstagramRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/home': {
@@ -422,7 +460,9 @@ interface AppRouteChildren {
   AppCodeRoute: typeof AppCodeRoute
   AppContactsRoute: typeof AppContactsRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppInstagramRoute: typeof AppInstagramRoute
   AppMatchRoute: typeof AppMatchRoute
+  AppOnboardingExplainerRoute: typeof AppOnboardingExplainerRoute
   AppOnboardingImportRoute: typeof AppOnboardingImportRoute
   AppPhoneRoute: typeof AppPhoneRoute
   AppProfileRoute: typeof AppProfileRoute
@@ -439,7 +479,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppCodeRoute: AppCodeRoute,
   AppContactsRoute: AppContactsRoute,
   AppHomeRoute: AppHomeRoute,
+  AppInstagramRoute: AppInstagramRoute,
   AppMatchRoute: AppMatchRoute,
+  AppOnboardingExplainerRoute: AppOnboardingExplainerRoute,
   AppOnboardingImportRoute: AppOnboardingImportRoute,
   AppPhoneRoute: AppPhoneRoute,
   AppProfileRoute: AppProfileRoute,
