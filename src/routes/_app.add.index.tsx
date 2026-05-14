@@ -6,7 +6,7 @@ import { Sheet, GhostButton, Eyebrow } from "@/sphere/ui";
 import { AvatarMono, initialsFromHash } from "@/sphere/components/AvatarMono";
 import { useApp } from "@/mutual/AppContext";
 
-export const Route = createFileRoute("/_app/add")({
+export const Route = createFileRoute("/_app/add/")({
   head: () => ({
     meta: [
       { title: "Add someone — sphere" },
