@@ -69,7 +69,7 @@ export function TestLogin({ onCancel }: Props) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-ink text-white overflow-y-auto" style={{ padding: "72px 28px 32px" }}>
+    <div className="h-full flex flex-col bg-ink-deep text-white overflow-y-auto" style={{ padding: "72px 28px 32px" }}>
       <button
         onClick={onCancel}
         className="w-11 h-11 rounded-full border-0 bg-glass-08 text-white text-xl cursor-pointer mb-6 self-start"
