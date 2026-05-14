@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_app/code")({
 
 function CodeRoute() {
   const { pendingPhone, pendingCodeHint, pendingOtpCooldownSeconds, resendOtp, verifyCode } = useApp();
+  const { enabled: testModeEnabled } = useTestMode();
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
