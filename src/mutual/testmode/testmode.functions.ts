@@ -355,3 +355,48 @@ export const setTestMode = createServerFn({ method: "POST" })
 
     return { testMode: data.enabled };
   });
+
+// Auto-reciprocate the caller's most recent add. TEST MODE ONLY.
+// Finds the test_account whose synthetic phone hashes to my latest add's
+// added_phone_hash, and inserts the reverse `adds` row as that user — instantly
+// producing a mutual match without needing a second browser. Remove this fn
+// (and its UI button) when test mode is retired.
+export const testmodeAutoReciprocateLatest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureTestModeEnabled();
+    const ctx = context as { userId: string; claims: { phone?: string } };
+    const myHash = await getCallerPhoneHash(ctx.claims);
+
+    const { data: latest, error: latestErr } = await supabaseAdmin
+      .from("adds")
+      .select("added_phone_hash")
+      .eq("adder_id", ctx.userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (latestErr) throw new Error("Could not read your latest add");
+    if (!latest) throw new Error("No recent add to reciprocate");
+
+    const { hashPhone } = await import("@/integrations/phone/hash.server");
+    const { data: testers, error: tErr } = await supabaseAdmin
+      .from("test_accounts")
+      .select("pin, user_id");
+    if (tErr) throw new Error("Could not list test accounts");
+
+    const match = (testers || []).find(
+      (t) => hashPhone(synthPhone(t.pin as string)) === latest.added_phone_hash
+    );
+    if (!match) throw new Error("Reverse-add only works for test PIN accounts");
+
+    const { error: insErr } = await supabaseAdmin.from("adds").insert({
+      adder_id: match.user_id,
+      adder_phone_hash: latest.added_phone_hash,
+      added_phone_hash: myHash,
+      intent: "romantic",
+    });
+    if (insErr && !/duplicate|unique|already/i.test(insErr.message || "")) {
+      throw new Error(insErr.message || "Could not insert reverse add");
+    }
+    return { matched: true };
+  });
