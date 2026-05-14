@@ -7,6 +7,7 @@ import { isNative } from "../mutual/native/platform";
 import { useKeyboardInset } from "@/sphere/native/useKeyboardInset";
 import { useRouteDirection } from "@/sphere/native/useRouteDirection";
 import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
+import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
 
 const PUBLIC_PATHS = new Set(["/welcome", "/phone", "/code"]);
 const ONBOARDED_KEY = (uid: string) => `mutual.onboarded.${uid}`;
