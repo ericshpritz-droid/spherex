@@ -89,7 +89,7 @@ function FieldRow({ label, value, onEdit }: { label: string; value: string; onEd
   return (
     <button
       onClick={onEdit}
-      className="w-full text-left rounded-2xl bg-white border border-line p-4 flex items-center justify-between gap-4 hover:border-[#D8D5D0]"
+      className="w-full text-left rounded-2xl bg-surface border border-line p-4 flex items-center justify-between gap-4 hover:border-[#D8D5D0]"
     >
       <div className="min-w-0">
         <Eyebrow>{label}</Eyebrow>

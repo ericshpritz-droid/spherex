@@ -93,7 +93,7 @@ function SheetOption({
   return (
     <button
       onClick={onClick}
-      className="w-full text-left rounded-2xl bg-white border border-line p-4 flex items-center gap-4 hover:border-[#D8D5D0]"
+      className="w-full text-left rounded-2xl bg-surface border border-line p-4 flex items-center gap-4 hover:border-[#D8D5D0]"
     >
       <AvatarMono initials={initials} size={42} />
       <div className="flex-1 min-w-0">
