@@ -16,6 +16,9 @@ const SUPABASE_URL = "https://llbwvnnrzuewzmfmzgnd.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsYnd2bm5yenVld3ptZm16Z25kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODIxNDQsImV4cCI6MjA5MjA1ODE0NH0.TJol3S2QvHZnI7X6OxkNmL9JPiAOohY5SXRVwETxigk";
 
+// This spec walks /phone → /code itself, so don't reuse the saved auth state.
+test.use({ storageState: { cookies: [], origins: [] } });
+
 const TWILIO_PATTERNS = [/Messages\.json/i, /\/twilio\//i];
 
 function isTwilio(req: Request): boolean {
