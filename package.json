@@ -9,6 +9,8 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "check:phone-flow": "node ./scripts/check-phone-flow-delivery.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium webkit",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
