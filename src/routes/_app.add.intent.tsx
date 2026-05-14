@@ -42,10 +42,19 @@ function IntentRoute() {
     if (!draft || busy) return;
     setBusy(true);
     try {
+      // Compliment / both paths defer the add until after preview.
+      if (intent === "compliment" || intent === "both") {
+        try {
+          sessionStorage.setItem(
+            DRAFT_KEY,
+            JSON.stringify({ ...draft, intent }),
+          );
+        } catch {}
+        navigate({ to: "/add/compose" as any, replace: true });
+        return;
+      }
       await addOne(draft.phone, intent);
       try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
-      // Compliment / both paths route to composer in Phase 4.
-      // For Phase 3, every intent ends at the patience screen.
       navigate({ to: "/add/patience" as any, replace: true });
     } catch (e: any) {
       toast(e?.message || "Could not save your pick.");

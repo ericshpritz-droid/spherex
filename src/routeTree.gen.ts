@@ -31,10 +31,12 @@ import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppAddRouteImport } from './routes/_app.add'
 import { Route as AppThreadHashRouteImport } from './routes/_app.thread.$hash'
+import { Route as AppAddPreviewRouteImport } from './routes/_app.add.preview'
 import { Route as AppAddPatienceRouteImport } from './routes/_app.add.patience'
 import { Route as AppAddManualRouteImport } from './routes/_app.add.manual'
 import { Route as AppAddIntentRouteImport } from './routes/_app.add.intent'
 import { Route as AppAddConfirmRouteImport } from './routes/_app.add.confirm'
+import { Route as AppAddComposeRouteImport } from './routes/_app.add.compose'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -145,6 +147,11 @@ const AppThreadHashRoute = AppThreadHashRouteImport.update({
   path: '/thread/$hash',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAddPreviewRoute = AppAddPreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
+  getParentRoute: () => AppAddRoute,
+} as any)
 const AppAddPatienceRoute = AppAddPatienceRouteImport.update({
   id: '/patience',
   path: '/patience',
@@ -163,6 +170,11 @@ const AppAddIntentRoute = AppAddIntentRouteImport.update({
 const AppAddConfirmRoute = AppAddConfirmRouteImport.update({
   id: '/confirm',
   path: '/confirm',
+  getParentRoute: () => AppAddRoute,
+} as any)
+const AppAddComposeRoute = AppAddComposeRouteImport.update({
+  id: '/compose',
+  path: '/compose',
   getParentRoute: () => AppAddRoute,
 } as any)
 
@@ -187,10 +199,12 @@ export interface FileRoutesByFullPath {
   '/test-share': typeof AppTestShareRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
+  '/add/compose': typeof AppAddComposeRoute
   '/add/confirm': typeof AppAddConfirmRoute
   '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
+  '/add/preview': typeof AppAddPreviewRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesByTo {
@@ -214,10 +228,12 @@ export interface FileRoutesByTo {
   '/test-share': typeof AppTestShareRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
+  '/add/compose': typeof AppAddComposeRoute
   '/add/confirm': typeof AppAddConfirmRoute
   '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
+  '/add/preview': typeof AppAddPreviewRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesById {
@@ -243,10 +259,12 @@ export interface FileRoutesById {
   '/_app/test-share': typeof AppTestShareRoute
   '/_app/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
+  '/_app/add/compose': typeof AppAddComposeRoute
   '/_app/add/confirm': typeof AppAddConfirmRoute
   '/_app/add/intent': typeof AppAddIntentRoute
   '/_app/add/manual': typeof AppAddManualRoute
   '/_app/add/patience': typeof AppAddPatienceRoute
+  '/_app/add/preview': typeof AppAddPreviewRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRouteTypes {
@@ -272,10 +290,12 @@ export interface FileRouteTypes {
     | '/test-share'
     | '/welcome'
     | '/i/$hash'
+    | '/add/compose'
     | '/add/confirm'
     | '/add/intent'
     | '/add/manual'
     | '/add/patience'
+    | '/add/preview'
     | '/thread/$hash'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -299,10 +319,12 @@ export interface FileRouteTypes {
     | '/test-share'
     | '/welcome'
     | '/i/$hash'
+    | '/add/compose'
     | '/add/confirm'
     | '/add/intent'
     | '/add/manual'
     | '/add/patience'
+    | '/add/preview'
     | '/thread/$hash'
   id:
     | '__root__'
@@ -327,10 +349,12 @@ export interface FileRouteTypes {
     | '/_app/test-share'
     | '/_app/welcome'
     | '/i/$hash'
+    | '/_app/add/compose'
     | '/_app/add/confirm'
     | '/_app/add/intent'
     | '/_app/add/manual'
     | '/_app/add/patience'
+    | '/_app/add/preview'
     | '/_app/thread/$hash'
   fileRoutesById: FileRoutesById
 }
@@ -499,6 +523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppThreadHashRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/add/preview': {
+      id: '/_app/add/preview'
+      path: '/preview'
+      fullPath: '/add/preview'
+      preLoaderRoute: typeof AppAddPreviewRouteImport
+      parentRoute: typeof AppAddRoute
+    }
     '/_app/add/patience': {
       id: '/_app/add/patience'
       path: '/patience'
@@ -527,21 +558,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAddConfirmRouteImport
       parentRoute: typeof AppAddRoute
     }
+    '/_app/add/compose': {
+      id: '/_app/add/compose'
+      path: '/compose'
+      fullPath: '/add/compose'
+      preLoaderRoute: typeof AppAddComposeRouteImport
+      parentRoute: typeof AppAddRoute
+    }
   }
 }
 
 interface AppAddRouteChildren {
+  AppAddComposeRoute: typeof AppAddComposeRoute
   AppAddConfirmRoute: typeof AppAddConfirmRoute
   AppAddIntentRoute: typeof AppAddIntentRoute
   AppAddManualRoute: typeof AppAddManualRoute
   AppAddPatienceRoute: typeof AppAddPatienceRoute
+  AppAddPreviewRoute: typeof AppAddPreviewRoute
 }
 
 const AppAddRouteChildren: AppAddRouteChildren = {
+  AppAddComposeRoute: AppAddComposeRoute,
   AppAddConfirmRoute: AppAddConfirmRoute,
   AppAddIntentRoute: AppAddIntentRoute,
   AppAddManualRoute: AppAddManualRoute,
   AppAddPatienceRoute: AppAddPatienceRoute,
+  AppAddPreviewRoute: AppAddPreviewRoute,
 }
 
 const AppAddRouteWithChildren =
