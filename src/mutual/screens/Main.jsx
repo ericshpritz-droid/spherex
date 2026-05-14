@@ -602,9 +602,11 @@ export function ScreenContacts({ accent, onBack, onPick }) {
   // Confirmation sheet for device-picked contacts
   const [confirmList, setConfirmList] = useState(null); // null | Array<{ name, phone }>
   const fileInputRef = useRef(null);
+  const [pickerNative, setPickerNative] = useState(false);
   useEffect(() => {
-    const nav = typeof navigator !== 'undefined' ? navigator : null;
-    setPickerSupported(!!(nav && nav.contacts && typeof nav.contacts.select === 'function'));
+    const cap = contactsCapability();
+    setPickerSupported(cap.available);
+    setPickerNative(cap.native);
   }, []);
 
   const filtered = CONTACTS.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.phone.includes(q));
@@ -619,24 +621,18 @@ export function ScreenContacts({ accent, onBack, onPick }) {
     if (!pickerSupported || pickerBusy) return;
     setPickerBusy(true);
     try {
-      const results = await navigator.contacts.select(['name', 'tel'], { multiple: true });
-      const items = [];
-      const seen = new Set();
-      for (const r of results) {
-        const tels = Array.isArray(r.tel) ? r.tel : [];
-        const names = Array.isArray(r.name) ? r.name : [];
-        const displayName = (names.find(Boolean) || '').toString().trim();
-        for (const t of tels) {
-          if (!t) continue;
-          const phone = String(t);
-          if (seen.has(phone)) continue;
-          seen.add(phone);
-          items.push({ name: displayName, phone });
-        }
-      }
+      const items = await pickContacts();
       if (items.length > 0) setConfirmList(items);
     } catch (e) {
-      // user cancelled or denied — silent
+      // Permission denied (native) — surface a soft hint via console; UI shows
+      // the manual fallback regardless.
+      if (e && e.code === 'permission-denied' && typeof window !== 'undefined') {
+        try {
+          // Lazy import to avoid circulars / SSR
+          const { toast } = await import('../toast');
+          toast.error('Contacts access is off. Enable it in Settings → Sphere → Contacts.');
+        } catch {}
+      }
     } finally {
       setPickerBusy(false);
     }
