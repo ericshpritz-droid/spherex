@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SpherePreviewRouteImport } from './routes/sphere-preview'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -32,6 +33,11 @@ import { Route as AppThreadHashRouteImport } from './routes/_app.thread.$hash'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpherePreviewRoute = SpherePreviewRouteImport.update({
+  id: '/sphere-preview',
+  path: '/sphere-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -127,6 +133,7 @@ const AppThreadHashRoute = AppThreadHashRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
+  '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
   '/add': typeof AppAddRoute
   '/admin': typeof AppAdminRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
+  '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
   '/add': typeof AppAddRoute
   '/admin': typeof AppAdminRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/privacy': typeof PrivacyRoute
+  '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
   '/_app/add': typeof AppAddRoute
   '/_app/admin': typeof AppAdminRoute
@@ -191,6 +200,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/privacy'
+    | '/sphere-preview'
     | '/terms'
     | '/add'
     | '/admin'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/privacy'
+    | '/sphere-preview'
     | '/terms'
     | '/add'
     | '/admin'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/privacy'
+    | '/sphere-preview'
     | '/terms'
     | '/_app/add'
     | '/_app/admin'
@@ -254,6 +266,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
+  SpherePreviewRoute: typeof SpherePreviewRoute
   TermsRoute: typeof TermsRoute
   IHashRoute: typeof IHashRoute
 }
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sphere-preview': {
+      id: '/sphere-preview'
+      path: '/sphere-preview'
+      fullPath: '/sphere-preview'
+      preLoaderRoute: typeof SpherePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -436,6 +456,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
+  SpherePreviewRoute: SpherePreviewRoute,
   TermsRoute: TermsRoute,
   IHashRoute: IHashRoute,
 }
