@@ -28,7 +28,10 @@ function IntentRoute() {
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(DRAFT_KEY);
-      if (!raw) return navigate({ to: "/add/manual" as any, replace: true });
+      if (!raw) {
+        navigate({ to: "/add/manual" as any, replace: true });
+        return;
+      }
       setDraft(JSON.parse(raw));
     } catch {
       navigate({ to: "/add/manual" as any, replace: true });
@@ -50,7 +53,7 @@ function IntentRoute() {
     }
   }
 
-  if (!draft) return <SphereScreen />;
+  if (!draft) return <SphereScreen>{null}</SphereScreen>;
 
   return (
     <SphereScreen>

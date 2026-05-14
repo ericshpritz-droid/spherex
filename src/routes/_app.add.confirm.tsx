@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, Eyebrow } from "@/sphere/ui";
-import { formatPhone } from "@/mutual/brand";
+import { formatPhone } from "@/mutual/brand.js";
 
 export const Route = createFileRoute("/_app/add/confirm")({
   head: () => ({
@@ -23,14 +23,17 @@ function ConfirmAdd() {
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(DRAFT_KEY);
-      if (!raw) return navigate({ to: "/add/manual" as any, replace: true });
+      if (!raw) {
+        navigate({ to: "/add/manual" as any, replace: true });
+        return;
+      }
       setDraft(JSON.parse(raw));
     } catch {
       navigate({ to: "/add/manual" as any, replace: true });
     }
   }, [navigate]);
 
-  if (!draft) return <SphereScreen />;
+  if (!draft) return <SphereScreen>{null}</SphereScreen>;
 
   return (
     <SphereScreen>
