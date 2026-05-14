@@ -32,6 +32,7 @@ import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppAddRouteImport } from './routes/_app.add'
+import { Route as AppAddIndexRouteImport } from './routes/_app.add.index'
 import { Route as AppThreadHashRouteImport } from './routes/_app.thread.$hash'
 import { Route as AppProfileInviteRouteImport } from './routes/_app.profile.invite'
 import { Route as AppProfileDeleteRouteImport } from './routes/_app.profile.delete'
@@ -155,6 +156,11 @@ const AppAddRoute = AppAddRouteImport.update({
   path: '/add',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAddIndexRoute = AppAddIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAddRoute,
+} as any)
 const AppThreadHashRoute = AppThreadHashRouteImport.update({
   id: '/thread/$hash',
   path: '/thread/$hash',
@@ -227,13 +233,13 @@ export interface FileRoutesByFullPath {
   '/profile/delete': typeof AppProfileDeleteRoute
   '/profile/invite': typeof AppProfileInviteRoute
   '/thread/$hash': typeof AppThreadHashRoute
+  '/add/': typeof AppAddIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
   '/sphere-preview': typeof SpherePreviewRoute
   '/terms': typeof TermsRoute
-  '/add': typeof AppAddRouteWithChildren
   '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
@@ -259,6 +265,7 @@ export interface FileRoutesByTo {
   '/profile/delete': typeof AppProfileDeleteRoute
   '/profile/invite': typeof AppProfileInviteRoute
   '/thread/$hash': typeof AppThreadHashRoute
+  '/add': typeof AppAddIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -293,6 +300,7 @@ export interface FileRoutesById {
   '/_app/profile/delete': typeof AppProfileDeleteRoute
   '/_app/profile/invite': typeof AppProfileInviteRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
+  '/_app/add/': typeof AppAddIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -327,13 +335,13 @@ export interface FileRouteTypes {
     | '/profile/delete'
     | '/profile/invite'
     | '/thread/$hash'
+    | '/add/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/privacy'
     | '/sphere-preview'
     | '/terms'
-    | '/add'
     | '/admin'
     | '/code'
     | '/contacts'
@@ -359,6 +367,7 @@ export interface FileRouteTypes {
     | '/profile/delete'
     | '/profile/invite'
     | '/thread/$hash'
+    | '/add'
   id:
     | '__root__'
     | '/'
@@ -392,6 +401,7 @@ export interface FileRouteTypes {
     | '/_app/profile/delete'
     | '/_app/profile/invite'
     | '/_app/thread/$hash'
+    | '/_app/add/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -566,6 +576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAddRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/add/': {
+      id: '/_app/add/'
+      path: '/'
+      fullPath: '/add/'
+      preLoaderRoute: typeof AppAddIndexRouteImport
+      parentRoute: typeof AppAddRoute
+    }
     '/_app/thread/$hash': {
       id: '/_app/thread/$hash'
       path: '/thread/$hash'
@@ -631,6 +648,7 @@ interface AppAddRouteChildren {
   AppAddIntentRoute: typeof AppAddIntentRoute
   AppAddManualRoute: typeof AppAddManualRoute
   AppAddPatienceRoute: typeof AppAddPatienceRoute
+  AppAddIndexRoute: typeof AppAddIndexRoute
 }
 
 const AppAddRouteChildren: AppAddRouteChildren = {
@@ -639,6 +657,7 @@ const AppAddRouteChildren: AppAddRouteChildren = {
   AppAddIntentRoute: AppAddIntentRoute,
   AppAddManualRoute: AppAddManualRoute,
   AppAddPatienceRoute: AppAddPatienceRoute,
+  AppAddIndexRoute: AppAddIndexRoute,
 }
 
 const AppAddRouteWithChildren =
