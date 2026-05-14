@@ -4,6 +4,7 @@ import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, GhostButton, Eyebrow, ComplimentBubble } from "@/sphere/ui";
 import { useApp } from "@/mutual/AppContext";
 import { toast } from "@/mutual/toast";
+import { callSendCompliment } from "@/mutual/compliments.rpc";
 import {
   COMPLIMENT_KEY,
   DRAFT_KEY,
