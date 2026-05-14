@@ -12,6 +12,7 @@ import { getContactPhotosEnabled, setContactPhotosEnabled } from "../mutual/nati
 import { isNative } from "../mutual/native/platform";
 import { haptics } from "../mutual/native/haptics";
 import { getHapticsEnabled, setHapticsEnabled } from "../mutual/native/hapticsPref";
+import { ThemeToggle } from "../sphere/ui/ThemeToggle";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
