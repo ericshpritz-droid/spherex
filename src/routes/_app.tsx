@@ -81,6 +81,13 @@ function PhoneFrame() {
             <Outlet />
           </RouteStack>
         )}
+        {/* Floating theme toggle — visible on every screen, sits above route content */}
+        <div
+          className="absolute z-50 pointer-events-auto"
+          style={{ top: "calc(env(safe-area-inset-top, 0px) + 10px)", right: 12 }}
+        >
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   );
