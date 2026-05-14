@@ -76,9 +76,57 @@ function PhoneFrame() {
             <div className="text-sm text-fg-60">Loading…</div>
           </div>
         ) : (
-          <Outlet />
+          <RouteStack>
+            <Outlet />
+          </RouteStack>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * iOS-style page stack: animates push/pop transitions on route change and
+ * supports edge-swipe-back. Renders the previous route alongside the new one
+ * during the transition window so the animation can cross-fade them.
+ */
+function RouteStack({ children }: { children: React.ReactNode }) {
+  useKeyboardInset();
+  const { dir, key } = useRouteDirection();
+  const swipeRef = useEdgeSwipeBack(true);
+  const [layers, setLayers] = useState<{ key: string; node: React.ReactNode; phase: "enter" | "stay" | "exit" }[]>(
+    () => [{ key, node: children, phase: "stay" }],
+  );
+  const prevKey = useRef(key);
+
+  useEffect(() => {
+    if (prevKey.current === key) {
+      // Same key, just refresh the node
+      setLayers((curr) => curr.map((l) => (l.key === key ? { ...l, node: children } : l)));
+      return;
+    }
+    prevKey.current = key;
+    setLayers((curr) => {
+      const exiting = curr.map((l) => ({ ...l, phase: "exit" as const }));
+      return [...exiting, { key, node: children, phase: "enter" as const }];
+    });
+    const t = window.setTimeout(() => {
+      setLayers((curr) => curr.filter((l) => l.key === key).map((l) => ({ ...l, phase: "stay" as const })));
+    }, 360);
+    return () => window.clearTimeout(t);
+  }, [key, children]);
+
+  return (
+    <div ref={swipeRef} className="ios-stack" data-dir={dir}>
+      {layers.map((l) => (
+        <div
+          key={l.key}
+          data-route
+          className={l.phase === "enter" ? "is-enter" : l.phase === "exit" ? "is-exit" : ""}
+        >
+          {l.node}
+        </div>
+      ))}
     </div>
   );
 }
