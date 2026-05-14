@@ -188,7 +188,7 @@ function HomeRoute() {
               $9.99 / month · cancel anytime.
             </div>
             <div className="mt-4">
-              <PrimaryButton onClick={() => toast("Sphere+ comes in Phase 5.")}>
+              <PrimaryButton onClick={() => navigate({ to: "/upgrade" as any })}>
                 Upgrade
               </PrimaryButton>
             </div>
@@ -212,6 +212,27 @@ function HomeRoute() {
       )}
 
       <TabBar />
+
+      {received && (
+        <ReceivedComplimentSheet
+          body={received.body}
+          candidates={myPicks.map((p: any) => ({
+            id: String(p.id),
+            name: p.unknown ? undefined : p.name,
+            unknown: p.unknown,
+          }))}
+          onGuess={(id) => {
+            if (id) toast("Guess locked. We'll tell you only if it's mutual.");
+            else toast("No guess saved.");
+            dismissReceived();
+          }}
+          onKeep={() => {
+            toast("Kept. Quiet brightness.");
+            dismissReceived();
+          }}
+          onClose={dismissReceived}
+        />
+      )}
     </SphereScreen>
   );
 }
