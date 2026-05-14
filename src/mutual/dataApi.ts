@@ -72,7 +72,11 @@ export async function loadAddsAndMatches(
  * Insert one or more "I added them" rows. Hashing happens server-side.
  * Returns the E.164 phones that were sent (for local hash-cache hydration).
  */
-export async function addPhones(myPhoneE164: string, phones: string[]): Promise<string[]> {
+export async function addPhones(
+  myPhoneE164: string,
+  phones: string[],
+  intent: "romantic" | "compliment" | "both" = "romantic",
+): Promise<string[]> {
   const e164s = Array.from(
     new Set(
       phones
@@ -81,6 +85,6 @@ export async function addPhones(myPhoneE164: string, phones: string[]): Promise<
     ),
   );
   if (e164s.length === 0) return [];
-  await callAddPhones(e164s);
+  await callAddPhones(e164s, intent);
   return e164s;
 }
