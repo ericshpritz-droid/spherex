@@ -42,10 +42,19 @@ function IntentRoute() {
     if (!draft || busy) return;
     setBusy(true);
     try {
+      // Compliment / both paths defer the add until after preview.
+      if (intent === "compliment" || intent === "both") {
+        try {
+          sessionStorage.setItem(
+            DRAFT_KEY,
+            JSON.stringify({ ...draft, intent }),
+          );
+        } catch {}
+        navigate({ to: "/add/compose" as any, replace: true });
+        return;
+      }
       await addOne(draft.phone, intent);
       try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
-      // Compliment / both paths route to composer in Phase 4.
-      // For Phase 3, every intent ends at the patience screen.
       navigate({ to: "/add/patience" as any, replace: true });
     } catch (e: any) {
       toast(e?.message || "Could not save your pick.");
@@ -107,15 +116,8 @@ function IntentRoute() {
 
       <div className="px-6 pb-8 pt-4">
         <PrimaryButton onClick={commit} disabled={busy}>
-          {busy ? "Saving…" : "Continue"}
+          {busy ? "Saving…" : intent === "romantic" ? "Continue" : "Compose compliment"}
         </PrimaryButton>
-        {(intent === "compliment" || intent === "both") && (
-          <div className="mt-3 text-center font-mono text-[10px] uppercase text-mute"
-            style={{ letterSpacing: "0.22em" }}
-          >
-            Compliment composer arrives in Phase 4
-          </div>
-        )}
       </div>
     </SphereScreen>
   );
