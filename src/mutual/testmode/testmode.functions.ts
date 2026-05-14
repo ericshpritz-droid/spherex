@@ -405,6 +405,19 @@ export const testmodeAutoReciprocateLatest = createServerFn({ method: "POST" })
     );
     if (!match) throw new Error("Reverse-add only works for test PIN accounts");
 
+    // Idempotency: bail out if the reverse add already exists. Without this,
+    // repeated clicks would insert duplicate rows (the `adds` table has no
+    // unique constraint on (adder_id, added_phone_hash)).
+    const { data: existing, error: existErr } = await supabaseAdmin
+      .from("adds")
+      .select("id")
+      .eq("adder_id", match.user_id)
+      .eq("added_phone_hash", myHash)
+      .limit(1)
+      .maybeSingle();
+    if (existErr) throw new Error("Could not check existing match");
+    if (existing) return { matched: true, alreadyMatched: true };
+
     const { error: insErr } = await supabaseAdmin.from("adds").insert({
       adder_id: match.user_id,
       adder_phone_hash: latest.added_phone_hash,
@@ -414,5 +427,5 @@ export const testmodeAutoReciprocateLatest = createServerFn({ method: "POST" })
     if (insErr && !/duplicate|unique|already/i.test(insErr.message || "")) {
       throw new Error(insErr.message || "Could not insert reverse add");
     }
-    return { matched: true };
+    return { matched: true, alreadyMatched: false };
   });
