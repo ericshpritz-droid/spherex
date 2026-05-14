@@ -25,6 +25,7 @@ import { Route as AppOnboardingImportRouteImport } from './routes/_app.onboardin
 import { Route as AppOnboardingExplainerRouteImport } from './routes/_app.onboarding-explainer'
 import { Route as AppMatchRouteImport } from './routes/_app.match'
 import { Route as AppInstagramRouteImport } from './routes/_app.instagram'
+import { Route as AppInboxRouteImport } from './routes/_app.inbox'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
@@ -117,6 +118,11 @@ const AppInstagramRoute = AppInstagramRouteImport.update({
   path: '/instagram',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInboxRoute = AppInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
+  '/inbox': typeof AppInboxRoute
   '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
   '/onboarding-explainer': typeof AppOnboardingExplainerRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
+  '/inbox': typeof AppInboxRoute
   '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
   '/onboarding-explainer': typeof AppOnboardingExplainerRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/_app/code': typeof AppCodeRoute
   '/_app/contacts': typeof AppContactsRoute
   '/_app/home': typeof AppHomeRoute
+  '/_app/inbox': typeof AppInboxRoute
   '/_app/instagram': typeof AppInstagramRoute
   '/_app/match': typeof AppMatchRoute
   '/_app/onboarding-explainer': typeof AppOnboardingExplainerRoute
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/code'
     | '/contacts'
     | '/home'
+    | '/inbox'
     | '/instagram'
     | '/match'
     | '/onboarding-explainer'
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/code'
     | '/contacts'
     | '/home'
+    | '/inbox'
     | '/instagram'
     | '/match'
     | '/onboarding-explainer'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/_app/code'
     | '/_app/contacts'
     | '/_app/home'
+    | '/_app/inbox'
     | '/_app/instagram'
     | '/_app/match'
     | '/_app/onboarding-explainer'
@@ -481,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstagramRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/inbox': {
+      id: '/_app/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AppInboxRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/home': {
       id: '/_app/home'
       path: '/home'
@@ -595,6 +614,7 @@ interface AppRouteChildren {
   AppCodeRoute: typeof AppCodeRoute
   AppContactsRoute: typeof AppContactsRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppInboxRoute: typeof AppInboxRoute
   AppInstagramRoute: typeof AppInstagramRoute
   AppMatchRoute: typeof AppMatchRoute
   AppOnboardingExplainerRoute: typeof AppOnboardingExplainerRoute
@@ -614,6 +634,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCodeRoute: AppCodeRoute,
   AppContactsRoute: AppContactsRoute,
   AppHomeRoute: AppHomeRoute,
+  AppInboxRoute: AppInboxRoute,
   AppInstagramRoute: AppInstagramRoute,
   AppMatchRoute: AppMatchRoute,
   AppOnboardingExplainerRoute: AppOnboardingExplainerRoute,

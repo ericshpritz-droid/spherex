@@ -59,6 +59,45 @@ export type Database = {
         }
         Relationships: []
       }
+      compliments: {
+        Row: {
+          adjective: string
+          adverb: string
+          body: string
+          created_at: string
+          frame_id: string
+          id: string
+          intent: string
+          recipient_phone_hash: string
+          sender_id: string
+          sender_phone_hash: string
+        }
+        Insert: {
+          adjective: string
+          adverb: string
+          body: string
+          created_at?: string
+          frame_id: string
+          id?: string
+          intent?: string
+          recipient_phone_hash: string
+          sender_id: string
+          sender_phone_hash: string
+        }
+        Update: {
+          adjective?: string
+          adverb?: string
+          body?: string
+          created_at?: string
+          frame_id?: string
+          id?: string
+          intent?: string
+          recipient_phone_hash?: string
+          sender_id?: string
+          sender_phone_hash?: string
+        }
+        Relationships: []
+      }
       invite_conversions: {
         Row: {
           created_at: string

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 const TABS = [
   { to: "/home", label: "SPHERE" },
-  { to: "/matches", label: "MATCHES" },
+  { to: "/inbox", label: "INBOX" },
   { to: "/profile", label: "PROFILE" },
 ] as const;
 
@@ -13,16 +13,14 @@ export function TabBar() {
     <nav className="border-t border-line bg-paper">
       <ul className="grid grid-cols-3">
         {TABS.map((t) => {
-          // /matches doesn't exist yet — falls back to /home in Phase 3.
-          const to = t.to === "/matches" ? "/home" : t.to;
           const active =
             (t.to === "/home" && pathname === "/home") ||
             (t.to === "/profile" && pathname.startsWith("/profile")) ||
-            (t.to === "/matches" && pathname.startsWith("/matches"));
+            (t.to === "/inbox" && pathname.startsWith("/inbox"));
           return (
             <li key={t.label} className="flex justify-center py-4">
               <Link
-                to={to as any}
+                to={t.to as any}
                 className={cn(
                   "font-mono text-[11px] uppercase",
                   active ? "text-ink" : "text-mute",

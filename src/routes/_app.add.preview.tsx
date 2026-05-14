@@ -4,6 +4,7 @@ import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, GhostButton, Eyebrow, ComplimentBubble } from "@/sphere/ui";
 import { useApp } from "@/mutual/AppContext";
 import { toast } from "@/mutual/toast";
+import { callSendCompliment } from "@/mutual/compliments.rpc";
 import {
   COMPLIMENT_KEY,
   DRAFT_KEY,
@@ -49,17 +50,22 @@ function PreviewRoute() {
     if (!draft || !compliment || busy) return;
     setBusy(true);
     try {
-      const intent = draft.intent ?? "both";
-      await addOne(draft.phone, intent);
-      // Stash the sent compliment for the patience screen / future history.
+      const intent = (draft.intent ?? "both") as "compliment" | "both";
+      const body = renderCompliment(compliment);
+      // Persist the compliment first (anonymous to recipient).
+      await callSendCompliment({
+        recipientPhone: draft.phone,
+        frameId: compliment.frameId,
+        adverb: compliment.adverb,
+        adjective: compliment.adjective,
+        body,
+        intent,
+      });
+      // For "both" intent we also record the romantic add so a mutual pick is possible.
+      if (intent === "both") {
+        try { await addOne(draft.phone, "both"); } catch { /* non-fatal: compliment already sent */ }
+      }
       try {
-        const sent = {
-          phone: draft.phone,
-          intent,
-          body: renderCompliment(compliment),
-          at: Date.now(),
-        };
-        sessionStorage.setItem("sphere.lastCompliment", JSON.stringify(sent));
         sessionStorage.removeItem(DRAFT_KEY);
         sessionStorage.removeItem(COMPLIMENT_KEY);
       } catch {}
