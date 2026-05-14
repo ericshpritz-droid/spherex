@@ -482,6 +482,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const startOtp = useCallback(async (digits: string) => {
     const e164 = toE164(digits);
     setPendingPhone(e164);
+    // Test mode: skip Twilio entirely, but keep the same /phone → /code UX.
+    // We surface the demo code as the "dev hint" so the tester can type it,
+    // and verifyCode() actually signs them in via testmodeLogin.
+    if (testModeEnabled) {
+      setPendingCodeHint(TEST_MODE_DEMO_CODE);
+      setPendingOtpCooldownSeconds(30);
+      return;
+    }
     try {
       applyOtpStartResult(await startPhoneVerificationFn({ data: { phoneE164: e164 } }), {
         setPendingCodeHint,
@@ -490,10 +498,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       throw new Error(friendlyError(e));
     }
-  }, [startPhoneVerificationFn]);
+  }, [startPhoneVerificationFn, testModeEnabled]);
 
   const resendOtp = useCallback(async () => {
     if (!pendingPhone) throw new Error("Enter your phone number first.");
+    if (testModeEnabled) {
+      setPendingCodeHint(TEST_MODE_DEMO_CODE);
+      setPendingOtpCooldownSeconds(30);
+      return;
+    }
     try {
       applyOtpStartResult(await startPhoneVerificationFn({ data: { phoneE164: pendingPhone } }), {
         setPendingCodeHint,
@@ -502,17 +515,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       throw new Error(friendlyError(e));
     }
-  }, [pendingPhone, startPhoneVerificationFn]);
+  }, [pendingPhone, startPhoneVerificationFn, testModeEnabled]);
 
   const verifyCode = useCallback(async (code: string) => {
     try {
+      if (testModeEnabled) {
+        const pin = pinFromDigits(pendingPhone);
+        const sessionTokens = await testmodeLoginFn({ data: { pin, code: TEST_MODE_DEMO_CODE } });
+        await applySessionTokens(sessionTokens.access_token, sessionTokens.refresh_token);
+        setPendingCodeHint("");
+        return;
+      }
       const sessionTokens = await verifyPhoneCodeFn({ data: { phoneE164: pendingPhone, code } });
       await applySessionTokens(sessionTokens.access_token, sessionTokens.refresh_token);
       setPendingCodeHint("");
     } catch (e) {
       throw new Error(friendlyError(e));
     }
-  }, [pendingPhone, verifyPhoneCodeFn]);
+  }, [pendingPhone, verifyPhoneCodeFn, testModeEnabled, testmodeLoginFn]);
 
   // After a successful add, ask the server to compute hashes for the just-
   // uploaded raw phones (using its pepper) and remember the mapping locally.
