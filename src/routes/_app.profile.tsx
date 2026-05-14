@@ -170,6 +170,9 @@ function ProfileRoute() {
           </button>
         </div>
       )}
+      <div className="absolute top-5 left-5 z-50">
+        <ThemeToggle />
+      </div>
       {isAdmin && (
         <button
           onClick={() => navigate({ to: "/admin" })}
