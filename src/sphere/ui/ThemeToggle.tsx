@@ -15,12 +15,13 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   const { mode, setMode } = useTheme();
   return (
     <div
-      className={"inline-flex items-center gap-1 rounded-full p-1 " + className}
-      style={{
-        background: "rgba(255,255,255,0.10)",
-        border: "1px solid rgba(255,255,255,0.18)",
-        backdropFilter: "blur(12px)",
-      }}
+      className={
+        "inline-flex items-center gap-1 rounded-full p-1 text-ink " +
+        "bg-[color-mix(in_oklab,var(--ink)_10%,transparent)] " +
+        "border border-[color-mix(in_oklab,var(--ink)_18%,transparent)] " +
+        "backdrop-blur-md " +
+        className
+      }
       role="radiogroup"
       aria-label="Theme"
     >
@@ -35,14 +36,13 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
             aria-label={m.label}
             title={m.label}
             onClick={() => setMode(m.mode)}
-            className="rounded-full text-[12px] font-semibold cursor-pointer transition-colors"
-            style={{
-              padding: "4px 10px",
-              background: active ? "rgba(255,255,255,0.85)" : "transparent",
-              color: active ? "#0A0A0A" : "rgba(255,255,255,0.85)",
-              border: "0",
-              minWidth: 36,
-            }}
+            className={
+              "rounded-full text-[12px] font-semibold cursor-pointer transition-colors border-0 " +
+              (active
+                ? "bg-ink text-paper"
+                : "bg-transparent text-[color-mix(in_oklab,var(--ink)_70%,transparent)]")
+            }
+            style={{ padding: "4px 10px", minWidth: 36 }}
           >
             <span aria-hidden>{m.glyph}</span>
           </button>

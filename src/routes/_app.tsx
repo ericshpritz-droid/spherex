@@ -7,6 +7,7 @@ import { isNative } from "../mutual/native/platform";
 import { useKeyboardInset } from "@/sphere/native/useKeyboardInset";
 import { useRouteDirection } from "@/sphere/native/useRouteDirection";
 import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
+import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
 
 const PUBLIC_PATHS = new Set(["/welcome", "/phone", "/code"]);
 const ONBOARDED_KEY = (uid: string) => `mutual.onboarded.${uid}`;
@@ -80,6 +81,13 @@ function PhoneFrame() {
             <Outlet />
           </RouteStack>
         )}
+        {/* Floating theme toggle — visible on every screen, sits above route content */}
+        <div
+          className="absolute z-50 pointer-events-auto"
+          style={{ top: "calc(env(safe-area-inset-top, 0px) + 10px)", right: 12 }}
+        >
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   );
