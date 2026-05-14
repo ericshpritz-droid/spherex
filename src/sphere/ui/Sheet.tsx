@@ -46,9 +46,10 @@ export function Sheet({ open, onClose, children, className, dismissable = true }
     if (!dismissable) return;
     const target = e.target as HTMLElement;
     const fromHandle = !!target.closest("[data-sheet-handle]");
-    // Only allow dragging from handle OR when the inner content isn't scrolled
-    const inner = target.closest("[data-sheet-scroll]") as HTMLElement | null;
-    if (!fromHandle && inner && inner.scrollTop > 0) return;
+    // Only initiate drag (and pointer capture) from the handle. Capturing on
+    // every tap inside the panel would swallow the `click` event on buttons,
+    // because pointerup gets redirected to the capturing element.
+    if (!fromHandle) return;
     dragRef.current = {
       startY: e.clientY,
       startT: performance.now(),
