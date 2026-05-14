@@ -125,7 +125,7 @@ function CodeRoute() {
                   key={i}
                   className={cn(
                     "flex-1 aspect-[3/4] max-w-[48px] rounded-xl",
-                    "flex items-center justify-center bg-white border",
+                    "flex items-center justify-center bg-surface border",
                     ch ? "border-ink" : "border-line",
                     active && !ch && "border-ink/40",
                   )}
