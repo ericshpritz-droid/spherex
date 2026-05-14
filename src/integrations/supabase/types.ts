@@ -304,6 +304,14 @@ export type Database = {
       }
     }
     Functions: {
+      _rls_verify_probe: {
+        Args: never
+        Returns: {
+          check_name: string
+          detail: string
+          ok: boolean
+        }[]
+      }
       current_user_phone_hash: { Args: never; Returns: string }
       has_role: {
         Args: {
