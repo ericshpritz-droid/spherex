@@ -696,7 +696,7 @@ export function ScreenContacts({ accent, onBack, onPick }) {
               className="flex-1 rounded-[14px] border border-hairline-10 bg-glass-08 text-white text-[14px] font-semibold cursor-pointer"
               style={{ padding: '12px 14px', opacity: pickerBusy ? 0.6 : 1, minWidth: '46%' }}
             >
-              {pickerBusy ? 'Opening…' : '📇 Pick from device'}
+              {pickerBusy ? 'Opening…' : (pickerNative ? '📇 Pick from Contacts' : '📇 Pick from device')}
             </button>
           )}
           {!pickerSupported && (
