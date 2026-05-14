@@ -127,7 +127,7 @@ export async function pickContacts(): Promise<PickedContact[]> {
       const display = (names.find(Boolean) || "").toString().trim();
       for (const t of tels) {
         const phone = normalizePhone(String(t || ""));
-        if (phone.length !== 10 || seen.has(phone)) continue;
+        if (!isValidNanp(phone) || seen.has(phone)) continue;
         seen.add(phone);
         out.push({ name: display, phone });
       }
