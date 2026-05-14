@@ -6,7 +6,7 @@ import { LinkedRings, Aura, NumPad, Wordmark } from '../components/index.jsx';
 import { Spinner } from '../components/Spinner.jsx';
 import { CONTACTS } from '../data.js';
 import { haptics } from '../native/haptics';
-import { contactsCapability, pickContacts } from '../native/contacts';
+import { contactsCapability, pickContacts, openAppSettings } from '../native/contacts';
 
 // Compact relative time for last-message timestamps on match cards.
 function messageAgo(iso) {
@@ -603,6 +603,8 @@ export function ScreenContacts({ accent, onBack, onPick }) {
   const [confirmList, setConfirmList] = useState(null); // null | Array<{ name, phone }>
   const fileInputRef = useRef(null);
   const [pickerNative, setPickerNative] = useState(false);
+  // null = no error; 'denied' = system permission off.
+  const [permissionState, setPermissionState] = useState(null);
   useEffect(() => {
     const cap = contactsCapability();
     setPickerSupported(cap.available);
@@ -620,21 +622,26 @@ export function ScreenContacts({ accent, onBack, onPick }) {
   const openDevicePicker = async () => {
     if (!pickerSupported || pickerBusy) return;
     setPickerBusy(true);
+    setPermissionState(null);
     try {
       const items = await pickContacts();
       if (items.length > 0) setConfirmList(items);
     } catch (e) {
-      // Permission denied (native) — surface a soft hint via console; UI shows
-      // the manual fallback regardless.
-      if (e && e.code === 'permission-denied' && typeof window !== 'undefined') {
-        try {
-          // Lazy import to avoid circulars / SSR
-          const { toast } = await import('../toast');
-          toast.error('Contacts access is off. Enable it in Settings → Sphere → Contacts.');
-        } catch {}
+      if (e && e.code === 'permission-denied') {
+        setPermissionState('denied');
       }
     } finally {
       setPickerBusy(false);
+    }
+  };
+
+  const handleOpenSettings = async () => {
+    const opened = await openAppSettings();
+    if (!opened && typeof window !== 'undefined') {
+      try {
+        const { toast } = await import('../toast');
+        toast('Open your device Settings → Sphere → Contacts to allow access.');
+      } catch {}
     }
   };
 
@@ -687,6 +694,36 @@ export function ScreenContacts({ accent, onBack, onPick }) {
             <div className="text-xs text-fg-50">{CONTACTS.length} people · pick as many as you want</div>
           </div>
         </div>
+
+        {permissionState === 'denied' && (
+          <div
+            role="alert"
+            className="mb-3 rounded-[14px] border border-hairline-10 bg-glass-08 text-white"
+            style={{ padding: '12px 14px' }}
+          >
+            <div className="text-[14px] font-semibold">Contacts access is off</div>
+            <div className="text-[12px] text-fg-50 mt-1">
+              Sphere only reads contacts you tap. Turn on access to use the picker —
+              you can still type a number below.
+            </div>
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={handleOpenSettings}
+                className="rounded-[10px] border-0 bg-white text-ink text-[13px] font-semibold cursor-pointer"
+                style={{ padding: '8px 12px' }}
+              >
+                Open Settings
+              </button>
+              <button
+                onClick={() => setPermissionState(null)}
+                className="rounded-[10px] border border-hairline-10 bg-transparent text-white text-[13px] cursor-pointer"
+                style={{ padding: '8px 12px' }}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-2 mb-3">
           {pickerSupported && (
