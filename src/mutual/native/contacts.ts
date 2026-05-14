@@ -11,14 +11,17 @@ import { isNative, nativePlatform } from "./platform";
  */
 export async function openAppSettings(): Promise<boolean> {
   if (!isNative()) return false;
+  // Capacitor 8 dropped App.openUrl. Opening a system URL scheme via
+  // window.open lets the iOS WebView hand it off to the OS, which routes
+  // `app-settings:` to this app's page in Settings.app.
+  const url = nativePlatform() === "ios" ? "app-settings:" : "package:";
   try {
-    const { App } = await import("@capacitor/app");
-    const url = nativePlatform() === "ios" ? "app-settings:" : "package:";
-    await App.openUrl({ url });
-    return true;
-  } catch {
-    return false;
-  }
+    if (typeof window !== "undefined") {
+      window.open(url, "_system");
+      return true;
+    }
+  } catch {}
+  return false;
 }
 
 export interface PickedContact {
