@@ -16,6 +16,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as IHashRouteImport } from './routes/i.$hash'
 import { Route as AppWelcomeRouteImport } from './routes/_app.welcome'
+import { Route as AppUpgradeRouteImport } from './routes/_app.upgrade'
 import { Route as AppTestShareRouteImport } from './routes/_app.test-share'
 import { Route as AppSitemapRouteImport } from './routes/_app.sitemap'
 import { Route as AppSentRouteImport } from './routes/_app.sent'
@@ -23,16 +24,17 @@ import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppPhoneRouteImport } from './routes/_app.phone'
 import { Route as AppOnboardingImportRouteImport } from './routes/_app.onboarding-import'
 import { Route as AppOnboardingExplainerRouteImport } from './routes/_app.onboarding-explainer'
+import { Route as AppMatchesRouteImport } from './routes/_app.matches'
 import { Route as AppMatchRouteImport } from './routes/_app.match'
 import { Route as AppInstagramRouteImport } from './routes/_app.instagram'
-import { Route as AppInboxRouteImport } from './routes/_app.inbox'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppAddRouteImport } from './routes/_app.add'
 import { Route as AppThreadHashRouteImport } from './routes/_app.thread.$hash'
-import { Route as AppAddPreviewRouteImport } from './routes/_app.add.preview'
+import { Route as AppProfileInviteRouteImport } from './routes/_app.profile.invite'
+import { Route as AppProfileDeleteRouteImport } from './routes/_app.profile.delete'
 import { Route as AppAddPatienceRouteImport } from './routes/_app.add.patience'
 import { Route as AppAddManualRouteImport } from './routes/_app.add.manual'
 import { Route as AppAddIntentRouteImport } from './routes/_app.add.intent'
@@ -73,6 +75,11 @@ const AppWelcomeRoute = AppWelcomeRouteImport.update({
   path: '/welcome',
   getParentRoute: () => AppRoute,
 } as any)
+const AppUpgradeRoute = AppUpgradeRouteImport.update({
+  id: '/upgrade',
+  path: '/upgrade',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppTestShareRoute = AppTestShareRouteImport.update({
   id: '/test-share',
   path: '/test-share',
@@ -108,6 +115,11 @@ const AppOnboardingExplainerRoute = AppOnboardingExplainerRouteImport.update({
   path: '/onboarding-explainer',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMatchesRoute = AppMatchesRouteImport.update({
+  id: '/matches',
+  path: '/matches',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMatchRoute = AppMatchRouteImport.update({
   id: '/match',
   path: '/match',
@@ -116,11 +128,6 @@ const AppMatchRoute = AppMatchRouteImport.update({
 const AppInstagramRoute = AppInstagramRouteImport.update({
   id: '/instagram',
   path: '/instagram',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppInboxRoute = AppInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
   getParentRoute: () => AppRoute,
 } as any)
 const AppHomeRoute = AppHomeRouteImport.update({
@@ -153,10 +160,15 @@ const AppThreadHashRoute = AppThreadHashRouteImport.update({
   path: '/thread/$hash',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAddPreviewRoute = AppAddPreviewRouteImport.update({
-  id: '/preview',
-  path: '/preview',
-  getParentRoute: () => AppAddRoute,
+const AppProfileInviteRoute = AppProfileInviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
+  getParentRoute: () => AppProfileRoute,
+} as any)
+const AppProfileDeleteRoute = AppProfileDeleteRouteImport.update({
+  id: '/delete',
+  path: '/delete',
+  getParentRoute: () => AppProfileRoute,
 } as any)
 const AppAddPatienceRoute = AppAddPatienceRouteImport.update({
   id: '/patience',
@@ -194,16 +206,17 @@ export interface FileRoutesByFullPath {
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
-  '/inbox': typeof AppInboxRoute
   '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
+  '/matches': typeof AppMatchesRoute
   '/onboarding-explainer': typeof AppOnboardingExplainerRoute
   '/onboarding-import': typeof AppOnboardingImportRoute
   '/phone': typeof AppPhoneRoute
-  '/profile': typeof AppProfileRoute
+  '/profile': typeof AppProfileRouteWithChildren
   '/sent': typeof AppSentRoute
   '/sitemap': typeof AppSitemapRoute
   '/test-share': typeof AppTestShareRoute
+  '/upgrade': typeof AppUpgradeRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
   '/add/compose': typeof AppAddComposeRoute
@@ -211,7 +224,8 @@ export interface FileRoutesByFullPath {
   '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
-  '/add/preview': typeof AppAddPreviewRoute
+  '/profile/delete': typeof AppProfileDeleteRoute
+  '/profile/invite': typeof AppProfileInviteRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesByTo {
@@ -224,16 +238,17 @@ export interface FileRoutesByTo {
   '/code': typeof AppCodeRoute
   '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
-  '/inbox': typeof AppInboxRoute
   '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
+  '/matches': typeof AppMatchesRoute
   '/onboarding-explainer': typeof AppOnboardingExplainerRoute
   '/onboarding-import': typeof AppOnboardingImportRoute
   '/phone': typeof AppPhoneRoute
-  '/profile': typeof AppProfileRoute
+  '/profile': typeof AppProfileRouteWithChildren
   '/sent': typeof AppSentRoute
   '/sitemap': typeof AppSitemapRoute
   '/test-share': typeof AppTestShareRoute
+  '/upgrade': typeof AppUpgradeRoute
   '/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
   '/add/compose': typeof AppAddComposeRoute
@@ -241,7 +256,8 @@ export interface FileRoutesByTo {
   '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
-  '/add/preview': typeof AppAddPreviewRoute
+  '/profile/delete': typeof AppProfileDeleteRoute
+  '/profile/invite': typeof AppProfileInviteRoute
   '/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRoutesById {
@@ -256,16 +272,17 @@ export interface FileRoutesById {
   '/_app/code': typeof AppCodeRoute
   '/_app/contacts': typeof AppContactsRoute
   '/_app/home': typeof AppHomeRoute
-  '/_app/inbox': typeof AppInboxRoute
   '/_app/instagram': typeof AppInstagramRoute
   '/_app/match': typeof AppMatchRoute
+  '/_app/matches': typeof AppMatchesRoute
   '/_app/onboarding-explainer': typeof AppOnboardingExplainerRoute
   '/_app/onboarding-import': typeof AppOnboardingImportRoute
   '/_app/phone': typeof AppPhoneRoute
-  '/_app/profile': typeof AppProfileRoute
+  '/_app/profile': typeof AppProfileRouteWithChildren
   '/_app/sent': typeof AppSentRoute
   '/_app/sitemap': typeof AppSitemapRoute
   '/_app/test-share': typeof AppTestShareRoute
+  '/_app/upgrade': typeof AppUpgradeRoute
   '/_app/welcome': typeof AppWelcomeRoute
   '/i/$hash': typeof IHashRoute
   '/_app/add/compose': typeof AppAddComposeRoute
@@ -273,7 +290,8 @@ export interface FileRoutesById {
   '/_app/add/intent': typeof AppAddIntentRoute
   '/_app/add/manual': typeof AppAddManualRoute
   '/_app/add/patience': typeof AppAddPatienceRoute
-  '/_app/add/preview': typeof AppAddPreviewRoute
+  '/_app/profile/delete': typeof AppProfileDeleteRoute
+  '/_app/profile/invite': typeof AppProfileInviteRoute
   '/_app/thread/$hash': typeof AppThreadHashRoute
 }
 export interface FileRouteTypes {
@@ -288,9 +306,9 @@ export interface FileRouteTypes {
     | '/code'
     | '/contacts'
     | '/home'
-    | '/inbox'
     | '/instagram'
     | '/match'
+    | '/matches'
     | '/onboarding-explainer'
     | '/onboarding-import'
     | '/phone'
@@ -298,6 +316,7 @@ export interface FileRouteTypes {
     | '/sent'
     | '/sitemap'
     | '/test-share'
+    | '/upgrade'
     | '/welcome'
     | '/i/$hash'
     | '/add/compose'
@@ -305,7 +324,8 @@ export interface FileRouteTypes {
     | '/add/intent'
     | '/add/manual'
     | '/add/patience'
-    | '/add/preview'
+    | '/profile/delete'
+    | '/profile/invite'
     | '/thread/$hash'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -318,9 +338,9 @@ export interface FileRouteTypes {
     | '/code'
     | '/contacts'
     | '/home'
-    | '/inbox'
     | '/instagram'
     | '/match'
+    | '/matches'
     | '/onboarding-explainer'
     | '/onboarding-import'
     | '/phone'
@@ -328,6 +348,7 @@ export interface FileRouteTypes {
     | '/sent'
     | '/sitemap'
     | '/test-share'
+    | '/upgrade'
     | '/welcome'
     | '/i/$hash'
     | '/add/compose'
@@ -335,7 +356,8 @@ export interface FileRouteTypes {
     | '/add/intent'
     | '/add/manual'
     | '/add/patience'
-    | '/add/preview'
+    | '/profile/delete'
+    | '/profile/invite'
     | '/thread/$hash'
   id:
     | '__root__'
@@ -349,9 +371,9 @@ export interface FileRouteTypes {
     | '/_app/code'
     | '/_app/contacts'
     | '/_app/home'
-    | '/_app/inbox'
     | '/_app/instagram'
     | '/_app/match'
+    | '/_app/matches'
     | '/_app/onboarding-explainer'
     | '/_app/onboarding-import'
     | '/_app/phone'
@@ -359,6 +381,7 @@ export interface FileRouteTypes {
     | '/_app/sent'
     | '/_app/sitemap'
     | '/_app/test-share'
+    | '/_app/upgrade'
     | '/_app/welcome'
     | '/i/$hash'
     | '/_app/add/compose'
@@ -366,7 +389,8 @@ export interface FileRouteTypes {
     | '/_app/add/intent'
     | '/_app/add/manual'
     | '/_app/add/patience'
-    | '/_app/add/preview'
+    | '/_app/profile/delete'
+    | '/_app/profile/invite'
     | '/_app/thread/$hash'
   fileRoutesById: FileRoutesById
 }
@@ -430,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWelcomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/upgrade': {
+      id: '/_app/upgrade'
+      path: '/upgrade'
+      fullPath: '/upgrade'
+      preLoaderRoute: typeof AppUpgradeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/test-share': {
       id: '/_app/test-share'
       path: '/test-share'
@@ -479,6 +510,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOnboardingExplainerRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/matches': {
+      id: '/_app/matches'
+      path: '/matches'
+      fullPath: '/matches'
+      preLoaderRoute: typeof AppMatchesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/match': {
       id: '/_app/match'
       path: '/match'
@@ -491,13 +529,6 @@ declare module '@tanstack/react-router' {
       path: '/instagram'
       fullPath: '/instagram'
       preLoaderRoute: typeof AppInstagramRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/inbox': {
-      id: '/_app/inbox'
-      path: '/inbox'
-      fullPath: '/inbox'
-      preLoaderRoute: typeof AppInboxRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/home': {
@@ -542,12 +573,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppThreadHashRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/add/preview': {
-      id: '/_app/add/preview'
-      path: '/preview'
-      fullPath: '/add/preview'
-      preLoaderRoute: typeof AppAddPreviewRouteImport
-      parentRoute: typeof AppAddRoute
+    '/_app/profile/invite': {
+      id: '/_app/profile/invite'
+      path: '/invite'
+      fullPath: '/profile/invite'
+      preLoaderRoute: typeof AppProfileInviteRouteImport
+      parentRoute: typeof AppProfileRoute
+    }
+    '/_app/profile/delete': {
+      id: '/_app/profile/delete'
+      path: '/delete'
+      fullPath: '/profile/delete'
+      preLoaderRoute: typeof AppProfileDeleteRouteImport
+      parentRoute: typeof AppProfileRoute
     }
     '/_app/add/patience': {
       id: '/_app/add/patience'
@@ -593,7 +631,6 @@ interface AppAddRouteChildren {
   AppAddIntentRoute: typeof AppAddIntentRoute
   AppAddManualRoute: typeof AppAddManualRoute
   AppAddPatienceRoute: typeof AppAddPatienceRoute
-  AppAddPreviewRoute: typeof AppAddPreviewRoute
 }
 
 const AppAddRouteChildren: AppAddRouteChildren = {
@@ -602,11 +639,24 @@ const AppAddRouteChildren: AppAddRouteChildren = {
   AppAddIntentRoute: AppAddIntentRoute,
   AppAddManualRoute: AppAddManualRoute,
   AppAddPatienceRoute: AppAddPatienceRoute,
-  AppAddPreviewRoute: AppAddPreviewRoute,
 }
 
 const AppAddRouteWithChildren =
   AppAddRoute._addFileChildren(AppAddRouteChildren)
+
+interface AppProfileRouteChildren {
+  AppProfileDeleteRoute: typeof AppProfileDeleteRoute
+  AppProfileInviteRoute: typeof AppProfileInviteRoute
+}
+
+const AppProfileRouteChildren: AppProfileRouteChildren = {
+  AppProfileDeleteRoute: AppProfileDeleteRoute,
+  AppProfileInviteRoute: AppProfileInviteRoute,
+}
+
+const AppProfileRouteWithChildren = AppProfileRoute._addFileChildren(
+  AppProfileRouteChildren,
+)
 
 interface AppRouteChildren {
   AppAddRoute: typeof AppAddRouteWithChildren
@@ -614,16 +664,17 @@ interface AppRouteChildren {
   AppCodeRoute: typeof AppCodeRoute
   AppContactsRoute: typeof AppContactsRoute
   AppHomeRoute: typeof AppHomeRoute
-  AppInboxRoute: typeof AppInboxRoute
   AppInstagramRoute: typeof AppInstagramRoute
   AppMatchRoute: typeof AppMatchRoute
+  AppMatchesRoute: typeof AppMatchesRoute
   AppOnboardingExplainerRoute: typeof AppOnboardingExplainerRoute
   AppOnboardingImportRoute: typeof AppOnboardingImportRoute
   AppPhoneRoute: typeof AppPhoneRoute
-  AppProfileRoute: typeof AppProfileRoute
+  AppProfileRoute: typeof AppProfileRouteWithChildren
   AppSentRoute: typeof AppSentRoute
   AppSitemapRoute: typeof AppSitemapRoute
   AppTestShareRoute: typeof AppTestShareRoute
+  AppUpgradeRoute: typeof AppUpgradeRoute
   AppWelcomeRoute: typeof AppWelcomeRoute
   AppThreadHashRoute: typeof AppThreadHashRoute
 }
@@ -634,16 +685,17 @@ const AppRouteChildren: AppRouteChildren = {
   AppCodeRoute: AppCodeRoute,
   AppContactsRoute: AppContactsRoute,
   AppHomeRoute: AppHomeRoute,
-  AppInboxRoute: AppInboxRoute,
   AppInstagramRoute: AppInstagramRoute,
   AppMatchRoute: AppMatchRoute,
+  AppMatchesRoute: AppMatchesRoute,
   AppOnboardingExplainerRoute: AppOnboardingExplainerRoute,
   AppOnboardingImportRoute: AppOnboardingImportRoute,
   AppPhoneRoute: AppPhoneRoute,
-  AppProfileRoute: AppProfileRoute,
+  AppProfileRoute: AppProfileRouteWithChildren,
   AppSentRoute: AppSentRoute,
   AppSitemapRoute: AppSitemapRoute,
   AppTestShareRoute: AppTestShareRoute,
+  AppUpgradeRoute: AppUpgradeRoute,
   AppWelcomeRoute: AppWelcomeRoute,
   AppThreadHashRoute: AppThreadHashRoute,
 }

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 const TABS = [
   { to: "/home", label: "SPHERE" },
-  { to: "/inbox", label: "INBOX" },
+  { to: "/matches", label: "MATCHES" },
   { to: "/profile", label: "PROFILE" },
 ] as const;
 
@@ -16,7 +16,7 @@ export function TabBar() {
           const active =
             (t.to === "/home" && pathname === "/home") ||
             (t.to === "/profile" && pathname.startsWith("/profile")) ||
-            (t.to === "/inbox" && pathname.startsWith("/inbox"));
+            (t.to === "/matches" && pathname.startsWith("/matches"));
           return (
             <li key={t.label} className="flex justify-center py-4">
               <Link

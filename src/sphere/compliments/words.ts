@@ -1,50 +1,38 @@
-// Word banks for the mad-lib compliment composer.
-// Kept small and curated — the constraint is the charm.
+// Mad-lib compliment composer — locked to spec.
+// Sentence: "I want you to know that I think you are __ __."
+// 4 adverb chips (last is "skip"), 8 adjective chips. Constraint is the charm.
 
-export const FRAMES = [
-  { id: "smile", template: "Your smile is {adv} {adj}.", label: "Their smile" },
-  { id: "energy", template: "You carry yourself {adv} {adj}.", label: "How they carry themselves" },
-  { id: "mind", template: "The way you think is {adv} {adj}.", label: "How they think" },
-  { id: "laugh", template: "Your laugh is {adv} {adj}.", label: "Their laugh" },
-  { id: "presence", template: "Being near you feels {adv} {adj}.", label: "Their presence" },
-] as const;
+export const SENTENCE_PREFIX = "I want you to know that I think you are";
 
 export const ADVERBS = [
-  "quietly",
-  "unreasonably",
-  "genuinely",
-  "dangerously",
-  "softly",
-  "completely",
-  "annoyingly",
-  "honestly",
+  { value: "Incredibly", label: "Incredibly" },
+  { value: "So", label: "So" },
+  { value: "Kinda", label: "Kinda" },
+  { value: "", label: "— skip —" },
 ] as const;
 
 export const ADJECTIVES = [
-  "magnetic",
-  "disarming",
-  "lovely",
-  "rare",
-  "steady",
-  "kind",
-  "electric",
-  "warm",
-  "sharp",
+  "Beautiful",
+  "Handsome",
+  "Talented",
+  "Stunning",
+  "Radiant",
+  "Brilliant",
+  "Hilarious",
+  "Captivating",
 ] as const;
 
-export type FrameId = typeof FRAMES[number]["id"];
+export type AdverbValue = typeof ADVERBS[number]["value"];
+export type AdjectiveValue = typeof ADJECTIVES[number];
 
 export interface ComplimentDraft {
-  frameId: FrameId;
-  adverb: string;
-  adjective: string;
+  adverb: AdverbValue;
+  adjective: AdjectiveValue;
 }
 
 export function renderCompliment(draft: ComplimentDraft): string {
-  const frame = FRAMES.find((f) => f.id === draft.frameId) ?? FRAMES[0];
-  return frame.template
-    .replace("{adv}", draft.adverb)
-    .replace("{adj}", draft.adjective);
+  const adv = draft.adverb ? `${draft.adverb} ` : "";
+  return `${SENTENCE_PREFIX} ${adv}${draft.adjective}.`;
 }
 
 export const DRAFT_KEY = "sphere.addDraft";

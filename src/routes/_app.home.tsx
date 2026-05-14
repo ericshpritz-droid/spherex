@@ -1,11 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { TabBar } from "@/sphere/components/TabBar";
 import { AvatarMono, initialsFromHash } from "@/sphere/components/AvatarMono";
-import { PrimaryButton, GhostButton, Eyebrow } from "@/sphere/ui";
+import { ReceivedComplimentSheet } from "@/sphere/components/ReceivedComplimentSheet";
+import { PrimaryButton, Eyebrow } from "@/sphere/ui";
 import { useApp } from "@/mutual/AppContext";
 import { toast } from "@/mutual/toast";
+import { callLoadInboxCompliments, type InboxCompliment } from "@/mutual/compliments.rpc";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/home")({
@@ -38,6 +40,37 @@ function HomeRoute() {
   useEffect(() => {
     if (!dataLoading) markMatchesSeen();
   }, [dataLoading, markMatchesSeen]);
+
+  // Surface the most-recent received compliment as a "push-style" modal once.
+  const [received, setReceived] = useState<InboxCompliment | null>(null);
+  const [seenIds, setSeenIds] = useState<Set<string>>(() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem("sphere.seenCompliments") || "[]"));
+    } catch { return new Set(); }
+  });
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const rows = await callLoadInboxCompliments();
+        if (cancelled) return;
+        const fresh = rows.find((r) => !seenIds.has(r.id));
+        if (fresh) setReceived(fresh);
+      } catch { /* silent */ }
+    })();
+    return () => { cancelled = true; };
+  }, [seenIds]);
+
+  function dismissReceived() {
+    if (!received) return;
+    const next = new Set(seenIds);
+    next.add(received.id);
+    setSeenIds(next);
+    try {
+      localStorage.setItem("sphere.seenCompliments", JSON.stringify([...next]));
+    } catch {}
+    setReceived(null);
+  }
 
   // Picks = pending I added + matched mutuals (each consumes a slot).
   const myPicks = [...matches, ...pending];
@@ -155,7 +188,7 @@ function HomeRoute() {
               $9.99 / month · cancel anytime.
             </div>
             <div className="mt-4">
-              <PrimaryButton onClick={() => toast("Sphere+ comes in Phase 5.")}>
+              <PrimaryButton onClick={() => navigate({ to: "/upgrade" as any })}>
                 Upgrade
               </PrimaryButton>
             </div>
@@ -179,6 +212,27 @@ function HomeRoute() {
       )}
 
       <TabBar />
+
+      {received && (
+        <ReceivedComplimentSheet
+          body={received.body}
+          candidates={myPicks.map((p: any) => ({
+            id: String(p.id),
+            name: p.unknown ? undefined : p.name,
+            unknown: p.unknown,
+          }))}
+          onGuess={(id) => {
+            if (id) toast("Guess locked. We'll tell you only if it's mutual.");
+            else toast("No guess saved.");
+            dismissReceived();
+          }}
+          onKeep={() => {
+            toast("Kept. Quiet brightness.");
+            dismissReceived();
+          }}
+          onClose={dismissReceived}
+        />
+      )}
     </SphereScreen>
   );
 }
