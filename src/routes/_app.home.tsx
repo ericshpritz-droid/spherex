@@ -41,6 +41,37 @@ function HomeRoute() {
     if (!dataLoading) markMatchesSeen();
   }, [dataLoading, markMatchesSeen]);
 
+  // Surface the most-recent received compliment as a "push-style" modal once.
+  const [received, setReceived] = useState<InboxCompliment | null>(null);
+  const [seenIds, setSeenIds] = useState<Set<string>>(() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem("sphere.seenCompliments") || "[]"));
+    } catch { return new Set(); }
+  });
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const rows = await callLoadInboxCompliments();
+        if (cancelled) return;
+        const fresh = rows.find((r) => !seenIds.has(r.id));
+        if (fresh) setReceived(fresh);
+      } catch { /* silent */ }
+    })();
+    return () => { cancelled = true; };
+  }, [seenIds]);
+
+  function dismissReceived() {
+    if (!received) return;
+    const next = new Set(seenIds);
+    next.add(received.id);
+    setSeenIds(next);
+    try {
+      localStorage.setItem("sphere.seenCompliments", JSON.stringify([...next]));
+    } catch {}
+    setReceived(null);
+  }
+
   // Picks = pending I added + matched mutuals (each consumes a slot).
   const myPicks = [...matches, ...pending];
   const isPlus = false; // Sphere+ comes in Phase 5
