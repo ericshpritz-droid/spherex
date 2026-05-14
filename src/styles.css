@@ -103,11 +103,17 @@
 
 :root {
   /* Mutual brand surfaces (kept as raw hex to preserve exact visuals) */
-  --ink: #120A32;
+  --ink: #0A0A0A;
   --ink-deep: #08041C;
   --ink-card: #1E1240;
-  --frame: #0A0620;
+  --frame: #F5F3EE;
   --error: #ff8f8f;
+
+  /* Sphere editorial palette */
+  --paper: #F5F3EE;
+  --line: #E8E6E1;
+  --mute: #8A8A8A;
+  --danger: #7A1F1F;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
