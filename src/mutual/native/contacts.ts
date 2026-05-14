@@ -52,11 +52,13 @@ export function contactsCapability(): ContactsCapability {
   return { available: false, native: false };
 }
 
+// Use the canonical NANP normalizer/validator so the picker silently drops
+// numbers that wouldn't survive the manual-entry validation either
+// (international numbers, N11 service codes, malformed entries).
+import { normalizeNanp, isValidNanp } from "../phone/nanp";
+
 function normalizePhone(raw: string): string {
-  // Keep digits only; strip leading US country code; cap at 10.
-  let d = String(raw).replace(/\D/g, "");
-  if (d.length === 11 && d.startsWith("1")) d = d.slice(1);
-  return d.slice(0, 10);
+  return normalizeNanp(raw);
 }
 
 /**
