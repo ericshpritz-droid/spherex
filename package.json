@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "check:phone-flow": "node ./scripts/check-phone-flow-delivery.mjs",
     "test:e2e": "playwright test",
+    "test:e2e:visual": "playwright test screens-visual",
+    "test:e2e:visual:update": "playwright test screens-visual --update-snapshots",
     "test:e2e:install": "playwright install --with-deps chromium webkit",
     "lint": "eslint .",
     "format": "prettier --write ."
