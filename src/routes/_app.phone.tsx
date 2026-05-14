@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_app/phone")({
 
 function PhoneRoute() {
   const { startOtp } = useApp();
+  const { enabled: testModeEnabled } = useTestMode();
   const navigate = useNavigate();
   const [digits, setDigits] = useState("");
   const [busy, setBusy] = useState(false);
