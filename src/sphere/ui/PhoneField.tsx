@@ -1,22 +1,18 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { normalizeNanp, formatNanp } from "@/mutual/phone/nanp";
 
-interface PhoneFieldProps {
-  value: string;
-  onChange: (digits: string) => void;
-  countryCode?: string;
-  flag?: string;
-  placeholder?: string;
-  autoFocus?: boolean;
-  className?: string;
-}
-
+// Display the in-progress NANP number with a space-separated grouping
+// (`555 123 4567`) — matches the placeholder style and avoids the parens
+// inside the input field. Validation lives in @/mutual/phone/nanp.
 function formatUS(digits: string) {
-  const d = digits.replace(/\D/g, "").slice(0, 10);
+  const d = normalizeNanp(digits);
   if (d.length <= 3) return d;
   if (d.length <= 6) return `${d.slice(0, 3)} ${d.slice(3)}`;
   return `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}`;
 }
+// Re-exported for callers that want the parenthesized display form.
+export { formatNanp };
 
 export function PhoneField({
   value,
