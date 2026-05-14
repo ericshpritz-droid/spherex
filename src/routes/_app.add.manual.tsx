@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, PhoneField, Eyebrow } from "@/sphere/ui";
 import { cn } from "@/lib/utils";
+import { validateNanp } from "@/mutual/phone/nanp";
 
 interface ManualSearch {
   ig?: number;
