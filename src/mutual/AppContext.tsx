@@ -6,10 +6,18 @@ import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
 import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
 import { loadLastMessagesServer } from "./messages.functions";
 import { consumeInviteServer } from "./invites.functions";
-import { testmodeListPhones } from "./testmode/testmode.functions";
+import { testmodeListPhones, testmodeLogin } from "./testmode/testmode.functions";
 import { useTestMode } from "./testmode/useTestMode";
 import { useServerFn } from "@tanstack/react-start";
 import { startPhoneVerification, verifyPhoneCode } from "./phoneAuth.functions";
+
+// In test mode, derive a 4-digit PIN from the phone digits the user typed,
+// so the same /phone → /code flow works without burning SMS quota.
+const TEST_MODE_DEMO_CODE = "111111";
+function pinFromDigits(digits: string): string {
+  const clean = String(digits || "").replace(/\D/g, "");
+  return clean.slice(-4).padStart(4, "0");
+}
 
 type Accent = "pink" | "lavender" | "blue";
 
