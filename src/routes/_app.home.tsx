@@ -1,11 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { TabBar } from "@/sphere/components/TabBar";
 import { AvatarMono, initialsFromHash } from "@/sphere/components/AvatarMono";
-import { PrimaryButton, GhostButton, Eyebrow } from "@/sphere/ui";
+import { ReceivedComplimentSheet } from "@/sphere/components/ReceivedComplimentSheet";
+import { PrimaryButton, Eyebrow } from "@/sphere/ui";
 import { useApp } from "@/mutual/AppContext";
 import { toast } from "@/mutual/toast";
+import { callLoadInboxCompliments, type InboxCompliment } from "@/mutual/compliments.rpc";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/home")({
