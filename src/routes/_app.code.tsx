@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_app/code")({
   head: () => ({
     meta: [
-      { title: "Enter your code — sphere" },
+      { title: "Check your messages — sphere" },
       { name: "description", content: "Enter the 6-digit code we just texted you." },
     ],
   }),
@@ -25,23 +25,18 @@ function CodeRoute() {
   const [cooldown, setCooldown] = useState(pendingOtpCooldownSeconds || 24);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Cooldown ticker
   useEffect(() => {
     if (cooldown <= 0) return;
     const t = setInterval(() => setCooldown((c) => Math.max(0, c - 1)), 1000);
     return () => clearInterval(t);
   }, [cooldown]);
 
-  // Auto-focus the (hidden) input so the iOS native numpad opens.
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Auto-submit when 6 digits entered
   useEffect(() => {
-    if (code.length === 6 && !busy) {
-      void submit();
-    }
+    if (code.length === 6 && !busy) void submit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
@@ -49,8 +44,6 @@ function CodeRoute() {
     setBusy(true);
     try {
       await verifyCode(code);
-      // Navigate explicitly to instagram. _app's redirect only fires from
-      // PUBLIC_PATHS or "/", so /instagram won't be overridden.
       navigate({ to: "/instagram" as any, replace: true });
     } catch (e: any) {
       toast(e?.message || "Invalid code.");
@@ -85,17 +78,22 @@ function CodeRoute() {
         >
           ←
         </button>
-        <div className="font-serif italic text-[18px]">sphere</div>
+        <div
+          className="font-mono text-[11px] uppercase text-mute"
+          style={{ letterSpacing: "0.22em" }}
+        >
+          Step 2 of 3
+        </div>
         <div className="w-6" />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pt-10 pb-4" data-scroll>
-        <Eyebrow>Step 2 of 2</Eyebrow>
+      <div className="flex-1 overflow-y-auto px-6 pt-8 pb-4" data-scroll>
+        <Eyebrow>Enter your code</Eyebrow>
         <h1 className="mt-3 font-serif italic text-[40px] leading-[1.02] tracking-tight">
-          Enter your code.
+          Check your messages.
         </h1>
         <div className="mt-3 flex items-center gap-2 text-[14px] text-mute">
-          <span>Sent to {phoneFmt || "your number"}.</span>
+          <span>Sent to {phoneFmt || "your number"} ·</span>
           <button
             onClick={() => navigate({ to: "/phone" })}
             className="underline text-ink/70"
@@ -140,7 +138,6 @@ function CodeRoute() {
             })}
           </div>
 
-          {/* Hidden numeric input drives state */}
           <input
             ref={inputRef}
             value={code}
@@ -154,30 +151,39 @@ function CodeRoute() {
           />
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-2 text-[13px]">
+        <div className="mt-6 text-center text-[13px] text-mute">
+          Didn't get it?{" "}
           <button
             onClick={handleResend}
             disabled={cooldown > 0}
             className={cn(
-              "underline",
-              cooldown > 0 ? "text-mute no-underline" : "text-ink/80",
+              cooldown > 0 ? "text-mute" : "text-ink/80 underline",
             )}
           >
             Resend
           </button>
           {cooldown > 0 && (
-            <span className="font-mono text-mute">{mm}:{ss}</span>
+            <span className="font-mono"> in {mm}:{ss}</span>
           )}
         </div>
       </div>
 
-      <div className="px-6 pb-8 pt-4">
-        <PrimaryButton
-          onClick={submit}
-          disabled={code.length !== 6 || busy}
-        >
+      <div
+        className="px-6 pt-4"
+        style={{ paddingBottom: `calc(env(safe-area-inset-bottom) + 2rem + var(--kb-inset, 0px))` }}
+      >
+        <PrimaryButton onClick={submit} disabled={code.length !== 6 || busy}>
           {busy ? "Verifying…" : "Confirm"}
         </PrimaryButton>
+        <div className="mt-4 text-center text-[12px] text-mute">
+          We'll text you a fresh code if anything looks off.
+        </div>
+        <div
+          className="mt-3 text-center font-mono text-[10px] uppercase text-mute"
+          style={{ letterSpacing: "0.22em" }}
+        >
+          · Almost in ·
+        </div>
       </div>
     </SphereScreen>
   );

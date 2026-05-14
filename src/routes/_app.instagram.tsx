@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
-import { PrimaryButton, GhostButton, Eyebrow } from "@/sphere/ui";
+import { PrimaryButton, Eyebrow } from "@/sphere/ui";
 import { cn } from "@/lib/utils";
+import { haptics } from "@/mutual/native/haptics";
 
 export const Route = createFileRoute("/_app/instagram")({
   head: () => ({
@@ -50,32 +51,37 @@ function InstagramRoute() {
   return (
     <SphereScreen>
       <div className="flex items-center justify-between px-6 pt-12 pb-2">
-        <div className="w-6" />
-        <div className="font-serif italic text-[18px]">sphere</div>
         <button
-          onClick={() => next(false)}
+          aria-label="Back"
+          onClick={() => navigate({ to: "/code" })}
+          className="font-sans text-[18px] text-ink/80 -ml-1 px-2"
+        >
+          ←
+        </button>
+        <div
+          className="font-mono text-[11px] uppercase text-mute"
+          style={{ letterSpacing: "0.22em" }}
+        >
+          Step 3 of 3
+        </div>
+        <button
+          onClick={() => { haptics.light(); next(false); }}
           className="font-sans text-[14px] text-ink/80"
         >
           Skip
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pt-10 pb-4" data-scroll>
-        <Eyebrow>Optional</Eyebrow>
+      <div className="flex-1 overflow-y-auto px-6 pt-8 pb-4" data-scroll>
+        <Eyebrow>Optional · you can skip</Eyebrow>
         <h1 className="mt-3 font-serif italic text-[40px] leading-[1.02] tracking-tight">
-          Add your Instagram.
+          Add your Instagram<br />so others can find you.
         </h1>
         <p className="mt-3 text-[14px] text-mute leading-snug">
-          A second way for someone to find you anonymously. Hashed on device, never shown.
+          Without it, you can only be added by phone number. Most people add their @handle so friends-of-friends can pick them too.
         </p>
 
-        <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-ink text-paper px-3 h-7 text-[11px] font-mono uppercase"
-          style={{ letterSpacing: "0.16em" }}
-        >
-          + 2× match odds
-        </div>
-
-        <div className="mt-8">
+        <div className="mt-7">
           <div
             className={cn(
               "flex items-center gap-2 rounded-2xl bg-white border border-line",
@@ -86,13 +92,18 @@ function InstagramRoute() {
             <input
               value={handle}
               onChange={(e) => setHandle(e.target.value)}
-              placeholder="yourhandle"
+              placeholder="jordan.sims"
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
+              autoComplete="username"
+              enterKeyHint="done"
               className="flex-1 bg-transparent font-sans text-[17px] text-ink placeholder:text-mute outline-none border-0"
             />
           </div>
+          <p className="mt-3 text-[13px] text-mute leading-snug">
+            Hashed on this device. We never post, never DM, and never see your handle in plain text.
+          </p>
           {handle && !valid && (
             <div className="mt-2 text-[12px] text-danger">
               Letters, numbers, dots and underscores only.
@@ -101,13 +112,23 @@ function InstagramRoute() {
         </div>
       </div>
 
-      <div className="px-6 pb-8 pt-4 space-y-3">
+      <div
+        className="px-6 pt-4 space-y-3"
+        style={{ paddingBottom: `calc(env(safe-area-inset-bottom) + 2rem + var(--kb-inset, 0px))` }}
+      >
         <PrimaryButton onClick={() => next(true)} disabled={!valid || busy}>
           {valid ? `Connect @${cleaned}` : "Connect Instagram"}
         </PrimaryButton>
-        <GhostButton onClick={() => next(false)} disabled={busy}>
+        <div className="text-center text-[12px] text-mute">
+          Now both your number and @handle can find a match.
+        </div>
+        <button
+          onClick={() => { haptics.light(); next(false); }}
+          disabled={busy}
+          className="w-full text-center font-sans text-[14px] text-ink/80 underline py-2"
+        >
           Skip · only my number
-        </GhostButton>
+        </button>
       </div>
     </SphereScreen>
   );
