@@ -51,6 +51,11 @@ export function PhoneField({
         ref={inputRef}
         type="tel"
         inputMode="numeric"
+        autoComplete="tel-national"
+        autoCorrect="off"
+        autoCapitalize="none"
+        spellCheck={false}
+        enterKeyHint="next"
         autoFocus={autoFocus}
         value={formatUS(value)}
         onChange={(e) => onChange(normalizeNanp(e.target.value))}
