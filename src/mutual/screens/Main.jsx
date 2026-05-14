@@ -695,6 +695,36 @@ export function ScreenContacts({ accent, onBack, onPick }) {
           </div>
         </div>
 
+        {permissionState === 'denied' && (
+          <div
+            role="alert"
+            className="mb-3 rounded-[14px] border border-hairline-10 bg-glass-08 text-white"
+            style={{ padding: '12px 14px' }}
+          >
+            <div className="text-[14px] font-semibold">Contacts access is off</div>
+            <div className="text-[12px] text-fg-50 mt-1">
+              Sphere only reads contacts you tap. Turn on access to use the picker —
+              you can still type a number below.
+            </div>
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={handleOpenSettings}
+                className="rounded-[10px] border-0 bg-white text-ink text-[13px] font-semibold cursor-pointer"
+                style={{ padding: '8px 12px' }}
+              >
+                Open Settings
+              </button>
+              <button
+                onClick={() => setPermissionState(null)}
+                className="rounded-[10px] border border-hairline-10 bg-transparent text-white text-[13px] cursor-pointer"
+                style={{ padding: '8px 12px' }}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-2 mb-3">
           {pickerSupported && (
             <button
