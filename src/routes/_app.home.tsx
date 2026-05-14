@@ -1,166 +1,184 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
-import confetti from "canvas-confetti";
-import { ScreenHome } from "../mutual/screens/Main.jsx";
-import { useApp } from "../mutual/AppContext";
-import { ACCENT_PRESETS } from "../mutual/brand.js";
-import { callGetMyPhoneHash } from "../mutual/dataApi.rpc";
-import { toast } from "../mutual/toast";
-import { useContactPhotos } from "../mutual/native/useContactPhotos";
-import { haptics } from "../mutual/native/haptics";
-
-function celebrateMutual(accent: string) {
-  const p = (ACCENT_PRESETS as any)[accent] || ACCENT_PRESETS.pink;
-  const colors = [p.a, p.b, p.c, "#ffffff"];
-  const defaults = { origin: { y: 0.35 }, colors, disableForReducedMotion: true };
-  confetti({ ...defaults, particleCount: 80, spread: 70, startVelocity: 45, scalar: 1 });
-  setTimeout(() => {
-    confetti({ ...defaults, particleCount: 50, spread: 100, startVelocity: 35, scalar: 0.9, origin: { x: 0.2, y: 0.4 } });
-    confetti({ ...defaults, particleCount: 50, spread: 100, startVelocity: 35, scalar: 0.9, origin: { x: 0.8, y: 0.4 } });
-  }, 180);
-  // iOS taptic success notification — falls back to navigator.vibrate on web.
-  haptics.success();
-}
+import { useEffect } from "react";
+import { SphereScreen } from "@/sphere/components/SphereScreen";
+import { TabBar } from "@/sphere/components/TabBar";
+import { AvatarMono, initialsFromHash } from "@/sphere/components/AvatarMono";
+import { PrimaryButton, GhostButton, Eyebrow } from "@/sphere/ui";
+import { useApp } from "@/mutual/AppContext";
+import { toast } from "@/mutual/toast";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/home")({
   head: () => ({
     meta: [
-      { title: "Your mutuals — Sphere" },
-      { name: "description", content: "See who picked you back." },
-      { property: "og:title", content: "Your mutuals — Sphere" },
-      { property: "og:description", content: "See who picked you back." },
+      { title: "Your sphere — sphere" },
+      { name: "description", content: "Three picks. Sealed unless mutual." },
     ],
   }),
   component: HomeRoute,
 });
 
-// Skip auto-refresh if the tab was hidden for less than this many ms,
-// to avoid spamming the network on quick app-switches.
-const MIN_HIDDEN_MS = 10_000;
+const FREE_LIMIT = 1;
+const SPHERE_PLUS_LIMIT = 3;
+
+function intentLabel(intent: string | undefined): string {
+  switch (intent) {
+    case "compliment": return "Compliment";
+    case "both": return "Both";
+    default: return "Romantic";
+  }
+}
 
 function HomeRoute() {
-  const { accent, matches, pending, setActiveMatch, dataLoading, dataError, refresh, lastByHash, unreadByHash, markThreadRead, myHash, markMatchesSeen, invitedByHash } = useApp();
-  const { photos: photoByHash } = useContactPhotos();
+  const {
+    matches, pending, dataLoading, dataError, refresh, markMatchesSeen,
+  } = useApp();
   const navigate = useNavigate();
-  const hasData = matches.length > 0 || pending.length > 0;
 
-  // 30s ticker so relative-time labels ("2m", "1h") stay fresh without a refetch.
-  const [, setNowTick] = useState(0);
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const id = setInterval(() => {
-      if (document.visibilityState === "visible") setNowTick((n) => n + 1);
-    }, 30_000);
-    return () => clearInterval(id);
-  }, []);
+    if (!dataLoading) markMatchesSeen();
+  }, [dataLoading, markMatchesSeen]);
 
-  // Sort: unread threads first, then by most-recent message activity,
-  // falling back to existing order for matches with no messages yet.
-  const sortedMatches = [...matches].sort((a: any, b: any) => {
-    const aId = String(a.id);
-    const bId = String(b.id);
-    const aUnread = unreadByHash[aId] ? 1 : 0;
-    const bUnread = unreadByHash[bId] ? 1 : 0;
-    if (aUnread !== bUnread) return bUnread - aUnread;
-    const aTs = lastByHash[aId]?.created_at || "";
-    const bTs = lastByHash[bId]?.created_at || "";
-    if (aTs !== bTs) return aTs < bTs ? 1 : -1;
-    return 0;
-  });
-
-  // Track known mutuals to detect newly-arrived ones (via Realtime or refresh)
-  const knownIdsRef = useRef<Set<string> | null>(null);
-  useEffect(() => {
-    // Wait until first successful load before tracking
-    if (dataLoading) return;
-    const ids = new Set(matches.map((m: any) => String(m.id ?? m.phone ?? m.other_phone)));
-    if (knownIdsRef.current === null) {
-      knownIdsRef.current = ids;
-      return;
-    }
-    let isNew = false;
-    for (const id of ids) {
-      if (!knownIdsRef.current.has(id)) { isNew = true; break; }
-    }
-    if (isNew) celebrateMutual(accent);
-    knownIdsRef.current = ids;
-  }, [matches, dataLoading, accent]);
-
-  // Once /home has been viewed with the latest matches loaded, clear the
-  // "new mutuals" dot on the bottom-nav tab.
-  useEffect(() => {
-    if (dataLoading) return;
-    markMatchesSeen();
-  }, [matches, dataLoading, markMatchesSeen]);
-
-  // Auto-refresh on tab visibility return
-  const hiddenSince = useRef<number | null>(null);
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden") {
-        hiddenSince.current = Date.now();
-      } else if (document.visibilityState === "visible") {
-        const since = hiddenSince.current;
-        hiddenSince.current = null;
-        if (since != null && Date.now() - since >= MIN_HIDDEN_MS) {
-          refresh();
-        }
-      }
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => document.removeEventListener("visibilitychange", onVisibility);
-  }, [refresh]);
-
-  const handleInvite = useCallback(async () => {
-    try {
-      const hash = await callGetMyPhoneHash();
-      if (!hash || typeof window === "undefined") return;
-      const url = `${window.location.origin}/i/${hash}`;
-      const text = "I'm on Sphere — add me and we're mutual. ✨";
-      const nav = navigator as any;
-      if (nav?.share) {
-        try { await nav.share({ title: "Sphere", text, url }); return; } catch {}
-      }
-      try {
-        await nav?.clipboard?.writeText(`${text} ${url}`);
-        toast.success("Invite link copied");
-      } catch { toast.error("Couldn't copy link"); }
-    } catch (e: any) {
-      toast.error(e?.message || "Couldn't build invite link");
-    }
-  }, []);
-
-  const sortedPending = invitedByHash
-    ? [...pending].sort((a: any, b: any) => {
-        const ai = String(a.id) === invitedByHash ? 1 : 0;
-        const bi = String(b.id) === invitedByHash ? 1 : 0;
-        return bi - ai;
-      })
-    : pending;
+  // Picks = pending I added + matched mutuals (each consumes a slot).
+  const myPicks = [...matches, ...pending];
+  const isPlus = false; // Sphere+ comes in Phase 5
+  const slotLimit = isPlus ? SPHERE_PLUS_LIMIT : FREE_LIMIT;
+  const slotsUsed = Math.min(myPicks.length, slotLimit);
+  const empty = myPicks.length === 0;
 
   return (
-    <ScreenHome
-      accent={accent}
-      matches={sortedMatches}
-      pending={sortedPending}
-      lastByHash={lastByHash}
-      unreadByHash={unreadByHash}
-      myHash={myHash}
-      invitedByHash={invitedByHash}
-      loading={dataLoading && !hasData}
-      refreshing={dataLoading && hasData}
-      error={dataError}
-      onRetry={refresh}
-      onOpenMatch={(m: any) => {
-        markThreadRead(String(m.id));
-        setActiveMatch(m);
-        navigate({ to: "/thread/$hash", params: { hash: String(m.id) } });
-      }}
-      onAdd={() => navigate({ to: "/add" })}
-      onInvite={handleInvite}
-      onOpenProfile={() => navigate({ to: "/profile" })}
-      photoByHash={photoByHash}
-    />
+    <SphereScreen>
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-6 pt-12 pb-2">
+        <div className="font-serif italic text-[22px]">sphere</div>
+        <button
+          onClick={refresh}
+          className="text-mute text-[14px]"
+          aria-label="Refresh"
+        >
+          {dataLoading ? "…" : "↻"}
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-6 pt-4 pb-4" data-scroll>
+        <Eyebrow>Your sphere</Eyebrow>
+        <h1 className="mt-2 font-serif italic text-[34px] leading-[1.05] tracking-tight">
+          {empty ? "Three picks. Sealed unless mutual." : "Waiting for magic to happen."}
+        </h1>
+
+        {/* Slot row — dashed circles for empty, filled circles for used */}
+        <div className="mt-7 flex items-center gap-3">
+          {Array.from({ length: slotLimit }).map((_, i) => {
+            const filled = i < slotsUsed;
+            return (
+              <div
+                key={i}
+                className={cn(
+                  "h-12 w-12 rounded-full flex items-center justify-center",
+                  filled
+                    ? "bg-ink text-paper"
+                    : "border border-dashed border-[#C9C5BC] text-mute",
+                )}
+              >
+                <span className="font-sans text-[14px]">{i + 1}</span>
+              </div>
+            );
+          })}
+          <div className="ml-auto font-mono text-[10px] uppercase text-mute"
+            style={{ letterSpacing: "0.22em" }}
+          >
+            Slot {slotsUsed} of {slotLimit}
+          </div>
+        </div>
+
+        {/* Pick cards */}
+        {myPicks.length > 0 && (
+          <div className="mt-7 space-y-3">
+            {myPicks.map((p: any) => {
+              const id = String(p.id || "");
+              const initials = initialsFromHash(id);
+              const matched = p.status === "matched";
+              return (
+                <div
+                  key={id}
+                  className="rounded-2xl bg-white border border-line p-4 flex items-center gap-4"
+                >
+                  <AvatarMono initials={initials} size={44} />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-serif text-[20px] leading-tight truncate">
+                      {p.unknown ? (matched ? "New mutual" : "Sealed pick") : p.name}
+                    </div>
+                    <div className="mt-0.5 font-mono text-[10px] uppercase text-mute"
+                      style={{ letterSpacing: "0.22em" }}
+                    >
+                      {intentLabel(p.intent)} · {matched ? "Mutual" : "Pending"}
+                    </div>
+                  </div>
+                  {matched ? (
+                    <button
+                      onClick={() =>
+                        navigate({ to: "/thread/$hash", params: { hash: id } })
+                      }
+                      className="rounded-full border border-ink h-9 px-4 text-[12px] font-medium"
+                    >
+                      Open
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => toast("Nudge sent. They'll get a fresh ping.")}
+                      className="rounded-full border border-ink h-9 px-4 text-[12px] font-medium"
+                    >
+                      Nudge
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Empty state body */}
+        {empty && (
+          <p className="mt-6 text-[14px] text-mute leading-snug">
+            Add a person by number, contact, or Instagram. They'll never know unless they pick you back.
+          </p>
+        )}
+
+        {/* Sphere+ card (always shown when at limit, soft prompt when not) */}
+        {slotsUsed >= slotLimit && !isPlus && (
+          <div className="mt-8 rounded-2xl bg-[#EFECE5] p-5">
+            <Eyebrow>Free limit reached</Eyebrow>
+            <div className="mt-2 font-serif italic text-[24px] leading-tight">
+              Add up to three with Sphere+.
+            </div>
+            <div className="mt-1 text-[13px] text-mute">
+              $9.99 / month · cancel anytime.
+            </div>
+            <div className="mt-4">
+              <PrimaryButton onClick={() => toast("Sphere+ comes in Phase 5.")}>
+                Upgrade
+              </PrimaryButton>
+            </div>
+          </div>
+        )}
+
+        {dataError && (
+          <div className="mt-6 text-[12px] text-danger">{dataError}</div>
+        )}
+
+        <div className="h-6" />
+      </div>
+
+      {/* Sticky add CTA (only when slots remain) */}
+      {slotsUsed < slotLimit && (
+        <div className="px-6 pt-2 pb-3">
+          <PrimaryButton onClick={() => navigate({ to: "/add" })}>
+            Number, contact, or Instagram +
+          </PrimaryButton>
+        </div>
+      )}
+
+      <TabBar />
+    </SphereScreen>
   );
 }
