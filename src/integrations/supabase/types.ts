@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      _rls_verify_results: {
+        Row: {
+          check_name: string | null
+          created_at: string | null
+          detail: string | null
+          id: number
+          ok: boolean | null
+        }
+        Insert: {
+          check_name?: string | null
+          created_at?: string | null
+          detail?: string | null
+          id?: number
+          ok?: boolean | null
+        }
+        Update: {
+          check_name?: string | null
+          created_at?: string | null
+          detail?: string | null
+          id?: number
+          ok?: boolean | null
+        }
+        Relationships: []
+      }
       adds: {
         Row: {
           added_phone_hash: string
@@ -304,14 +328,6 @@ export type Database = {
       }
     }
     Functions: {
-      _rls_verify_probe: {
-        Args: never
-        Returns: {
-          check_name: string
-          detail: string
-          ok: boolean
-        }[]
-      }
       current_user_phone_hash: { Args: never; Returns: string }
       has_role: {
         Args: {
