@@ -364,8 +364,24 @@ export const setTestMode = createServerFn({ method: "POST" })
 export const testmodeAutoReciprocateLatest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    // Hard guard: refuse outright on any non-test deployment, regardless of
+    // the app_settings.test_mode flag. AUTORECIPROCATE_ALLOWED must be
+    // explicitly set to "1" in the runtime env for this fn to do anything.
+    if (process.env.AUTORECIPROCATE_ALLOWED !== "1") {
+      throw new Error("Auto-reciprocate is disabled in this environment");
+    }
     await ensureTestModeEnabled();
     const ctx = context as { userId: string; claims: { phone?: string } };
+
+    // Second guard: the caller must themselves be a synthetic test account.
+    const { data: callerTest, error: callerErr } = await supabaseAdmin
+      .from("test_accounts")
+      .select("user_id")
+      .eq("user_id", ctx.userId)
+      .maybeSingle();
+    if (callerErr) throw new Error("Could not verify test account");
+    if (!callerTest) throw new Error("Auto-reciprocate is only for test PIN accounts");
+
     const myHash = await getCallerPhoneHash(ctx.claims);
 
     const { data: latest, error: latestErr } = await supabaseAdmin
