@@ -65,9 +65,10 @@ export type Database = {
           adverb: string
           body: string
           created_at: string
-          frame_id: string
+          frame_id: string | null
           id: string
           intent: string
+          pick_id: string | null
           recipient_phone_hash: string
           sender_id: string
           sender_phone_hash: string
@@ -77,9 +78,10 @@ export type Database = {
           adverb: string
           body: string
           created_at?: string
-          frame_id: string
+          frame_id?: string | null
           id?: string
           intent?: string
+          pick_id?: string | null
           recipient_phone_hash: string
           sender_id: string
           sender_phone_hash: string
@@ -89,14 +91,23 @@ export type Database = {
           adverb?: string
           body?: string
           created_at?: string
-          frame_id?: string
+          frame_id?: string | null
           id?: string
           intent?: string
+          pick_id?: string | null
           recipient_phone_hash?: string
           sender_id?: string
           sender_phone_hash?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "compliments_pick_id_fkey"
+            columns: ["pick_id"]
+            isOneToOne: false
+            referencedRelation: "adds"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invite_conversions: {
         Row: {
