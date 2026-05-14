@@ -603,6 +603,8 @@ export function ScreenContacts({ accent, onBack, onPick }) {
   const [confirmList, setConfirmList] = useState(null); // null | Array<{ name, phone }>
   const fileInputRef = useRef(null);
   const [pickerNative, setPickerNative] = useState(false);
+  // null = no error; 'denied' = system permission off.
+  const [permissionState, setPermissionState] = useState(null);
   useEffect(() => {
     const cap = contactsCapability();
     setPickerSupported(cap.available);
@@ -620,21 +622,26 @@ export function ScreenContacts({ accent, onBack, onPick }) {
   const openDevicePicker = async () => {
     if (!pickerSupported || pickerBusy) return;
     setPickerBusy(true);
+    setPermissionState(null);
     try {
       const items = await pickContacts();
       if (items.length > 0) setConfirmList(items);
     } catch (e) {
-      // Permission denied (native) — surface a soft hint via console; UI shows
-      // the manual fallback regardless.
-      if (e && e.code === 'permission-denied' && typeof window !== 'undefined') {
-        try {
-          // Lazy import to avoid circulars / SSR
-          const { toast } = await import('../toast');
-          toast.error('Contacts access is off. Enable it in Settings → Sphere → Contacts.');
-        } catch {}
+      if (e && e.code === 'permission-denied') {
+        setPermissionState('denied');
       }
     } finally {
       setPickerBusy(false);
+    }
+  };
+
+  const handleOpenSettings = async () => {
+    const opened = await openAppSettings();
+    if (!opened && typeof window !== 'undefined') {
+      try {
+        const { toast } = await import('../toast');
+        toast('Open your device Settings → Sphere → Contacts to allow access.');
+      } catch {}
     }
   };
 
