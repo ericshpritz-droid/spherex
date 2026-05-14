@@ -43,8 +43,8 @@ type Ctx = {
   verifyCode: (code: string) => Promise<void>;
   // Adds
   lastAddedPhone: string;
-  addOne: (digits: string) => Promise<void>;
-  addMany: (formattedPhones: string[]) => Promise<void>;
+  addOne: (digits: string, intent?: "romantic" | "compliment" | "both") => Promise<void>;
+  addMany: (formattedPhones: string[], intent?: "romantic" | "compliment" | "both") => Promise<void>;
   // Active match (for /match)
   activeMatch: Person | null;
   setActiveMatch: (m: Person | null) => void;
