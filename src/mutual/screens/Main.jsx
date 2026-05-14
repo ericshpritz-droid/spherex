@@ -6,7 +6,7 @@ import { LinkedRings, Aura, NumPad, Wordmark } from '../components/index.jsx';
 import { Spinner } from '../components/Spinner.jsx';
 import { CONTACTS } from '../data.js';
 import { haptics } from '../native/haptics';
-import { contactsCapability, pickContacts } from '../native/contacts';
+import { contactsCapability, pickContacts, openAppSettings } from '../native/contacts';
 
 // Compact relative time for last-message timestamps on match cards.
 function messageAgo(iso) {
