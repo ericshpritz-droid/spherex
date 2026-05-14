@@ -21,6 +21,7 @@ export type Database = {
           adder_phone_hash: string
           created_at: string
           id: string
+          intent: string
         }
         Insert: {
           added_phone_hash: string
@@ -28,6 +29,7 @@ export type Database = {
           adder_phone_hash: string
           created_at?: string
           id?: string
+          intent?: string
         }
         Update: {
           added_phone_hash?: string
@@ -35,6 +37,7 @@ export type Database = {
           adder_phone_hash?: string
           created_at?: string
           id?: string
+          intent?: string
         }
         Relationships: []
       }
