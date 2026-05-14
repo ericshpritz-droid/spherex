@@ -21,10 +21,7 @@ export function gradient(accent = 'pink', dir = '135deg') {
   return `linear-gradient(${dir}, ${p.a} 0%, ${p.b} 50%, ${p.c} 100%)`;
 }
 
-export function formatPhone(digits) {
-  const d = String(digits).replace(/\D/g, '').slice(0, 10);
-  if (d.length === 0) return '';
-  if (d.length <= 3) return `(${d}`;
-  if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
-  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
-}
+// Re-exported NANP formatter so existing `import { formatPhone } from
+// '../brand.js'` call sites keep working. The canonical implementation lives
+// in src/mutual/phone/nanp.ts — see that file for the rules.
+export { formatNanp as formatPhone } from './phone/nanp';

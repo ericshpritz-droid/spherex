@@ -52,11 +52,13 @@ export function contactsCapability(): ContactsCapability {
   return { available: false, native: false };
 }
 
+// Use the canonical NANP normalizer/validator so the picker silently drops
+// numbers that wouldn't survive the manual-entry validation either
+// (international numbers, N11 service codes, malformed entries).
+import { normalizeNanp, isValidNanp } from "../phone/nanp";
+
 function normalizePhone(raw: string): string {
-  // Keep digits only; strip leading US country code; cap at 10.
-  let d = String(raw).replace(/\D/g, "");
-  if (d.length === 11 && d.startsWith("1")) d = d.slice(1);
-  return d.slice(0, 10);
+  return normalizeNanp(raw);
 }
 
 /**
@@ -94,7 +96,7 @@ export async function pickContacts(): Promise<PickedContact[]> {
         [c.name?.given, c.name?.family].filter(Boolean).join(" ").trim();
       const phones = (c.phones ?? [])
         .map((p) => normalizePhone(p?.number ?? ""))
-        .filter((p) => p.length === 10);
+        .filter(isValidNanp);
       // De-duplicate
       const seen = new Set<string>();
       const out: PickedContact[] = [];
@@ -125,7 +127,7 @@ export async function pickContacts(): Promise<PickedContact[]> {
       const display = (names.find(Boolean) || "").toString().trim();
       for (const t of tels) {
         const phone = normalizePhone(String(t || ""));
-        if (phone.length !== 10 || seen.has(phone)) continue;
+        if (!isValidNanp(phone) || seen.has(phone)) continue;
         seen.add(phone);
         out.push({ name: display, phone });
       }

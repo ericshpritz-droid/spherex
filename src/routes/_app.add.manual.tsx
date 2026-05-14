@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, PhoneField, Eyebrow } from "@/sphere/ui";
 import { cn } from "@/lib/utils";
+import { validateNanp } from "@/mutual/phone/nanp";
 
 interface ManualSearch {
   ig?: number;
@@ -47,9 +48,10 @@ function ManualAdd() {
   const [ig, setIg] = useState(draft.ig);
 
   const cleanedIg = ig.replace(/^@/, "").trim().toLowerCase();
-  const validPhone = phone.length === 10;
+  const phoneCheck = validateNanp(phone);
   const validIg = cleanedIg ? /^[a-z0-9._]{1,30}$/.test(cleanedIg) : true;
-  const canContinue = validPhone && validIg;
+  const canContinue = phoneCheck.ok && validIg;
+  const phoneError = phone.length > 0 && !phoneCheck.ok ? phoneCheck.message : "";
 
   function next() {
     if (!canContinue) return;
@@ -93,7 +95,10 @@ function ManualAdd() {
               onChange={setPhone}
               autoFocus={search.focus !== "ig"}
             />
-            {search.prefilled && (
+            {phoneError && (
+              <div className="mt-2 text-[12px] text-danger">{phoneError}</div>
+            )}
+            {search.prefilled && !phoneError && (
               <div className="mt-1 text-[12px] text-mute">From your contacts.</div>
             )}
           </div>
