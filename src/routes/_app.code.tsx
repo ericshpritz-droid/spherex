@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, Eyebrow } from "@/sphere/ui";
 import { useApp } from "@/mutual/AppContext";
+import { useTestMode } from "@/mutual/testmode/useTestMode";
 import { formatE164 } from "@/mutual/auth";
 import { toast } from "@/mutual/toast";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/_app/code")({
 
 function CodeRoute() {
   const { pendingPhone, pendingCodeHint, pendingOtpCooldownSeconds, resendOtp, verifyCode } = useApp();
+  const { enabled: testModeEnabled } = useTestMode();
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
@@ -104,7 +106,8 @@ function CodeRoute() {
 
         {pendingCodeHint && (
           <div className="mt-3 rounded-xl border border-line bg-white px-3 py-2 text-[12px] font-mono text-mute">
-            Dev hint: {pendingCodeHint}
+            <span className="text-ink font-semibold">{testModeEnabled ? "TEST MODE" : "Dev hint"}:</span> {pendingCodeHint}
+            {testModeEnabled && <span className="block mt-1 normal-case text-mute">Tap to auto-fill, or just type it in.</span>}
           </div>
         )}
 

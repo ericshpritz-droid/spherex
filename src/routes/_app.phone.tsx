@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, PhoneField, Eyebrow } from "@/sphere/ui";
 import { useApp } from "@/mutual/AppContext";
+import { useTestMode } from "@/mutual/testmode/useTestMode";
 import { toast } from "@/mutual/toast";
 
 export const Route = createFileRoute("/_app/phone")({
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/_app/phone")({
 
 function PhoneRoute() {
   const { startOtp } = useApp();
+  const { enabled: testModeEnabled } = useTestMode();
   const navigate = useNavigate();
   const [digits, setDigits] = useState("");
   const [busy, setBusy] = useState(false);
@@ -70,6 +72,14 @@ function PhoneRoute() {
           <p className="mt-3 text-[13px] text-mute leading-snug">
             Hashed on this device. Used only to find your matches — never shared.
           </p>
+          {testModeEnabled && (
+            <div
+              className="mt-4 rounded-xl border border-line bg-white px-3 py-2 text-[12px] font-mono text-mute"
+              style={{ letterSpacing: "0.04em" }}
+            >
+              <span className="text-ink font-semibold">TEST MODE</span> · No SMS will be sent. Use any 10-digit number; the next-screen code is <span className="text-ink font-semibold">111111</span>.
+            </div>
+          )}
         </div>
       </div>
 
