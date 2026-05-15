@@ -3,6 +3,16 @@ import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "../mutual/toast";
 import { SphereProfile } from "@/sphere/screens/SphereProfile";
+import { Eyebrow } from "@/sphere/ui";
+
+function SectionLike({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-7">
+      <div className="px-2 pb-2"><Eyebrow>{title}</Eyebrow></div>
+      <div className="rounded-2xl bg-surface border border-line overflow-hidden">{children}</div>
+    </div>
+  );
+}
 import { useApp } from "../mutual/AppContext";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
 import { ShareInviteButton } from "../mutual/components/ShareInviteButton";
@@ -110,56 +120,56 @@ function ProfileRoute() {
     return () => { cancelled = true; };
   }, [session?.access_token, fetchConversions]);
 
+  // Test PIN — laid out as a profile section so it sits flush in the page
+  // rhythm rather than floating over the layout.
   const testPinSlot = testPin ? (
-    <div className="rounded-2xl bg-surface border border-line p-4 flex flex-col items-center text-center">
-      <div
-        className="font-mono text-[10px] uppercase text-mute"
-        style={{ letterSpacing: "0.22em" }}
-      >
-        Your test PIN
+    <SectionLike title="Test PIN">
+      <div className="px-4 py-5 flex flex-col items-center text-center">
+        <button
+          onClick={() => {
+            haptics.selection();
+            navigator.clipboard?.writeText(testPin).then(
+              () => toast.success("PIN copied"),
+              () => {},
+            );
+          }}
+          className="font-serif italic text-ink bg-transparent border-0 cursor-pointer leading-none"
+          style={{ fontSize: 40, letterSpacing: 8 }}
+          title="Tap to copy"
+        >
+          {testPin}
+        </button>
+        <div className="mt-3 text-[12px] text-mute">
+          Tap to copy. Share this so others can add you.
+        </div>
+        <button
+          onClick={() => navigate({ to: "/test-share" })}
+          className="mt-4 rounded-full text-[12px] font-semibold cursor-pointer bg-ink text-paper border-0"
+          style={{ padding: "8px 16px" }}
+        >
+          One-time share code →
+        </button>
       </div>
-      <button
-        onClick={() => {
-          haptics.selection();
-          navigator.clipboard?.writeText(testPin).then(
-            () => toast.success("PIN copied"),
-            () => {},
-          );
-        }}
-        className="mt-1 font-serif italic text-ink bg-transparent border-0 cursor-pointer"
-        style={{ fontSize: 32, letterSpacing: 6 }}
-        title="Tap to copy"
-      >
-        {testPin}
-      </button>
-      <div className="mt-1 text-[12px] text-mute">
-        Share this so others can add you
-      </div>
-      <button
-        onClick={() => navigate({ to: "/test-share" })}
-        className="mt-3 rounded-full text-[12px] font-semibold cursor-pointer bg-ink text-paper border-0"
-        style={{ padding: "6px 14px" }}
-      >
-        One-time share code →
-      </button>
-    </div>
+    </SectionLike>
   ) : null;
 
   const inviteSlot = (
-    <div className="flex flex-col items-stretch gap-2">
-      <ShareInviteButton accent={accent} />
-      {invites.count >= 1 && (
-        <div className="text-center text-[12px] text-mute">
-          <span className="font-semibold text-ink">
-            {invites.count} {invites.count === 1 ? "friend" : "friends"}
-          </span>{" "}
-          joined via your link
-          {invites.lastAt && (
-            <span className="text-mute"> · last {relativeTime(invites.lastAt)}</span>
-          )}
-        </div>
-      )}
-    </div>
+    <SectionLike title="Invite">
+      <div className="p-4 flex flex-col items-stretch gap-3">
+        <ShareInviteButton accent={accent} />
+        {invites.count >= 1 && (
+          <div className="text-center text-[12px] text-mute">
+            <span className="font-semibold text-ink">
+              {invites.count} {invites.count === 1 ? "friend" : "friends"}
+            </span>{" "}
+            joined via your link
+            {invites.lastAt && (
+              <span className="text-mute"> · last {relativeTime(invites.lastAt)}</span>
+            )}
+          </div>
+        )}
+      </div>
+    </SectionLike>
   );
 
   return (
