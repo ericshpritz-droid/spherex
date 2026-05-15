@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/rea
 import { useEffect, useRef, useState } from "react";
 import { AppProvider, useApp } from "../mutual/AppContext";
 import { Spinner } from "../mutual/components/Spinner.jsx";
-import { isNative } from "../mutual/native/platform";
+import { isNative, nativePlatform } from "../mutual/native/platform";
 import { useKeyboardInset } from "@/sphere/native/useKeyboardInset";
 import { useRouteDirection } from "@/sphere/native/useRouteDirection";
 import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
