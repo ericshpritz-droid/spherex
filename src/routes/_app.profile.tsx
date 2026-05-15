@@ -172,6 +172,21 @@ function ProfileRoute() {
     </SectionLike>
   );
 
+  const introSlot = (
+    <SectionLike title="Intro">
+      <button
+        onClick={() => {
+          haptics.selection();
+          navigate({ to: "/onboarding-explainer", search: { rewatch: true } as any });
+        }}
+        className="w-full text-left flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer hover:bg-ink/[0.03] bg-transparent border-0"
+      >
+        <span className="text-[15px] font-medium text-ink">Watch intro again</span>
+        <span className="text-[14px] text-mute">▶</span>
+      </button>
+    </SectionLike>
+  );
+
   return (
     <div className="relative h-full">
       <SphereProfile
@@ -179,7 +194,7 @@ function ProfileRoute() {
         contactPhotos={contactPhotos}
         feel={feel}
         topSlot={testPinSlot}
-        bottomSlot={inviteSlot}
+        bottomSlot={<>{inviteSlot}{introSlot}</>}
         onSignOut={async () => {
           try {
             await doSignOut();
