@@ -58,7 +58,7 @@ function ExplainerRoute() {
   const remaining = TOTAL_S - elapsed;
 
   return (
-    <div className="h-full w-full bg-ink text-paper font-sans flex flex-col">
+    <div className="h-full w-full bg-paper text-ink font-sans flex flex-col">
       {/* Top bar: countdown · × */}
       <div className="flex items-center justify-between px-6 pt-12 pb-2">
         <div
