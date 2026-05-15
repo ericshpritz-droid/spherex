@@ -72,20 +72,20 @@ function InstagramRoute() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pt-8 pb-4" data-scroll>
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-5 pb-4" data-scroll>
         <Eyebrow>Optional · you can skip</Eyebrow>
-        <h1 className="mt-3 font-serif italic text-[40px] leading-[1.02] tracking-tight">
+        <h1 className="mt-2 font-serif italic text-[30px] leading-[1.05] tracking-tight">
           Add your Instagram<br />so others can find you.
         </h1>
-        <p className="mt-3 text-[14px] text-mute leading-snug">
+        <p className="mt-2 text-[14px] text-mute leading-snug">
           Without it, you can only be added by phone number. Most people add their @handle so friends-of-friends can pick them too.
         </p>
 
-        <div className="mt-7">
+        <div className="mt-5">
           <div
             className={cn(
               "flex items-center gap-2 rounded-2xl bg-surface border border-line",
-              "h-16 px-4",
+              "h-14 px-4",
             )}
           >
             <span className="font-sans text-[17px] text-mute">@</span>
@@ -113,8 +113,8 @@ function InstagramRoute() {
       </div>
 
       <div
-        className="px-6 pt-4 space-y-3"
-        style={{ paddingBottom: `calc(env(safe-area-inset-bottom) + 2rem + var(--kb-inset, 0px))` }}
+        className="px-6 pt-3 space-y-2 shrink-0"
+        style={{ paddingBottom: `calc(max(env(safe-area-inset-bottom), var(--kb-inset, 0px)) + 1rem)` }}
       >
         <PrimaryButton onClick={() => next(true)} disabled={!valid || busy}>
           {valid ? `Connect @${cleaned}` : "Connect Instagram"}

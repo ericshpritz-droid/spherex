@@ -75,17 +75,17 @@ function ExplainerRoute() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pt-2 pb-4" data-scroll>
-        <h1 className="font-serif italic text-[34px] leading-[1.05] tracking-tight">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-2 pb-4" data-scroll>
+        <h1 className="font-serif italic text-[28px] leading-[1.05] tracking-tight">
           A quick tour,<br />before you start.
         </h1>
 
         {/* Segmented Watch / Skip */}
-        <div className="mt-6 grid grid-cols-2 gap-2">
+        <div className="mt-4 grid grid-cols-2 gap-2">
           <button
             onClick={() => { haptics.selection(); setMode("watch"); setPlaying(true); }}
             className={cn(
-              "h-14 rounded-full border text-[15px] font-medium transition-colors active:scale-[0.97]",
+              "h-12 rounded-full border text-[15px] font-medium transition-colors active:scale-[0.97]",
               mode === "watch"
                 ? "bg-paper text-ink border-paper"
                 : "bg-transparent text-paper/80 border-paper/25",
@@ -100,7 +100,7 @@ function ExplainerRoute() {
           <button
             onClick={dismiss}
             className={cn(
-              "h-14 rounded-full border text-[15px] font-medium transition-colors active:scale-[0.97]",
+              "h-12 rounded-full border text-[15px] font-medium transition-colors active:scale-[0.97]",
               "bg-transparent text-paper/80 border-paper/25",
             )}
           >
@@ -112,8 +112,8 @@ function ExplainerRoute() {
         <div
           onClick={() => !playing && (setMode("watch"), setPlaying(true))}
           className={cn(
-            "mt-6 rounded-3xl bg-paper/[0.04] border border-paper/12",
-            "aspect-[9/14] relative overflow-hidden cursor-pointer",
+            "mt-4 rounded-3xl bg-paper/[0.04] border border-paper/12",
+            "aspect-[9/12] relative overflow-hidden cursor-pointer",
           )}
         >
           {/* Header strip */}
