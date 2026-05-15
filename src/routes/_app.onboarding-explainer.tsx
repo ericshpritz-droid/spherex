@@ -58,18 +58,18 @@ function ExplainerRoute() {
   const remaining = TOTAL_S - elapsed;
 
   return (
-    <div className="h-full w-full bg-paper text-ink font-sans flex flex-col">
+    <div className="h-full w-full bg-ink text-paper font-sans flex flex-col">
       {/* Top bar: countdown · × */}
       <div className="flex items-center justify-between px-6 pt-12 pb-2">
         <div
-          className="font-mono text-[12px] text-paper/70 tabular-nums"
+          className="font-mono text-[12px] text-ink/70 tabular-nums"
         >
           {fmtTime(remaining)}
         </div>
         <button
           onClick={dismiss}
           aria-label="Close"
-          className="text-paper/70 text-[22px] -mr-1 px-2 leading-none"
+          className="text-ink/70 text-[22px] -mr-1 px-2 leading-none"
         >
           ×
         </button>
@@ -87,8 +87,8 @@ function ExplainerRoute() {
             className={cn(
               "h-12 rounded-full border text-[15px] font-medium transition-colors active:scale-[0.97]",
               mode === "watch"
-                ? "bg-paper text-ink border-paper"
-                : "bg-transparent text-paper/80 border-paper/25",
+                ? "bg-ink text-paper border-ink"
+                : "bg-transparent text-ink/80 border-ink/25",
             )}
           >
             Watch
@@ -101,7 +101,7 @@ function ExplainerRoute() {
             onClick={dismiss}
             className={cn(
               "h-12 rounded-full border text-[15px] font-medium transition-colors active:scale-[0.97]",
-              "bg-transparent text-paper/80 border-paper/25",
+              "bg-transparent text-ink/80 border-ink/25",
             )}
           >
             Skip
@@ -112,20 +112,20 @@ function ExplainerRoute() {
         <div
           onClick={() => !playing && (setMode("watch"), setPlaying(true))}
           className={cn(
-            "mt-4 rounded-3xl bg-paper/[0.04] border border-paper/12",
+            "mt-4 rounded-3xl bg-ink/[0.04] border border-ink/12",
             "aspect-[9/12] relative overflow-hidden cursor-pointer",
           )}
         >
           {/* Header strip */}
           <div className="absolute top-0 inset-x-0 px-5 pt-5 flex items-center justify-between">
             <div
-              className="font-mono text-[10px] uppercase text-paper/55"
+              className="font-mono text-[10px] uppercase text-ink/55"
               style={{ letterSpacing: "0.22em" }}
             >
               Placeholder · {TOTAL_S}s
             </div>
             <div
-              className="font-mono text-[10px] uppercase text-paper/55 flex items-center gap-1"
+              className="font-mono text-[10px] uppercase text-ink/55 flex items-center gap-1"
               style={{ letterSpacing: "0.22em" }}
             >
               Sound on <span aria-hidden>🔊</span>
@@ -134,22 +134,22 @@ function ExplainerRoute() {
 
           {/* Body — rotating tagline */}
           <div className="absolute inset-x-0 bottom-0 px-5 pb-7">
-            <div className="font-serif italic text-[26px] leading-[1.1] text-paper/85">
+            <div className="font-serif italic text-[26px] leading-[1.1] text-ink/85">
               {!playing ? (
-                <>How <span className="text-paper/55">three numbers</span><br />change everything.</>
+                <>How <span className="text-ink/55">three numbers</span><br />change everything.</>
               ) : progress < 0.34 ? (
-                <>Add a <span className="text-paper/55">person.</span></>
+                <>Add a <span className="text-ink/55">person.</span></>
               ) : progress < 0.67 ? (
-                <>Sealed <span className="text-paper/55">unless mutual.</span></>
+                <>Sealed <span className="text-ink/55">unless mutual.</span></>
               ) : (
-                <>Reveal <span className="text-paper/55">together.</span></>
+                <>Reveal <span className="text-ink/55">together.</span></>
               )}
             </div>
           </div>
 
           {!playing && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-14 w-14 rounded-full bg-paper text-ink flex items-center justify-center text-[18px] shadow-lg">
+              <div className="h-14 w-14 rounded-full bg-ink text-paper flex items-center justify-center text-[18px] shadow-lg">
                 ▶
               </div>
             </div>
@@ -162,12 +162,12 @@ function ExplainerRoute() {
         className="px-6 pt-2 flex items-center gap-3"
         style={{ paddingBottom: `calc(env(safe-area-inset-bottom) + 1rem)` }}
       >
-        <div className="font-mono text-[11px] tabular-nums text-paper/60">
+        <div className="font-mono text-[11px] tabular-nums text-ink/60">
           {fmtTime(elapsed)} / {fmtTime(TOTAL_S)}
         </div>
-        <div className="flex-1 h-[2px] bg-paper/15 rounded-full overflow-hidden">
+        <div className="flex-1 h-[2px] bg-ink/15 rounded-full overflow-hidden">
           <div
-            className="h-full bg-paper transition-[width] duration-100"
+            className="h-full bg-ink transition-[width] duration-100"
             style={{ width: `${progress * 100}%` }}
           />
         </div>
