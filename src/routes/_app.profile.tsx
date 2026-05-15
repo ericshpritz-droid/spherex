@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "../mutual/toast";
-import { ScreenProfile } from "../mutual/screens/Main.jsx";
+import { SphereProfile } from "@/sphere/screens/SphereProfile";
 import { useApp } from "../mutual/AppContext";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
 import { ShareInviteButton } from "../mutual/components/ShareInviteButton";
