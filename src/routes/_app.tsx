@@ -57,13 +57,13 @@ function PhoneFrame() {
   const native = isNative();
   const [tooSmallForFrame, setTooSmallForFrame] = useState(() => {
     if (typeof window === "undefined") return false;
-    // Need ~402px wide + 874px tall + a little breathing room for the frame.
-    return window.innerWidth < 440 || window.innerHeight < 900;
+    // Frame needs ~402×600 minimum to look right; below that, fill the screen.
+    return window.innerWidth < 440 || window.innerHeight < 620;
   });
   useEffect(() => {
     if (typeof window === "undefined") return;
     const onResize = () => {
-      setTooSmallForFrame(window.innerWidth < 440 || window.innerHeight < 900);
+      setTooSmallForFrame(window.innerWidth < 440 || window.innerHeight < 620);
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
