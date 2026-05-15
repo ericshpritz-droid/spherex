@@ -2,7 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { AvatarMono, initialsFromHash } from "@/sphere/components/AvatarMono";
 import { PrimaryButton, GhostButton, Eyebrow, Sheet } from "@/sphere/ui";
+// @ts-expect-error - JS module without types
 import { CONTACTS } from "@/mutual/data";
+type Contact = { name: string; phone: string; avatar?: string };
+const ALL_CONTACTS = CONTACTS as Contact[];
 import { formatPhone } from "@/mutual/brand.js";
 import { contactsCapability, pickContacts, openAppSettings } from "@/mutual/native/contacts";
 import { haptics } from "@/mutual/native/haptics";
