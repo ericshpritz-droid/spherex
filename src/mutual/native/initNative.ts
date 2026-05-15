@@ -19,10 +19,11 @@ export async function initNativeShell(): Promise<void> {
     await StatusBar.setOverlaysWebView({ overlay: true });
   } catch {}
 
-  // Keyboard: native resize so inputs lift the view, plus class hooks for CSS.
+  // Keyboard: don't let iOS resize the WebView — we manage the offset ourselves
+  // via --kb-inset so layout shifts exactly once.
   try {
     const { Keyboard, KeyboardResize } = await import("@capacitor/keyboard");
-    await Keyboard.setResizeMode({ mode: KeyboardResize.Native });
+    await Keyboard.setResizeMode({ mode: KeyboardResize.None });
     await Keyboard.setScroll({ isDisabled: true });
     Keyboard.addListener("keyboardWillShow", () => {
       document.documentElement.classList.add("kb-open");
