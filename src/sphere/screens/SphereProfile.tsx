@@ -85,39 +85,6 @@ export function SphereProfile({
 
         {topSlot && <div className="mt-6">{topSlot}</div>}
 
-        {/* Accent hue */}
-        <Section title="Accent hue">
-          <div className="grid grid-cols-3 gap-2 p-3">
-            {ACCENTS.map((a) => {
-              const on = accent === a.key;
-              return (
-                <button
-                  key={a.key}
-                  onClick={() => onAccent(a.key)}
-                  className={`rounded-2xl border p-3 text-[13px] font-medium transition-colors flex flex-col items-center gap-2 ${
-                    on
-                      ? "bg-ink/[0.04] border-ink/40"
-                      : "bg-transparent border-line hover:border-ink/30"
-                  }`}
-                >
-                  <span
-                    className="inline-block rounded-full"
-                    style={{
-                      width: 18,
-                      height: 18,
-                      background: ACCENT_DOT[a.key],
-                      boxShadow: on
-                        ? `0 0 0 3px color-mix(in oklab, ${ACCENT_DOT[a.key]} 25%, transparent)`
-                        : "none",
-                    }}
-                  />
-                  <span className="text-ink">{a.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </Section>
-
         {contactPhotos && contactPhotos.status !== "unsupported" && (
           <Section title="Contact photos">
             <ToggleRow
