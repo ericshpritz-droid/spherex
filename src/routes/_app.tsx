@@ -50,19 +50,25 @@ function PhoneFrame() {
   // Detect "phone-sized" viewport so the faux phone-frame ONLY shows on
   // desktop preview. On any mobile-sized viewport — real native shell, the
   // iframe preview at mobile sizes, or a real iPhone Safari — fill the screen.
+  // Only the real native iOS shell or a viewport too small to fit the
+  // 402×874 phone frame goes full-bleed. Everything else (desktop, tablet,
+  // and large mobile browsers) renders inside the iPhone-shaped frame so
+  // the web app always feels like the app.
   const native = isNative();
-  const [isPhoneViewport, setIsPhoneViewport] = useState(() => {
-    if (typeof window === "undefined") return true; // SSR-safe default: fill
-    return window.matchMedia("(max-width: 640px)").matches;
+  const [tooSmallForFrame, setTooSmallForFrame] = useState(() => {
+    if (typeof window === "undefined") return false;
+    // Need ~402px wide + 874px tall + a little breathing room for the frame.
+    return window.innerWidth < 440 || window.innerHeight < 900;
   });
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(max-width: 640px)");
-    const onChange = () => setIsPhoneViewport(mq.matches);
-    mq.addEventListener?.("change", onChange);
-    return () => mq.removeEventListener?.("change", onChange);
+    const onResize = () => {
+      setTooSmallForFrame(window.innerWidth < 440 || window.innerHeight < 900);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
-  const fullBleed = native || isPhoneViewport;
+  const fullBleed = native || tooSmallForFrame;
 
   const wrapperClass = fullBleed
     ? "h-[100dvh] w-screen bg-black"
