@@ -49,7 +49,7 @@ function relativeTime(iso: string): string {
 }
 
 function ProfileRoute() {
-  const { accent, setAccent, myPhoneFormatted, doSignOut, user, session } = useApp();
+  const { myPhoneFormatted, doSignOut, user, session } = useApp();
   const navigate = useNavigate();
   const isAdmin = useIsAdmin(user?.id);
   const testPin: string | undefined = user?.user_metadata?.test_pin;
