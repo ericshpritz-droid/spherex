@@ -112,6 +112,8 @@ function InstagramRoute() {
         </div>
       </div>
 
+      <div className="flex-1 min-h-0" />
+
       <div
         className="px-6 pt-3 space-y-2 shrink-0"
         style={{ paddingBottom: `calc(max(env(safe-area-inset-bottom), var(--kb-inset, 0px)) + 1rem)` }}
