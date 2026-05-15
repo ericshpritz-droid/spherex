@@ -58,7 +58,7 @@ function PhoneRoute() {
         <div className="w-6" />
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-5 pb-4" data-scroll>
+      <div className="px-6 pt-5 pb-2 shrink-0">
         <Eyebrow>Verify your number</Eyebrow>
         <h1 className="mt-2 font-serif italic text-[32px] leading-[1.05] tracking-tight">
           What's your number?
@@ -82,6 +82,8 @@ function PhoneRoute() {
           )}
         </div>
       </div>
+
+      <div className="flex-1 min-h-0" />
 
       <div
         className="px-6 pt-3 shrink-0"
