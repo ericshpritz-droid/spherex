@@ -171,11 +171,7 @@ function Row({
         last ? "" : "border-b border-line"
       } ${onClick ? "cursor-pointer hover:bg-ink/[0.03]" : ""}`}
     >
-      <span
-        className={`text-[15px] font-medium ${
-          danger ? "text-[#C44569]" : "text-ink"
-        }`}
-      >
+      <span className={`text-[15px] font-medium text-ink ${danger ? "italic" : ""}`}>
         {label}
       </span>
       {value !== undefined && (
