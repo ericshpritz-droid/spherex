@@ -220,6 +220,7 @@ function ProfileRoute() {
           Admin
         </button>
       )}
+      <TabBar />
     </div>
   );
 }
