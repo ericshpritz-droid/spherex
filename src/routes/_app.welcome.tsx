@@ -46,12 +46,12 @@ function WelcomeRoute() {
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" data-scroll>
-        <h1 className="font-serif italic text-[44px] leading-[1.02] tracking-tight">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-4 pb-4" data-scroll>
+        <h1 className="font-serif italic text-[36px] leading-[1.04] tracking-tight">
           There's someone you can't stop thinking about.
         </h1>
-        <Eyebrow className="mt-5">But it's been too awkward to ask</Eyebrow>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <Eyebrow className="mt-4">But it's been too awkward to ask</Eyebrow>
+        <div className="mt-3 flex flex-wrap gap-2">
           {CHIPS.map((c) => (
             <Chip key={c} as="span">{c}</Chip>
           ))}
@@ -59,7 +59,10 @@ function WelcomeRoute() {
       </div>
 
       {/* Footer */}
-      <div className="px-6 pb-8 pt-4">
+      <div
+        className="px-6 pt-3 shrink-0"
+        style={{ paddingBottom: `calc(max(env(safe-area-inset-bottom), 0px) + 1.25rem)` }}
+      >
         <PrimaryButton onClick={() => navigate({ to: "/phone" })}>
           Verify your number to start
         </PrimaryButton>
