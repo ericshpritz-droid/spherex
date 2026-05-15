@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { ACCENT_PRESETS, gradient } from "../brand.js";
 import { callGetMyPhoneHash } from "../dataApi.rpc";
 import { toast } from "../toast";
-
-type Accent = "pink" | "lavender" | "blue";
 
 /**
  * Share button for the invite link. The link encodes the user's *hashed*
  * phone (server-computed) so we never expose the raw number publicly.
  */
-export function ShareInviteButton({ accent, variant = "primary" }: { accent: Accent; variant?: "primary" | "ghost" }) {
+export function ShareInviteButton({ variant = "primary" }: { variant?: "primary" | "ghost" }) {
   const [hash, setHash] = useState<string>("");
   useEffect(() => {
     let cancelled = false;

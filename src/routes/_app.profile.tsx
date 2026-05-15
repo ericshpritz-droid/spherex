@@ -49,7 +49,7 @@ function relativeTime(iso: string): string {
 }
 
 function ProfileRoute() {
-  const { accent, setAccent, myPhoneFormatted, doSignOut, user, session } = useApp();
+  const { myPhoneFormatted, doSignOut, user, session } = useApp();
   const navigate = useNavigate();
   const isAdmin = useIsAdmin(user?.id);
   const testPin: string | undefined = user?.user_metadata?.test_pin;
@@ -156,7 +156,7 @@ function ProfileRoute() {
   const inviteSlot = (
     <SectionLike title="Invite">
       <div className="p-4 flex flex-col items-stretch gap-3">
-        <ShareInviteButton accent={accent} />
+        <ShareInviteButton />
         {invites.count >= 1 && (
           <div className="text-center text-[12px] text-mute">
             <span className="font-semibold text-ink">
@@ -175,8 +175,6 @@ function ProfileRoute() {
   return (
     <div className="relative h-full">
       <SphereProfile
-        accent={accent}
-        onAccent={setAccent}
         phone={myPhoneFormatted}
         contactPhotos={contactPhotos}
         feel={feel}
