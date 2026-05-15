@@ -175,8 +175,6 @@ function ProfileRoute() {
   return (
     <div className="relative h-full">
       <SphereProfile
-        accent={accent}
-        onAccent={setAccent}
         phone={myPhoneFormatted}
         contactPhotos={contactPhotos}
         feel={feel}
