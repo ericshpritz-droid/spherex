@@ -17,21 +17,7 @@ type Feel = {
   onToggleReduced: (nextReduced: boolean) => void;
 } | null;
 
-const ACCENTS: Array<{ key: "pink" | "lavender" | "blue"; label: string }> = [
-  { key: "pink", label: "Pink" },
-  { key: "lavender", label: "Lavender" },
-  { key: "blue", label: "Blue" },
-];
-
-const ACCENT_DOT: Record<string, string> = {
-  pink: "#F13F5E",
-  lavender: "#B08AFC",
-  blue: "#5B7BFF",
-};
-
 export function SphereProfile({
-  accent,
-  onAccent,
   phone,
   onSignOut,
   contactPhotos = null,
@@ -39,8 +25,6 @@ export function SphereProfile({
   topSlot,
   bottomSlot,
 }: {
-  accent: "pink" | "lavender" | "blue";
-  onAccent: (a: "pink" | "lavender" | "blue") => void;
   phone?: string;
   onSignOut: () => void;
   contactPhotos?: ContactPhotos;
