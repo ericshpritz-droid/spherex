@@ -69,7 +69,7 @@ export function SphereContacts({
     [q],
   );
   const groups = useMemo(() => {
-    const g: Record<string, typeof CONTACTS> = {};
+    const g: Record<string, Contact[]> = {};
     for (const c of filtered) {
       const k = c.name[0]?.toUpperCase() || "#";
       (g[k] = g[k] || []).push(c);
