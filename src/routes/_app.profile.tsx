@@ -156,7 +156,7 @@ function ProfileRoute() {
   const inviteSlot = (
     <SectionLike title="Invite">
       <div className="p-4 flex flex-col items-stretch gap-3">
-        <ShareInviteButton accent={accent} />
+        <ShareInviteButton />
         {invites.count >= 1 && (
           <div className="text-center text-[12px] text-mute">
             <span className="font-semibold text-ink">
