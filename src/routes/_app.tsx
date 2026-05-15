@@ -99,6 +99,8 @@ function PhoneFrame() {
             <Outlet />
           </RouteStack>
         )}
+        {/* Test-mode indicator — small orange pill, top-left */}
+        <TestModeIndicator />
         {/* Floating theme toggle — visible on every screen, sits above route content */}
         <div
           className="absolute z-50 pointer-events-auto"
