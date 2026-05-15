@@ -129,7 +129,17 @@ jobs:
           fi
 
       - name: Sync Capacitor iOS project
-        run: bunx cap sync ios
+        run: |
+          # `cap sync` = copy + update. `update` runs `pod install`, which fails
+          # hard when the generated iOS template uses SPM (no Podfile). Split the
+          # steps so we can copy web assets unconditionally and only run
+          # `cap update` when a Podfile is actually present.
+          bunx cap copy ios
+          if [ -f ios/App/Podfile ]; then
+            bunx cap update ios
+          else
+            echo "No Podfile found — skipping 'cap update ios' (SPM project)."
+          fi
 
       - name: Generate iOS app icons
         run: |
