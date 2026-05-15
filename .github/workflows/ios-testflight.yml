@@ -123,9 +123,29 @@ jobs:
 
       - name: Ensure iOS platform exists
         run: |
-          if [ ! -d ios ]; then
+          # The repo may contain an `ios/` dir with only docs (e.g. INFO_PLIST_ADDITIONS.md)
+          # but no actual Xcode project. Detect the real project files, not just the dir.
+          if [ ! -d ios/App/App.xcodeproj ] && [ ! -d ios/App/App.xcworkspace ]; then
+            echo "No Xcode project found — generating iOS platform via 'cap add ios'."
             mkdir -p dist && touch dist/index.html
+            # `cap add ios` refuses to run if `ios/` already exists; move docs aside.
+            if [ -d ios ]; then
+              mv ios ios.docs.bak
+            fi
             bunx cap add ios
+            # Restore any docs that lived in the original ios/ folder.
+            if [ -d ios.docs.bak ]; then
+              for f in ios.docs.bak/*; do
+                [ -e "$f" ] || continue
+                base=$(basename "$f")
+                if [ ! -e "ios/$base" ]; then
+                  cp -R "$f" "ios/$base"
+                fi
+              done
+              rm -rf ios.docs.bak
+            fi
+          else
+            echo "Existing Xcode project detected — skipping 'cap add ios'."
           fi
 
       - name: Sync Capacitor iOS project
