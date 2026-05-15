@@ -46,10 +46,10 @@ export function ShareInviteButton({ accent, variant = "primary" }: { accent: Acc
       <button
         onClick={onShare}
         disabled={!url}
-        className="rounded-[14px] border border-hairline-10 bg-glass-08 text-white text-[14px] font-semibold cursor-pointer w-full"
+        className="w-full rounded-2xl border border-line bg-transparent text-ink text-[14px] font-medium cursor-pointer"
         style={{ padding: "12px 14px", opacity: url ? 1 : 0.5 }}
       >
-        🔗 Share invite link
+        Share invite link
       </button>
     );
   }
@@ -58,16 +58,15 @@ export function ShareInviteButton({ accent, variant = "primary" }: { accent: Acc
     <button
       onClick={onShare}
       disabled={!url}
-      className="rounded-[16px] text-white font-semibold cursor-pointer w-full"
+      className="w-full rounded-full bg-ink text-paper font-semibold cursor-pointer border-0"
       style={{
         padding: "14px 16px",
-        background: gradient(accent, "135deg"),
-        boxShadow: `0 10px 28px ${ACCENT_PRESETS[accent].a}40`,
         opacity: url ? 1 : 0.5,
         fontSize: 15,
+        letterSpacing: 0.2,
       }}
     >
-      ✨ Invite friends
+      Invite friends →
     </button>
   );
 }
