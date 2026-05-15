@@ -3,6 +3,16 @@ import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "../mutual/toast";
 import { SphereProfile } from "@/sphere/screens/SphereProfile";
+import { Eyebrow } from "@/sphere/ui";
+
+function SectionLike({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-7">
+      <div className="px-2 pb-2"><Eyebrow>{title}</Eyebrow></div>
+      <div className="rounded-2xl bg-surface border border-line overflow-hidden">{children}</div>
+    </div>
+  );
+}
 import { useApp } from "../mutual/AppContext";
 import { useIsAdmin } from "../mutual/testmode/useTestMode";
 import { ShareInviteButton } from "../mutual/components/ShareInviteButton";
