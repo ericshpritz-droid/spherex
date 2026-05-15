@@ -44,7 +44,7 @@ function UpgradeRoute() {
           three sealed picks, more shots at mutual.
         </p>
 
-        <div className="mt-8 rounded-2xl bg-[#EFECE5] p-6">
+        <div className="mt-8 rounded-2xl bg-surface border border-line p-6">
           <div className="flex items-baseline gap-2">
             <div className="font-serif italic text-[40px] leading-none">$9.99</div>
             <div className="text-[13px] text-mute">/ month</div>
