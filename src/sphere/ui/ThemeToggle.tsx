@@ -16,10 +16,12 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   return (
     <div
       className={
-        "inline-flex items-center gap-1 rounded-full p-1 text-ink " +
-        "bg-[color-mix(in_oklab,var(--ink)_10%,transparent)] " +
-        "border border-[color-mix(in_oklab,var(--ink)_18%,transparent)] " +
-        "backdrop-blur-md " +
+        // Neutral floating pill that reads on both light (paper) and dark
+        // (ink) screens — uses a translucent dark chip with white glyphs +
+        // a subtle white hairline so it never blends into either background.
+        "inline-flex items-center gap-1 rounded-full p-1 " +
+        "bg-black/45 border border-white/20 backdrop-blur-md " +
+        "shadow-[0_2px_8px_rgba(0,0,0,0.25)] " +
         className
       }
       role="radiogroup"
@@ -39,8 +41,8 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
             className={
               "rounded-full text-[12px] font-semibold cursor-pointer transition-colors border-0 " +
               (active
-                ? "bg-ink text-paper"
-                : "bg-transparent text-[color-mix(in_oklab,var(--ink)_70%,transparent)]")
+                ? "bg-white text-black"
+                : "bg-transparent text-white/75 hover:text-white")
             }
             style={{ padding: "4px 10px", minWidth: 36 }}
           >

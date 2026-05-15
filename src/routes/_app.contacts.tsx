@@ -1,14 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "../mutual/toast";
-import { ScreenContacts } from "../mutual/screens/Main.jsx";
+import { SphereContacts } from "@/sphere/screens/SphereContacts";
 import { useApp } from "../mutual/AppContext";
 
 export const Route = createFileRoute("/_app/contacts")({
   head: () => ({
     meta: [
-      { title: "Pick from contacts — Sphere" },
+      { title: "Pick from contacts — sphere" },
       { name: "description", content: "Add people from your contacts. We only use hashes — never upload raw." },
-      { property: "og:title", content: "Pick from contacts — Sphere" },
+      { property: "og:title", content: "Pick from contacts — sphere" },
       { property: "og:description", content: "Add people from your contacts. We only use hashes — never upload raw." },
     ],
   }),
@@ -16,11 +16,10 @@ export const Route = createFileRoute("/_app/contacts")({
 });
 
 function ContactsRoute() {
-  const { accent, addMany } = useApp();
+  const { addMany } = useApp();
   const navigate = useNavigate();
   return (
-    <ScreenContacts
-      accent={accent}
+    <SphereContacts
       onBack={() => navigate({ to: "/add" })}
       onPick={async (phones: string[]) => {
         try {
