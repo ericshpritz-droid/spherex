@@ -4,12 +4,17 @@ import { useApp } from "@/mutual/AppContext";
 import { cn } from "@/lib/utils";
 import { haptics } from "@/mutual/native/haptics";
 
+type ExplainerSearch = { rewatch?: boolean };
+
 export const Route = createFileRoute("/_app/onboarding-explainer")({
   head: () => ({
     meta: [
       { title: "A quick tour — sphere" },
       { name: "description", content: "47 seconds. The whole idea." },
     ],
+  }),
+  validateSearch: (search: Record<string, unknown>): ExplainerSearch => ({
+    rewatch: search.rewatch === true || search.rewatch === "1" || search.rewatch === "true",
   }),
   component: ExplainerRoute,
 });
@@ -20,10 +25,29 @@ const TOTAL_S = 47;
 function ExplainerRoute() {
   const navigate = useNavigate();
   const { user } = useApp();
+  const { rewatch } = Route.useSearch();
   const [mode, setMode] = useState<"watch" | "skip">("watch");
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [checked, setChecked] = useState(false);
   const startedAt = useRef<number | null>(null);
+
+  // If the user has already seen the explainer, skip it. They can re-enter
+  // via /onboarding-explainer?rewatch=1 from profile to bypass this guard.
+  useEffect(() => {
+    if (rewatch) { setChecked(true); return; }
+    try {
+      const seenGlobal = localStorage.getItem(SEEN_KEY) === "1";
+      const seenUser = user?.id
+        ? localStorage.getItem(`mutual.onboarded.${user.id}`) === "1"
+        : false;
+      if (seenGlobal || seenUser) {
+        navigate({ to: "/home", replace: true });
+        return;
+      }
+    } catch {}
+    setChecked(true);
+  }, [rewatch, user?.id, navigate]);
 
   useEffect(() => {
     if (!playing) return;
