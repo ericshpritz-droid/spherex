@@ -81,6 +81,8 @@ function ExplainerRoute() {
   const fmtTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   const remaining = TOTAL_S - elapsed;
 
+  if (!checked) return <div className="h-full w-full bg-paper" />;
+
   return (
     <div className="h-full w-full bg-paper text-ink font-sans flex flex-col">
       {/* Top bar: countdown · × */}
