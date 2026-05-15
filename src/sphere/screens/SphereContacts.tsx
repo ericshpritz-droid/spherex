@@ -62,7 +62,7 @@ export function SphereContacts({
 
   const filtered = useMemo(
     () =>
-      CONTACTS.filter(
+      ALL_CONTACTS.filter(
         (c) =>
           c.name.toLowerCase().includes(q.toLowerCase()) || c.phone.includes(q),
       ),
@@ -127,7 +127,7 @@ export function SphereContacts({
           Your contacts.
         </h1>
         <p className="mt-3 text-[14px] text-mute">
-          {CONTACTS.length} people · pick as many as you want. Anonymous unless mutual.
+          {ALL_CONTACTS.length} people · pick as many as you want. Anonymous unless mutual.
         </p>
 
         {permissionDenied && (
