@@ -24,8 +24,9 @@ const config: CapacitorConfig = {
   backgroundColor: "#08041C",
   plugins: {
     Keyboard: {
-      // "native" pushes the WebView up like a real iOS app instead of resizing.
-      resize: "native",
+      // "none" = WebView stays full-screen; we lift CTAs ourselves via --kb-inset.
+      // Avoids double-shift when both iOS and our CSS pad for the keyboard.
+      resize: "none",
       style: "DARK",
       resizeOnFullScreen: true,
     },

@@ -72,7 +72,7 @@ function InstagramRoute() {
         </button>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-5 pb-4" data-scroll>
+      <div className="px-6 pt-5 pb-2 shrink-0" data-scroll>
         <Eyebrow>Optional · you can skip</Eyebrow>
         <h1 className="mt-2 font-serif italic text-[30px] leading-[1.05] tracking-tight">
           Add your Instagram<br />so others can find you.
@@ -111,6 +111,8 @@ function InstagramRoute() {
           )}
         </div>
       </div>
+
+      <div className="flex-1 min-h-0" />
 
       <div
         className="px-6 pt-3 space-y-2 shrink-0"
