@@ -7,6 +7,25 @@ import { useKeyboardInset } from "@/sphere/native/useKeyboardInset";
 import { useRouteDirection } from "@/sphere/native/useRouteDirection";
 import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
 import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
+import { useTestMode } from "@/mutual/testmode/useTestMode";
+
+function TestModeIndicator() {
+  const { enabled } = useTestMode();
+  if (!enabled) return null;
+  return (
+    <div
+      className="absolute z-50 pointer-events-none flex items-center gap-1.5 rounded-full px-2 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-white shadow-sm"
+      style={{
+        top: "calc(env(safe-area-inset-top, 0px) + 12px)",
+        left: 12,
+        background: "#F97316",
+      }}
+    >
+      <span className="size-1.5 rounded-full bg-white" />
+      Test
+    </div>
+  );
+}
 
 const PUBLIC_PATHS = new Set(["/welcome", "/phone", "/code"]);
 const ONBOARDED_KEY = (uid: string) => `mutual.onboarded.${uid}`;
@@ -99,6 +118,8 @@ function PhoneFrame() {
             <Outlet />
           </RouteStack>
         )}
+        {/* Test-mode indicator — small orange pill, top-left */}
+        <TestModeIndicator />
         {/* Floating theme toggle — visible on every screen, sits above route content */}
         <div
           className="absolute z-50 pointer-events-auto"
