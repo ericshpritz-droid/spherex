@@ -89,7 +89,7 @@ function CodeRoute() {
         <div className="w-6" />
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-5 pb-4" data-scroll>
+      <div className="px-6 pt-5 pb-2 shrink-0" data-scroll>
         <Eyebrow>Enter your code</Eyebrow>
         <h1 className="mt-2 font-serif italic text-[28px] leading-[1.05] tracking-tight">
           Check your messages.
