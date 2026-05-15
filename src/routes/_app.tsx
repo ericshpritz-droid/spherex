@@ -73,21 +73,23 @@ function PhoneFrame() {
   // 402×874 phone frame goes full-bleed. Everything else (desktop, tablet,
   // and large mobile browsers) renders inside the iPhone-shaped frame so
   // the web app always feels like the app.
-  const native = isNative();
-  const [tooSmallForFrame, setTooSmallForFrame] = useState(() => {
-    if (typeof window === "undefined") return false;
-    // Frame needs ~402×600 minimum to look right; below that, fill the screen.
-    return window.innerWidth < 440 || window.innerHeight < 620;
-  });
+  const [mounted, setMounted] = useState(false);
+  const [tooSmallForFrame, setTooSmallForFrame] = useState(false);
+  const [nativeShell, setNativeShell] = useState(false);
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    setMounted(true);
+    setNativeShell(isNative() || nativePlatform() !== "web");
     const onResize = () => {
-      setTooSmallForFrame(window.innerWidth < 440 || window.innerHeight < 620);
+      // Frame needs ~440×620 minimum to look right; below that, fill the screen.
+      setTooSmallForFrame(window.innerWidth < 480 || window.innerHeight < 620);
     };
+    onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
-  const fullBleed = native || tooSmallForFrame;
+  // Default to full-bleed until we've measured — prevents the desktop phone
+  // frame from flashing on real devices during hydration.
+  const fullBleed = !mounted ? true : (nativeShell || tooSmallForFrame);
 
   const wrapperClass = fullBleed
     ? "h-[100dvh] w-screen bg-black"
@@ -99,7 +101,7 @@ function PhoneFrame() {
   const innerStyle: React.CSSProperties = fullBleed
     ? {}
     : {
-        width: "min(402px, 100vw)", height: "min(874px, 100vh)",
+        width: "min(402px, 100vw)", height: "min(874px, 100dvh)",
         maxWidth: 402, maxHeight: 874,
         borderRadius: 48,
         boxShadow: "0 40px 80px rgba(0,0,0,0.4)",
