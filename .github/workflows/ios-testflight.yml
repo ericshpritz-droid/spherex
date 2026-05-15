@@ -76,7 +76,6 @@ jobs:
     timeout-minutes: 60
     env:
       BUNDLE_ID: app.lovable.sphere
-      LOG_DIR: /tmp/ios-build-logs
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
       CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
@@ -99,7 +98,10 @@ jobs:
           node-version: 22
 
       - name: Prepare artifact directories
-        run: mkdir -p "$LOG_DIR" "$RUNNER_TEMP/export"
+        run: |
+          LOG_DIR="$RUNNER_TEMP/ios-build-logs"
+          mkdir -p "$LOG_DIR" "$RUNNER_TEMP/export"
+          echo "LOG_DIR=$LOG_DIR" >> "$GITHUB_ENV"
 
       - name: Verify required secrets
         run: |
