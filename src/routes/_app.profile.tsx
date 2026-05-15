@@ -109,14 +109,69 @@ function ProfileRoute() {
       .catch((e) => console.warn("getInviteConversions failed", e));
     return () => { cancelled = true; };
   }, [session?.access_token, fetchConversions]);
+
+  const testPinSlot = testPin ? (
+    <div className="rounded-2xl bg-surface border border-line p-4 flex flex-col items-center text-center">
+      <div
+        className="font-mono text-[10px] uppercase text-mute"
+        style={{ letterSpacing: "0.22em" }}
+      >
+        Your test PIN
+      </div>
+      <button
+        onClick={() => {
+          haptics.selection();
+          navigator.clipboard?.writeText(testPin).then(
+            () => toast.success("PIN copied"),
+            () => {},
+          );
+        }}
+        className="mt-1 font-serif italic text-ink bg-transparent border-0 cursor-pointer"
+        style={{ fontSize: 32, letterSpacing: 6 }}
+        title="Tap to copy"
+      >
+        {testPin}
+      </button>
+      <div className="mt-1 text-[12px] text-mute">
+        Share this so others can add you
+      </div>
+      <button
+        onClick={() => navigate({ to: "/test-share" })}
+        className="mt-3 rounded-full text-[12px] font-semibold cursor-pointer bg-ink text-paper border-0"
+        style={{ padding: "6px 14px" }}
+      >
+        One-time share code →
+      </button>
+    </div>
+  ) : null;
+
+  const inviteSlot = (
+    <div className="flex flex-col items-stretch gap-2">
+      <ShareInviteButton accent={accent} />
+      {invites.count >= 1 && (
+        <div className="text-center text-[12px] text-mute">
+          <span className="font-semibold text-ink">
+            {invites.count} {invites.count === 1 ? "friend" : "friends"}
+          </span>{" "}
+          joined via your link
+          {invites.lastAt && (
+            <span className="text-mute"> · last {relativeTime(invites.lastAt)}</span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="relative h-full">
-      <ScreenProfile
+      <SphereProfile
         accent={accent}
         onAccent={setAccent}
         phone={myPhoneFormatted}
         contactPhotos={contactPhotos}
         feel={feel}
+        topSlot={testPinSlot}
+        bottomSlot={inviteSlot}
         onSignOut={async () => {
           try {
             await doSignOut();
@@ -127,81 +182,20 @@ function ProfileRoute() {
           }
         }}
       />
-      {testPin && (
-        <div
-          className="absolute left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-1 rounded-2xl"
-          style={{
-            top: 80,
-            padding: "10px 18px",
-            background: "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(255,255,255,0.18)",
-            backdropFilter: "blur(12px)",
-          }}
-        >
-          <div className="text-[10px] font-semibold uppercase tracking-widest text-white/60">
-            Your test PIN
-          </div>
-          <button
-            onClick={() => {
-              haptics.selection();
-              navigator.clipboard?.writeText(testPin).then(
-                () => toast.success("PIN copied"),
-                () => {},
-              );
-            }}
-            className="text-white font-bold tracking-widest cursor-pointer bg-transparent border-0"
-            style={{ fontSize: 24, letterSpacing: 6 }}
-            title="Tap to copy"
-          >
-            {testPin}
-          </button>
-          <div className="text-[10px] text-white/50">Share this so others can add you</div>
-          <button
-            onClick={() => navigate({ to: "/test-share" })}
-            className="mt-2 rounded-full text-[11px] font-semibold tracking-wide cursor-pointer"
-            style={{
-              padding: "6px 14px",
-              background: "rgba(255,255,255,0.18)",
-              color: "white",
-              border: "1px solid rgba(255,255,255,0.25)",
-            }}
-          >
-            One-time share code →
-          </button>
-        </div>
-      )}
       {isAdmin && (
         <button
           onClick={() => navigate({ to: "/admin" })}
-          className="absolute top-5 right-5 z-50 rounded-full text-[11px] font-semibold uppercase tracking-wide cursor-pointer"
+          className="absolute z-50 rounded-full text-[11px] font-semibold uppercase tracking-wide cursor-pointer bg-ink text-paper border-0"
           style={{
+            top: "calc(env(safe-area-inset-top, 0px) + 12px)",
+            left: 12,
             padding: "6px 12px",
-            background: "rgba(255,255,255,0.12)",
-            color: "white",
-            border: "1px solid rgba(255,255,255,0.2)",
             letterSpacing: 1,
           }}
         >
           Admin
         </button>
       )}
-      <div className="absolute left-4 right-4 z-40 flex flex-col items-stretch gap-2" style={{ bottom: 96 }}>
-        <ShareInviteButton accent={accent} />
-        {invites.count >= 1 && (
-          <div
-            className="text-center text-[12px] text-white/70"
-            style={{ letterSpacing: 0.2 }}
-          >
-            <span className="font-semibold text-white">
-              {invites.count} {invites.count === 1 ? "friend" : "friends"}
-            </span>{" "}
-            joined via your link
-            {invites.lastAt && (
-              <span className="text-white/50"> · last {relativeTime(invites.lastAt)}</span>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
