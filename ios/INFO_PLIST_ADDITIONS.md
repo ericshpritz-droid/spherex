@@ -1,3 +1,22 @@
+# iOS native permissions & orientation
+
+> Note: the TestFlight workflow (`.github/workflows/ios-testflight.yml`) now
+> automatically writes `UISupportedInterfaceOrientations` (and the `~ipad`
+> variant) to portrait-only via PlistBuddy after `cap copy ios`. The block
+> below is only needed if you generate the Xcode project locally and want
+> the same lock baked in by hand.
+>
+> ```xml
+> <key>UISupportedInterfaceOrientations</key>
+> <array>
+>   <string>UIInterfaceOrientationPortrait</string>
+> </array>
+> <key>UISupportedInterfaceOrientations~ipad</key>
+> <array>
+>   <string>UIInterfaceOrientationPortrait</string>
+> </array>
+> ```
+
 # iOS native permissions
 
 After running `npx cap add ios`, open `ios/App/App/Info.plist` and add the

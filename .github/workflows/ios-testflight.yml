@@ -161,6 +161,25 @@ jobs:
             echo "No Podfile found — skipping 'cap update ios' (SPM project)."
           fi
 
+      - name: Lock app to portrait orientation (Info.plist)
+        run: |
+          PLIST="ios/App/App/Info.plist"
+          if [ ! -f "$PLIST" ]; then
+            echo "Info.plist not found at $PLIST" >&2
+            exit 1
+          fi
+          # iPhone — portrait only (no upside-down on notched devices).
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations" "$PLIST" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          # iPad — portrait only as well, so tilting never rotates the UI.
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations~ipad" "$PLIST" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations~ipad:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          echo "Locked orientations:"
+          /usr/libexec/PlistBuddy -c "Print :UISupportedInterfaceOrientations" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Print :UISupportedInterfaceOrientations~ipad" "$PLIST"
+
       - name: Generate iOS app icons
         run: |
           mkdir -p assets
