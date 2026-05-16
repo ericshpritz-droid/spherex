@@ -11,6 +11,17 @@ export async function initNativeShell(): Promise<void> {
   // Tag <html> so CSS can lock the viewport.
   document.documentElement.classList.add("capacitor-native");
 
+  // Belt to the Info.plist suspenders: ask the browser/WebView to stay
+  // portrait. iOS enforces this via Info.plist UISupportedInterfaceOrientations;
+  // this catches any web-side rotation observers (visualViewport, CSS @media
+  // (orientation: landscape)) and keeps Android/web consistent.
+  try {
+    const orientation = (screen as any)?.orientation;
+    if (orientation?.lock) {
+      await orientation.lock("portrait").catch(() => {});
+    }
+  } catch {}
+
   // Status bar: dark content area, our background, overlay so safe-area CSS
   // controls spacing.
   try {
