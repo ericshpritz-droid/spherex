@@ -138,6 +138,18 @@ function PhoneFrame() {
   );
 }
 
+function AppShell({ path, showTabBar, children }: { path: string; showTabBar: boolean; children: React.ReactNode }) {
+  const swipeRef = useTabSwipe(path);
+  return (
+    <div className="h-full w-full flex flex-col">
+      <div ref={swipeRef} className="flex-1 min-h-0 relative">
+        {children}
+      </div>
+      {showTabBar && <TabBar />}
+    </div>
+  );
+}
+
 /**
  * iOS-style page stack: animates push/pop transitions on route change and
  * supports edge-swipe-back. Renders the previous route alongside the new one
