@@ -313,17 +313,6 @@ function HomeRoute() {
                 </SwipeRevealRow>
               );
             })}
-
-            {/* Manage contacts link */}
-            <div className="pt-2 text-center">
-              <button
-                onClick={() => navigate({ to: "/contacts" })}
-                className="font-mono text-[10px] uppercase text-mute bg-transparent border-0 cursor-pointer underline-offset-4 hover:underline"
-                style={{ letterSpacing: "0.22em" }}
-              >
-                Manage contacts →
-              </button>
-            </div>
           </div>
         )}
 
@@ -333,6 +322,18 @@ function HomeRoute() {
             Add a person by number, contact, or Instagram. They'll never know unless they pick you back.
           </p>
         )}
+
+        {/* Manage contacts link — always available */}
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => navigate({ to: "/contacts" })}
+            className="font-mono text-[10px] uppercase text-mute bg-transparent border-0 cursor-pointer underline-offset-4 hover:underline"
+            style={{ letterSpacing: "0.22em" }}
+          >
+            Manage contacts →
+          </button>
+        </div>
+
 
         {/* Sphere+ card (always shown when at limit, soft prompt when not) */}
         {slotsUsed >= slotLimit && !isPlus && (
