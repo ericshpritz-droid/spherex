@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
-import { TabBar } from "@/sphere/components/TabBar";
+
 import { Sheet, GhostButton, Eyebrow } from "@/sphere/ui";
 import { AvatarMono, initialsFromHash } from "@/sphere/components/AvatarMono";
 import { useApp } from "@/mutual/AppContext";
