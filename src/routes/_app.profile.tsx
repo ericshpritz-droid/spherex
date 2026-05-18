@@ -174,6 +174,21 @@ function ProfileRoute() {
     </SectionLike>
   );
 
+  const contactsSlot = (
+    <SectionLike title="Contacts">
+      <button
+        onClick={() => {
+          haptics.selection();
+          navigate({ to: "/contacts" });
+        }}
+        className="w-full text-left flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer hover:bg-ink/[0.03] bg-transparent border-0"
+      >
+        <span className="text-[15px] font-medium text-ink">Manage contacts</span>
+        <span className="text-[14px] text-mute">›</span>
+      </button>
+    </SectionLike>
+  );
+
   const introSlot = (
     <SectionLike title="Intro">
       <button
@@ -205,7 +220,7 @@ function ProfileRoute() {
         contactPhotos={contactPhotos}
         feel={feel}
         topSlot={testPinSlot}
-        bottomSlot={<>{appearanceSlot}{inviteSlot}{introSlot}</>}
+        bottomSlot={<>{appearanceSlot}{contactsSlot}{inviteSlot}{introSlot}</>}
         onSignOut={async () => {
           try {
             await doSignOut();
