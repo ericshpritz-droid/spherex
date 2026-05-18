@@ -118,14 +118,11 @@ function PhoneFrame() {
             <div className="text-sm text-fg-60">Loading…</div>
           </div>
         ) : (
-          <div className="h-full w-full flex flex-col">
-            <div className="flex-1 min-h-0 relative">
-              <RouteStack>
-                <Outlet />
-              </RouteStack>
-            </div>
-            {session && !isPublic && path !== "/" && <TabBar />}
-          </div>
+          <AppShell path={path} showTabBar={!!session && !isPublic && path !== "/"}>
+            <RouteStack>
+              <Outlet />
+            </RouteStack>
+          </AppShell>
         )}
         {/* Test-mode indicator — small orange pill, top-left */}
         <TestModeIndicator />
