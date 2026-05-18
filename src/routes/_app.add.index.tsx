@@ -63,7 +63,7 @@ function AddSheetRoute() {
             initials="C"
             title="Pick from Contacts"
             sub="Fastest. We only read what you tap."
-            onClick={() => navigate({ to: "/contacts" })}
+            onClick={() => navigate({ to: "/add/contacts" as any })}
           />
           <SheetOption
             initials="#"
