@@ -39,6 +39,7 @@ import { Route as AppProfileDeleteRouteImport } from './routes/_app.profile.dele
 import { Route as AppAddPatienceRouteImport } from './routes/_app.add.patience'
 import { Route as AppAddManualRouteImport } from './routes/_app.add.manual'
 import { Route as AppAddIntentRouteImport } from './routes/_app.add.intent'
+import { Route as AppAddContactsRouteImport } from './routes/_app.add.contacts'
 import { Route as AppAddConfirmRouteImport } from './routes/_app.add.confirm'
 import { Route as AppAddComposeRouteImport } from './routes/_app.add.compose'
 
@@ -191,6 +192,11 @@ const AppAddIntentRoute = AppAddIntentRouteImport.update({
   path: '/intent',
   getParentRoute: () => AppAddRoute,
 } as any)
+const AppAddContactsRoute = AppAddContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => AppAddRoute,
+} as any)
 const AppAddConfirmRoute = AppAddConfirmRouteImport.update({
   id: '/confirm',
   path: '/confirm',
@@ -227,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/i/$hash': typeof IHashRoute
   '/add/compose': typeof AppAddComposeRoute
   '/add/confirm': typeof AppAddConfirmRoute
+  '/add/contacts': typeof AppAddContactsRoute
   '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
@@ -259,6 +266,7 @@ export interface FileRoutesByTo {
   '/i/$hash': typeof IHashRoute
   '/add/compose': typeof AppAddComposeRoute
   '/add/confirm': typeof AppAddConfirmRoute
+  '/add/contacts': typeof AppAddContactsRoute
   '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/i/$hash': typeof IHashRoute
   '/_app/add/compose': typeof AppAddComposeRoute
   '/_app/add/confirm': typeof AppAddConfirmRoute
+  '/_app/add/contacts': typeof AppAddContactsRoute
   '/_app/add/intent': typeof AppAddIntentRoute
   '/_app/add/manual': typeof AppAddManualRoute
   '/_app/add/patience': typeof AppAddPatienceRoute
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/i/$hash'
     | '/add/compose'
     | '/add/confirm'
+    | '/add/contacts'
     | '/add/intent'
     | '/add/manual'
     | '/add/patience'
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/i/$hash'
     | '/add/compose'
     | '/add/confirm'
+    | '/add/contacts'
     | '/add/intent'
     | '/add/manual'
     | '/add/patience'
@@ -395,6 +406,7 @@ export interface FileRouteTypes {
     | '/i/$hash'
     | '/_app/add/compose'
     | '/_app/add/confirm'
+    | '/_app/add/contacts'
     | '/_app/add/intent'
     | '/_app/add/manual'
     | '/_app/add/patience'
@@ -625,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAddIntentRouteImport
       parentRoute: typeof AppAddRoute
     }
+    '/_app/add/contacts': {
+      id: '/_app/add/contacts'
+      path: '/contacts'
+      fullPath: '/add/contacts'
+      preLoaderRoute: typeof AppAddContactsRouteImport
+      parentRoute: typeof AppAddRoute
+    }
     '/_app/add/confirm': {
       id: '/_app/add/confirm'
       path: '/confirm'
@@ -645,6 +664,7 @@ declare module '@tanstack/react-router' {
 interface AppAddRouteChildren {
   AppAddComposeRoute: typeof AppAddComposeRoute
   AppAddConfirmRoute: typeof AppAddConfirmRoute
+  AppAddContactsRoute: typeof AppAddContactsRoute
   AppAddIntentRoute: typeof AppAddIntentRoute
   AppAddManualRoute: typeof AppAddManualRoute
   AppAddPatienceRoute: typeof AppAddPatienceRoute
@@ -654,6 +674,7 @@ interface AppAddRouteChildren {
 const AppAddRouteChildren: AppAddRouteChildren = {
   AppAddComposeRoute: AppAddComposeRoute,
   AppAddConfirmRoute: AppAddConfirmRoute,
+  AppAddContactsRoute: AppAddContactsRoute,
   AppAddIntentRoute: AppAddIntentRoute,
   AppAddManualRoute: AppAddManualRoute,
   AppAddPatienceRoute: AppAddPatienceRoute,
