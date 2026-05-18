@@ -59,3 +59,10 @@ export const callBackfillPhoneHashes = createClientOnlyFn(
     return await backfillPhoneHashes({ headers });
   },
 );
+
+export const callRemoveAdd = createClientOnlyFn(
+  async (addedPhoneHash: string): Promise<{ removed: number }> => {
+    const headers = await bearerHeaders();
+    return await removeAddServer({ data: { addedPhoneHash }, headers });
+  },
+);
