@@ -47,7 +47,7 @@ function AddSheetRoute() {
           ))}
         </div>
       </div>
-      <TabBar />
+      
 
       <Sheet open={open} onClose={close}>
         <Eyebrow>Slot {slotN} of {FREE_LIMIT}</Eyebrow>
