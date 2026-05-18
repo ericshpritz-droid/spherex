@@ -16,10 +16,11 @@ const config: CapacitorConfig = {
     allowsLinkPreview: false,
     handleApplicationNotifications: false,
   },
+  // No `server.url`: ship the built `dist/` inside the IPA so the app works
+  // offline and is not dependent on any remote domain being healthy.
   server: {
-    url: "https://mysphere.love",
-    cleartext: false,
     iosScheme: "https",
+    cleartext: false,
   },
   backgroundColor: "#08041C",
   plugins: {
