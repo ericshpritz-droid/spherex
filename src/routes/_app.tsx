@@ -6,7 +6,7 @@ import { isNative, nativePlatform } from "../mutual/native/platform";
 import { useKeyboardInset } from "@/sphere/native/useKeyboardInset";
 import { useRouteDirection } from "@/sphere/native/useRouteDirection";
 import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
-import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
+
 import { useTestMode } from "@/mutual/testmode/useTestMode";
 import { TabBar } from "@/sphere/components/TabBar";
 import { useTabSwipe } from "@/sphere/native/useTabSwipe";
@@ -130,13 +130,6 @@ function PhoneFrame() {
         )}
         {/* Test-mode indicator — small orange pill, top-left */}
         <TestModeIndicator />
-        {/* Floating theme toggle — visible on every screen, sits above route content */}
-        <div
-          className="absolute z-50 pointer-events-auto"
-          style={{ top: "calc(env(safe-area-inset-top, 0px) + 10px)", right: 12 }}
-        >
-          <ThemeToggle />
-        </div>
       </div>
     </div>
   );

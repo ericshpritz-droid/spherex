@@ -5,6 +5,7 @@ import { toast } from "../mutual/toast";
 import { SphereProfile } from "@/sphere/screens/SphereProfile";
 
 import { Eyebrow } from "@/sphere/ui";
+import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
 
 function SectionLike({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -187,6 +188,15 @@ function ProfileRoute() {
       </button>
     </SectionLike>
   );
+  const appearanceSlot = (
+    <SectionLike title="Appearance">
+      <div className="px-4 py-4 flex items-center justify-between gap-3">
+        <span className="text-[15px] font-medium text-ink">Theme</span>
+        <ThemeToggle />
+      </div>
+    </SectionLike>
+  );
+
 
   return (
     <div className="relative h-full">
@@ -195,7 +205,7 @@ function ProfileRoute() {
         contactPhotos={contactPhotos}
         feel={feel}
         topSlot={testPinSlot}
-        bottomSlot={<>{inviteSlot}{introSlot}</>}
+        bottomSlot={<>{appearanceSlot}{inviteSlot}{introSlot}</>}
         onSignOut={async () => {
           try {
             await doSignOut();
