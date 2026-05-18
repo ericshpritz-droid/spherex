@@ -188,6 +188,15 @@ function ProfileRoute() {
       </button>
     </SectionLike>
   );
+  const appearanceSlot = (
+    <SectionLike title="Appearance">
+      <div className="px-4 py-4 flex items-center justify-between gap-3">
+        <span className="text-[15px] font-medium text-ink">Theme</span>
+        <ThemeToggle />
+      </div>
+    </SectionLike>
+  );
+
 
   return (
     <div className="relative h-full">
