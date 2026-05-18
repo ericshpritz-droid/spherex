@@ -8,6 +8,7 @@ import { useRouteDirection } from "@/sphere/native/useRouteDirection";
 import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
 import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
 import { useTestMode } from "@/mutual/testmode/useTestMode";
+import { TabBar } from "@/sphere/components/TabBar";
 
 function TestModeIndicator() {
   const { enabled } = useTestMode();
