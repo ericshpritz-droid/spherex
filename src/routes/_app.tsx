@@ -9,6 +9,7 @@ import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
 import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
 import { useTestMode } from "@/mutual/testmode/useTestMode";
 import { TabBar } from "@/sphere/components/TabBar";
+import { useTabSwipe } from "@/sphere/native/useTabSwipe";
 
 function TestModeIndicator() {
   const { enabled } = useTestMode();
