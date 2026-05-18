@@ -16,9 +16,10 @@ const config: CapacitorConfig = {
     allowsLinkPreview: false,
     handleApplicationNotifications: false,
   },
-  // No `server.url`: ship the built `dist/` inside the IPA so the app works
-  // offline and is not dependent on any remote domain being healthy.
+  // Load the live web app from spherex.lovable.app instead of the bundled
+  // `dist/` so TestFlight builds always reflect the latest deployed UI.
   server: {
+    url: "https://spherex.lovable.app",
     iosScheme: "https",
     cleartext: false,
   },
