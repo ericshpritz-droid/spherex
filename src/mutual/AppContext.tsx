@@ -3,7 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession, formatE164, applySessionTokens, signOut, toE164 } from "./auth";
 import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
-import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
+import { callGetMyPhoneHash, callHashPhones, callRemoveAdd } from "./dataApi.rpc";
 import { loadLastMessagesServer } from "./messages.functions";
 import { consumeInviteServer } from "./invites.functions";
 import { testmodeListPhones, testmodeLogin } from "./testmode/testmode.functions";
