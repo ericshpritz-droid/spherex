@@ -9,6 +9,7 @@ import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
 import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
 import { useTestMode } from "@/mutual/testmode/useTestMode";
 import { TabBar } from "@/sphere/components/TabBar";
+import { useTabSwipe } from "@/sphere/native/useTabSwipe";
 
 function TestModeIndicator() {
   const { enabled } = useTestMode();
@@ -117,14 +118,11 @@ function PhoneFrame() {
             <div className="text-sm text-fg-60">Loading…</div>
           </div>
         ) : (
-          <div className="h-full w-full flex flex-col">
-            <div className="flex-1 min-h-0 relative">
-              <RouteStack>
-                <Outlet />
-              </RouteStack>
-            </div>
-            {session && !isPublic && path !== "/" && <TabBar />}
-          </div>
+          <AppShell path={path} showTabBar={!!session && !isPublic && path !== "/"}>
+            <RouteStack>
+              <Outlet />
+            </RouteStack>
+          </AppShell>
         )}
         {/* Test-mode indicator — small orange pill, top-left */}
         <TestModeIndicator />
@@ -136,6 +134,18 @@ function PhoneFrame() {
           <ThemeToggle />
         </div>
       </div>
+    </div>
+  );
+}
+
+function AppShell({ path, showTabBar, children }: { path: string; showTabBar: boolean; children: React.ReactNode }) {
+  const swipeRef = useTabSwipe(path);
+  return (
+    <div className="h-full w-full flex flex-col">
+      <div ref={swipeRef} className="flex-1 min-h-0 relative">
+        {children}
+      </div>
+      {showTabBar && <TabBar />}
     </div>
   );
 }
