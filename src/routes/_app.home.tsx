@@ -132,9 +132,8 @@ function HomeRoute() {
               const id = String(p.id || "");
               const initials = initialsFromHash(id);
               const matched = p.status === "matched";
-              return (
+              const row = (
                 <div
-                  key={id}
                   className="rounded-2xl bg-surface border border-line p-4 flex items-center gap-4"
                 >
                   <AvatarMono initials={initials} size={44} />
@@ -166,6 +165,25 @@ function HomeRoute() {
                     </button>
                   )}
                 </div>
+              );
+              if (matched) {
+                return <div key={id}>{row}</div>;
+              }
+              return (
+                <SwipeRevealRow
+                  key={id}
+                  actionLabel="Remove"
+                  onAction={async () => {
+                    try {
+                      await removePending(id);
+                      toast("Pick removed.");
+                    } catch (e: any) {
+                      toast(e?.message || "Couldn't remove pick.");
+                    }
+                  }}
+                >
+                  {row}
+                </SwipeRevealRow>
               );
             })}
           </div>
