@@ -8,6 +8,7 @@ import { useRouteDirection } from "@/sphere/native/useRouteDirection";
 import { useEdgeSwipeBack } from "@/sphere/native/useEdgeSwipeBack";
 import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
 import { useTestMode } from "@/mutual/testmode/useTestMode";
+import { TabBar } from "@/sphere/components/TabBar";
 
 function TestModeIndicator() {
   const { enabled } = useTestMode();
@@ -116,9 +117,14 @@ function PhoneFrame() {
             <div className="text-sm text-fg-60">Loading…</div>
           </div>
         ) : (
-          <RouteStack>
-            <Outlet />
-          </RouteStack>
+          <div className="h-full w-full flex flex-col">
+            <div className="flex-1 min-h-0 relative">
+              <RouteStack>
+                <Outlet />
+              </RouteStack>
+            </div>
+            {session && !isPublic && path !== "/" && <TabBar />}
+          </div>
         )}
         {/* Test-mode indicator — small orange pill, top-left */}
         <TestModeIndicator />

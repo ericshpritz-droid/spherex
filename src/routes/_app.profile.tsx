@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "../mutual/toast";
 import { SphereProfile } from "@/sphere/screens/SphereProfile";
-import { TabBar } from "@/sphere/components/TabBar";
+
 import { Eyebrow } from "@/sphere/ui";
 
 function SectionLike({ title, children }: { title: string; children: React.ReactNode }) {
@@ -220,7 +220,7 @@ function ProfileRoute() {
           Admin
         </button>
       )}
-      <TabBar />
+      
     </div>
   );
 }

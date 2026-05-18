@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
-import { TabBar } from "@/sphere/components/TabBar";
+
 import { AvatarMono, initialsFromHash } from "@/sphere/components/AvatarMono";
 import { ReceivedComplimentSheet } from "@/sphere/components/ReceivedComplimentSheet";
 import { PrimaryButton, Eyebrow } from "@/sphere/ui";
@@ -211,7 +211,7 @@ function HomeRoute() {
         </div>
       )}
 
-      <TabBar />
+      
 
       {received && (
         <ReceivedComplimentSheet
