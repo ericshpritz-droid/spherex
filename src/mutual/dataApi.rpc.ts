@@ -13,6 +13,7 @@ import {
   getMyPhoneHash,
   hashPhonesServer,
   backfillPhoneHashes,
+  removeAddServer,
 } from "./dataApi.functions";
 
 async function bearerHeaders(): Promise<Record<string, string>> {
@@ -56,5 +57,12 @@ export const callBackfillPhoneHashes = createClientOnlyFn(
   async (): Promise<{ updated: number }> => {
     const headers = await bearerHeaders();
     return await backfillPhoneHashes({ headers });
+  },
+);
+
+export const callRemoveAdd = createClientOnlyFn(
+  async (addedPhoneHash: string): Promise<{ removed: number }> => {
+    const headers = await bearerHeaders();
+    return await removeAddServer({ data: { addedPhoneHash }, headers });
   },
 );

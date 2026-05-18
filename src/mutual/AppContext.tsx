@@ -3,7 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession, formatE164, applySessionTokens, signOut, toE164 } from "./auth";
 import { addPhones, loadAddsAndMatches, type Person } from "./dataApi";
-import { callGetMyPhoneHash, callHashPhones } from "./dataApi.rpc";
+import { callGetMyPhoneHash, callHashPhones, callRemoveAdd } from "./dataApi.rpc";
 import { loadLastMessagesServer } from "./messages.functions";
 import { consumeInviteServer } from "./invites.functions";
 import { testmodeListPhones, testmodeLogin } from "./testmode/testmode.functions";
@@ -34,6 +34,7 @@ type Ctx = {
   dataLoading: boolean;
   dataError: string | null;
   refresh: () => Promise<void>;
+  removePending: (hash: string) => Promise<void>;
   // Last message per matched hash + unread tracking
   lastByHash: Record<string, { body: string; sender_phone_hash: string; created_at: string }>;
   unreadByHash: Record<string, boolean>;
@@ -589,6 +590,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     session, sessionLoading, user,
     myPhone, myPhoneFormatted,
     matches, pending, dataLoading, dataError, refresh,
+    removePending: async (hash: string) => {
+      setPending((curr) => curr.filter((p) => String(p.id) !== hash));
+      try {
+        await callRemoveAdd(hash);
+      } finally {
+        refresh();
+      }
+    },
     pendingPhone, pendingCodeHint, pendingOtpCooldownSeconds, startOtp, resendOtp, verifyCode,
     lastAddedPhone, addOne, addMany,
     activeMatch, setActiveMatch,
