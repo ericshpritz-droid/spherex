@@ -4,6 +4,7 @@ import { SphereScreen } from "@/sphere/components/SphereScreen";
 
 import { AvatarMono, initialsFromHash } from "@/sphere/components/AvatarMono";
 import { ReceivedComplimentSheet } from "@/sphere/components/ReceivedComplimentSheet";
+import { SwipeRevealRow } from "@/sphere/components/SwipeRevealRow";
 import { PrimaryButton, Eyebrow } from "@/sphere/ui";
 import { useApp } from "@/mutual/AppContext";
 import { toast } from "@/mutual/toast";
