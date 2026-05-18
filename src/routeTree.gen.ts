@@ -28,7 +28,6 @@ import { Route as AppMatchesRouteImport } from './routes/_app.matches'
 import { Route as AppMatchRouteImport } from './routes/_app.match'
 import { Route as AppInstagramRouteImport } from './routes/_app.instagram'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
-import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 import { Route as AppCodeRouteImport } from './routes/_app.code'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppAddRouteImport } from './routes/_app.add'
@@ -137,11 +136,6 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
-const AppContactsRoute = AppContactsRouteImport.update({
-  id: '/contacts',
-  path: '/contacts',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppCodeRoute = AppCodeRouteImport.update({
   id: '/code',
   path: '/code',
@@ -216,7 +210,6 @@ export interface FileRoutesByFullPath {
   '/add': typeof AppAddRouteWithChildren
   '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
-  '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
   '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
@@ -249,7 +242,6 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin': typeof AppAdminRoute
   '/code': typeof AppCodeRoute
-  '/contacts': typeof AppContactsRoute
   '/home': typeof AppHomeRoute
   '/instagram': typeof AppInstagramRoute
   '/match': typeof AppMatchRoute
@@ -285,7 +277,6 @@ export interface FileRoutesById {
   '/_app/add': typeof AppAddRouteWithChildren
   '/_app/admin': typeof AppAdminRoute
   '/_app/code': typeof AppCodeRoute
-  '/_app/contacts': typeof AppContactsRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/instagram': typeof AppInstagramRoute
   '/_app/match': typeof AppMatchRoute
@@ -321,7 +312,6 @@ export interface FileRouteTypes {
     | '/add'
     | '/admin'
     | '/code'
-    | '/contacts'
     | '/home'
     | '/instagram'
     | '/match'
@@ -354,7 +344,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin'
     | '/code'
-    | '/contacts'
     | '/home'
     | '/instagram'
     | '/match'
@@ -389,7 +378,6 @@ export interface FileRouteTypes {
     | '/_app/add'
     | '/_app/admin'
     | '/_app/code'
-    | '/_app/contacts'
     | '/_app/home'
     | '/_app/instagram'
     | '/_app/match'
@@ -560,13 +548,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/contacts': {
-      id: '/_app/contacts'
-      path: '/contacts'
-      fullPath: '/contacts'
-      preLoaderRoute: typeof AppContactsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/code': {
       id: '/_app/code'
       path: '/code'
@@ -702,7 +683,6 @@ interface AppRouteChildren {
   AppAddRoute: typeof AppAddRouteWithChildren
   AppAdminRoute: typeof AppAdminRoute
   AppCodeRoute: typeof AppCodeRoute
-  AppContactsRoute: typeof AppContactsRoute
   AppHomeRoute: typeof AppHomeRoute
   AppInstagramRoute: typeof AppInstagramRoute
   AppMatchRoute: typeof AppMatchRoute
@@ -723,7 +703,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppAddRoute: AppAddRouteWithChildren,
   AppAdminRoute: AppAdminRoute,
   AppCodeRoute: AppCodeRoute,
-  AppContactsRoute: AppContactsRoute,
   AppHomeRoute: AppHomeRoute,
   AppInstagramRoute: AppInstagramRoute,
   AppMatchRoute: AppMatchRoute,
@@ -753,3 +732,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
