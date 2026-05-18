@@ -34,6 +34,7 @@ type Ctx = {
   dataLoading: boolean;
   dataError: string | null;
   refresh: () => Promise<void>;
+  removePending: (hash: string) => Promise<void>;
   // Last message per matched hash + unread tracking
   lastByHash: Record<string, { body: string; sender_phone_hash: string; created_at: string }>;
   unreadByHash: Record<string, boolean>;
