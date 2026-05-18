@@ -211,7 +211,7 @@ function HomeRoute() {
         </div>
       )}
 
-      <TabBar />
+      
 
       {received && (
         <ReceivedComplimentSheet
