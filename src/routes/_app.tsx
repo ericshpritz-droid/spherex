@@ -93,12 +93,12 @@ function PhoneFrame() {
   // frame from flashing on real devices during hydration.
   const fullBleed = !mounted ? true : (nativeShell || tooSmallForFrame);
 
-  // On native, html/body already apply env(safe-area-inset-*) padding, so
-  // using 100dvh here would push the TabBar below the home indicator and
-  // clip it behind the Dynamic Island at the top. Use h-full/w-full so we
-  // fill the body's content box (viewport minus safe areas) exactly.
+  // On native, html/body apply env(safe-area-inset-*) padding AND set
+  // height:100% explicitly, so h-full fills the safe content box. On the
+  // web (mobile Safari, etc.) html/body only have min-height:100%, so
+  // h-full collapses to 0 → black screen. Use 100dvh there.
   const wrapperClass = fullBleed
-    ? "h-full w-full bg-black"
+    ? (nativeShell ? "h-full w-full bg-black" : "h-[100dvh] w-screen bg-black")
     : "min-h-screen bg-frame flex justify-center items-center";
   const wrapperStyle: React.CSSProperties = fullBleed ? {} : { padding: "20px 0" };
   const innerClass = fullBleed
