@@ -34,7 +34,7 @@ function intentLabel(intent: string | undefined): string {
 
 function HomeRoute() {
   const {
-    matches, pending, dataLoading, dataError, refresh, markMatchesSeen,
+    matches, pending, dataLoading, dataError, refresh, markMatchesSeen, removePending,
   } = useApp();
   const navigate = useNavigate();
 
