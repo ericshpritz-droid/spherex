@@ -590,6 +590,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     session, sessionLoading, user,
     myPhone, myPhoneFormatted,
     matches, pending, dataLoading, dataError, refresh,
+    removePending: async (hash: string) => {
+      setPending((curr) => curr.filter((p) => String(p.id) !== hash));
+      try {
+        await callRemoveAdd(hash);
+      } finally {
+        refresh();
+      }
+    },
     pendingPhone, pendingCodeHint, pendingOtpCooldownSeconds, startOtp, resendOtp, verifyCode,
     lastAddedPhone, addOne, addMany,
     activeMatch, setActiveMatch,
