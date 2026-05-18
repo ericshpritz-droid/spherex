@@ -5,6 +5,7 @@ import { toast } from "../mutual/toast";
 import { SphereProfile } from "@/sphere/screens/SphereProfile";
 
 import { Eyebrow } from "@/sphere/ui";
+import { ThemeToggle } from "@/sphere/ui/ThemeToggle";
 
 function SectionLike({ title, children }: { title: string; children: React.ReactNode }) {
   return (
