@@ -220,7 +220,7 @@ function ProfileRoute() {
         contactPhotos={contactPhotos}
         feel={feel}
         topSlot={testPinSlot}
-        bottomSlot={<>{appearanceSlot}{inviteSlot}{introSlot}</>}
+        bottomSlot={<>{appearanceSlot}{contactsSlot}{inviteSlot}{introSlot}</>}
         onSignOut={async () => {
           try {
             await doSignOut();
