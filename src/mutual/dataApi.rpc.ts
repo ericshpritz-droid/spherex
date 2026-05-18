@@ -13,6 +13,7 @@ import {
   getMyPhoneHash,
   hashPhonesServer,
   backfillPhoneHashes,
+  removeAddServer,
 } from "./dataApi.functions";
 
 async function bearerHeaders(): Promise<Record<string, string>> {
