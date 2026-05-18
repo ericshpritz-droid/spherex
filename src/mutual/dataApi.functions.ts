@@ -121,6 +121,27 @@ export const loadAddsAndMatchesServer = createServerFn({ method: "GET" })
   });
 
 /**
+ * Remove one of my own pending adds by the target's phone hash.
+ * RLS scopes the delete to rows where adder_id = auth.uid().
+ */
+export const removeAddServer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { addedPhoneHash: string }) => {
+    const h = String(input?.addedPhoneHash || "").toLowerCase();
+    if (!/^[a-f0-9]{64}$/.test(h)) throw new Error("Invalid hash");
+    return { addedPhoneHash: h };
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase } = context as any;
+    const { error, count } = await supabase
+      .from("adds")
+      .delete({ count: "exact" })
+      .eq("added_phone_hash", data.addedPhoneHash);
+    if (error) throw new Error(error.message);
+    return { removed: count ?? 0 };
+  });
+
+/**
  * Hash a list of E.164 phones using the server pepper, so the client can
  * remember "this hash → this contact's readable number" locally without
  * ever seeing the pepper.
