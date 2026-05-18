@@ -100,24 +100,8 @@ function HomeRoute() {
           {empty ? "Three picks. Sealed unless mutual." : "Waiting for magic to happen."}
         </h1>
 
-        {/* Slot row — dashed circles for empty, filled circles for used */}
-        <div className="mt-7 flex items-center gap-3">
-          {Array.from({ length: slotLimit }).map((_, i) => {
-            const filled = i < slotsUsed;
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "h-12 w-12 rounded-full flex items-center justify-center",
-                  filled
-                    ? "bg-ink text-paper"
-                    : "border border-dashed border-[#C9C5BC] text-mute",
-                )}
-              >
-                <span className="font-sans text-[14px]">{i + 1}</span>
-              </div>
-            );
-          })}
+        {/* Slot counter */}
+        <div className="mt-7 flex items-center">
           <div className="ml-auto font-mono text-[10px] uppercase text-mute"
             style={{ letterSpacing: "0.22em" }}
           >
