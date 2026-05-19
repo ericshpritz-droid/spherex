@@ -164,7 +164,14 @@ function ContactsManageRoute() {
                   className="rounded-full text-[12px] font-semibold cursor-pointer bg-ink text-paper border-0"
                   style={{ padding: "10px 20px" }}
                 >
-                  Add someone →
+                  Add by number →
+                </button>
+                <button
+                  onClick={() => navigate({ to: "/add/contacts" })}
+                  className="rounded-full text-[12px] font-semibold cursor-pointer bg-transparent text-ink border border-line"
+                  style={{ padding: "10px 20px" }}
+                >
+                  Pick from contacts →
                 </button>
                 <button
                   onClick={() => navigate({ to: "/home" })}
