@@ -154,6 +154,30 @@ function HomeRoute() {
     }
   }
 
+  async function blockFromHome(id: string, matched: boolean) {
+    if (typeof window !== "undefined") {
+      const ok = window.confirm(
+        matched
+          ? "Block this person? You'll unmatch and they won't show in your sphere again."
+          : "Block this person? They won't show in your sphere again.",
+      );
+      if (!ok) return;
+    }
+    try {
+      await removePending(id);
+      if (labels[id]) {
+        const next = { ...labels };
+        delete next[id];
+        persistLabels(next);
+      }
+      if (!blocked.includes(id)) persistBlocked([...blocked, id]);
+      setExpandedId(null);
+      toast("Blocked");
+    } catch (e: any) {
+      toast(e?.message || "Couldn't block");
+    }
+  }
+
   // Picks = pending I added + matched mutuals (each consumes a slot).
   const myPicks = [...matches, ...pending];
   const isPlus = false; // Sphere+ comes in Phase 5
