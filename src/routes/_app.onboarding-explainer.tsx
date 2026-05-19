@@ -26,7 +26,6 @@ function ExplainerRoute() {
   const navigate = useNavigate();
   const { user } = useApp();
   const { rewatch } = Route.useSearch();
-  const [mode, setMode] = useState<"watch" | "skip">("watch");
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [checked, setChecked] = useState(false);
