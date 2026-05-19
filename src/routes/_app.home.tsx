@@ -304,13 +304,23 @@ function HomeRoute() {
                         Stored on this device only. Never uploaded.
                       </p>
                       <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
-                        <button
-                          onClick={() => removeFromHome(id, matched)}
-                          className="rounded-full text-[12px] font-semibold cursor-pointer bg-danger text-paper border-0"
-                          style={{ padding: "8px 14px" }}
-                        >
-                          Remove
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => removeFromHome(id, matched)}
+                            className="rounded-full text-[12px] font-semibold cursor-pointer bg-danger text-paper border-0"
+                            style={{ padding: "8px 14px" }}
+                          >
+                            Remove
+                          </button>
+                          <button
+                            onClick={() => blockFromHome(id, matched)}
+                            className="rounded-full text-[12px] font-semibold cursor-pointer bg-transparent text-danger border border-danger"
+                            style={{ padding: "8px 14px" }}
+                            title="Remove and stop them from showing up again"
+                          >
+                            Block
+                          </button>
+                        </div>
                         <div className="flex items-center gap-2 ml-auto">
                           <button
                             onClick={() => { setExpandedId(null); setDraft(""); }}
