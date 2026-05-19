@@ -24,6 +24,7 @@ function CodeRoute() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [cooldown, setCooldown] = useState(pendingOtpCooldownSeconds || 24);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -44,11 +45,13 @@ function CodeRoute() {
 
   async function submit() {
     setBusy(true);
+    setError(null);
     try {
       await verifyCode(code);
       navigate({ to: "/instagram" as any, replace: true });
     } catch (e: any) {
-      toast(e?.message || "Invalid code.");
+      const msg = e?.message || "We couldn't verify that code. Try again.";
+      setError(msg);
       setCode("");
       setBusy(false);
       inputRef.current?.focus();
