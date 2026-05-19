@@ -123,7 +123,7 @@ function PhoneFrame() {
           </div>
         ) : (
           <AppShell path={path} showTabBar={!!session && !isPublic && path !== "/"}>
-            <RouteStack>
+            <RouteStack mode={isPublic || path === "/instagram" ? "fade" : "stack"}>
               <Outlet />
             </RouteStack>
           </AppShell>
