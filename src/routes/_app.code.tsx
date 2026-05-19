@@ -24,6 +24,7 @@ function CodeRoute() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [cooldown, setCooldown] = useState(pendingOtpCooldownSeconds || 24);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -44,11 +45,13 @@ function CodeRoute() {
 
   async function submit() {
     setBusy(true);
+    setError(null);
     try {
       await verifyCode(code);
       navigate({ to: "/instagram" as any, replace: true });
     } catch (e: any) {
-      toast(e?.message || "Invalid code.");
+      const msg = e?.message || "We couldn't verify that code. Try again.";
+      setError(msg);
       setCode("");
       setBusy(false);
       inputRef.current?.focus();
@@ -144,7 +147,10 @@ function CodeRoute() {
           <input
             ref={inputRef}
             value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            onChange={(e) => {
+              setCode(e.target.value.replace(/\D/g, "").slice(0, 6));
+              if (error) setError(null);
+            }}
             inputMode="numeric"
             autoComplete="one-time-code"
             type="tel"
@@ -156,6 +162,34 @@ function CodeRoute() {
             style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none", left: 0, top: 0 }}
           />
         </div>
+
+        {error && (
+          <div
+            role="alert"
+            className="mt-4 rounded-xl border border-[#C0553D]/40 bg-[#FBEBE6] px-3 py-3 text-[13px] text-[#7A2E1E]"
+          >
+            <div className="font-medium">We couldn't sign you in.</div>
+            <div className="mt-1 text-[#7A2E1E]/90">{error}</div>
+            <div className="mt-3 flex items-center gap-3">
+              <button
+                onClick={() => { setError(null); setCode(""); inputRef.current?.focus(); }}
+                className="rounded-lg border border-[#7A2E1E]/30 px-3 py-1.5 text-[12px] font-medium text-[#7A2E1E] hover:bg-white/40"
+              >
+                Try again
+              </button>
+              <button
+                onClick={handleResend}
+                disabled={cooldown > 0}
+                className={cn(
+                  "rounded-lg px-3 py-1.5 text-[12px] font-medium",
+                  cooldown > 0 ? "text-[#7A2E1E]/40" : "text-[#7A2E1E] underline",
+                )}
+              >
+                Send a new code{cooldown > 0 ? ` (${mm}:${ss})` : ""}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 text-center text-[13px] text-mute">
           Didn't get it?{" "}
