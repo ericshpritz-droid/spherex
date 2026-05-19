@@ -46,6 +46,7 @@ function ExplainerRoute() {
       }
     } catch {}
     setChecked(true);
+    setPlaying(true);
   }, [rewatch, user?.id, navigate]);
 
   useEffect(() => {
