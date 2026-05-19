@@ -147,7 +147,10 @@ function CodeRoute() {
           <input
             ref={inputRef}
             value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            onChange={(e) => {
+              setCode(e.target.value.replace(/\D/g, "").slice(0, 6));
+              if (error) setError(null);
+            }}
             inputMode="numeric"
             autoComplete="one-time-code"
             type="tel"
