@@ -27,8 +27,8 @@ const POINTS = [
   },
   {
     n: "02",
-    title: "Mutual is rare. That's the point.",
-    body: "Most picks stay sealed. The ones that match are the ones that mean something.",
+    title: "We'll notify you — no need to check every day.",
+    body: "Most days, nothing happens. Don't refresh. Let it sit. The rarity is the point.",
   },
   {
     n: "03",

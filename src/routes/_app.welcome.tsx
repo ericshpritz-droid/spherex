@@ -50,7 +50,7 @@ function WelcomeRoute() {
         <h1 className="font-serif italic text-[36px] leading-[1.04] tracking-tight">
           There's someone you can't stop thinking about.
         </h1>
-        <Eyebrow className="mt-4">But it's been too awkward to ask</Eyebrow>
+        <Eyebrow className="mt-4">But you're too shy to ask them out</Eyebrow>
         <div className="mt-3 flex flex-wrap gap-2">
           {CHIPS.map((c) => (
             <Chip key={c} as="span">{c}</Chip>

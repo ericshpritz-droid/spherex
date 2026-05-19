@@ -73,8 +73,8 @@ function InviteRoute() {
           Pull someone in.
         </h1>
         <p className="mt-4 text-[14px] text-mute leading-relaxed">
-          Send your link to someone you'd want on your sphere. They join — you
-          get attribution if it ever turns mutual.
+          Sphere only matches when both sides are here. Inviting one person
+          you'd pick is the simplest way to make your sphere actually work.
         </p>
 
         <div className="mt-7 rounded-2xl bg-[#EFECE5] p-5">

@@ -26,7 +26,6 @@ function ExplainerRoute() {
   const navigate = useNavigate();
   const { user } = useApp();
   const { rewatch } = Route.useSearch();
-  const [mode, setMode] = useState<"watch" | "skip">("watch");
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [checked, setChecked] = useState(false);
@@ -47,6 +46,7 @@ function ExplainerRoute() {
       }
     } catch {}
     setChecked(true);
+    setPlaying(true);
   }, [rewatch, user?.id, navigate]);
 
   useEffect(() => {
@@ -106,27 +106,12 @@ function ExplainerRoute() {
           A quick tour,<br />before you start.
         </h1>
 
-        {/* Segmented Watch / Skip */}
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <button
-            onClick={() => { haptics.selection(); setMode("watch"); setPlaying(true); }}
-            className={cn(
-              "h-12 rounded-full border text-[15px] font-medium transition-colors active:scale-[0.97]",
-              mode === "watch"
-                ? "bg-ink text-paper border-ink"
-                : "bg-transparent text-ink/80 border-ink/25",
-            )}
-          >
-            Watch
-            <span className="block text-[11px] font-mono opacity-70 mt-0.5"
-              style={{ letterSpacing: "0.16em" }}>
-              ({TOTAL_S}s)
-            </span>
-          </button>
+        {/* Single Skip action — video autoplays on mount */}
+        <div className="mt-4">
           <button
             onClick={dismiss}
             className={cn(
-              "h-12 rounded-full border text-[15px] font-medium transition-colors active:scale-[0.97]",
+              "h-12 w-full rounded-full border text-[15px] font-medium transition-colors active:scale-[0.97]",
               "bg-transparent text-ink/80 border-ink/25",
             )}
           >
@@ -134,12 +119,11 @@ function ExplainerRoute() {
           </button>
         </div>
 
-        {/* Player frame — 9:16 placeholder */}
+        {/* Player frame — 9:16 placeholder, autoplays */}
         <div
-          onClick={() => !playing && (setMode("watch"), setPlaying(true))}
           className={cn(
             "mt-4 rounded-3xl bg-ink/[0.04] border border-ink/12",
-            "aspect-[9/12] relative overflow-hidden cursor-pointer",
+            "aspect-[9/12] relative overflow-hidden",
           )}
         >
           {/* Header strip */}
@@ -161,9 +145,7 @@ function ExplainerRoute() {
           {/* Body — rotating tagline */}
           <div className="absolute inset-x-0 bottom-0 px-5 pb-7">
             <div className="font-serif italic text-[26px] leading-[1.1] text-ink/85">
-              {!playing ? (
-                <>How <span className="text-ink/55">three numbers</span><br />change everything.</>
-              ) : progress < 0.34 ? (
+              {progress < 0.34 ? (
                 <>Add a <span className="text-ink/55">person.</span></>
               ) : progress < 0.67 ? (
                 <>Sealed <span className="text-ink/55">unless mutual.</span></>
@@ -172,16 +154,9 @@ function ExplainerRoute() {
               )}
             </div>
           </div>
-
-          {!playing && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-14 w-14 rounded-full bg-ink text-paper flex items-center justify-center text-[18px] shadow-lg">
-                ▶
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
 
       {/* Bottom scrubber bar */}
       <div

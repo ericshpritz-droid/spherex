@@ -70,7 +70,7 @@ function PhoneRoute() {
         <div className="mt-5">
           <PhoneField value={digits} onChange={setDigits} autoFocus />
           <p className="mt-3 text-[13px] text-mute leading-snug">
-            Hashed on this device. Used only to find your matches — never shared.
+            Kept private on your device. Only used to find your matches — never shared.
           </p>
           {testModeEnabled && (
             <div
