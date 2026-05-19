@@ -321,8 +321,8 @@ export function SphereContacts({
         </div>
         <div className="mt-2">
           <GhostButton
-            onPointerUp={(e) => { e.stopPropagation(); setOpenSheet(null); }}
-            onClick={(e) => { e.stopPropagation(); setOpenSheet(null); }}
+            type="button"
+            onClick={() => { setManualPhone(""); setOpenSheet(null); }}
           >
             Cancel
           </GhostButton>
