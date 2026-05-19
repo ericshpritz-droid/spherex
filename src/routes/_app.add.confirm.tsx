@@ -60,20 +60,23 @@ function ConfirmAdd() {
 
         <div className="mt-7 space-y-3">
           <FieldRow
+            icon={<PhoneIcon />}
             label="PHONE"
             value={formatPhone(draft.phone)}
             onEdit={() => navigate({ to: "/add/manual" as any, search: { focus: "phone" } as any })}
           />
           <FieldRow
+            icon={<InstagramIcon />}
             label="INSTAGRAM"
             value={draft.ig ? `@${draft.ig}` : "— skipped —"}
+            muted={!draft.ig}
             onEdit={() => navigate({ to: "/add/manual" as any, search: { focus: "ig" } as any })}
           />
         </div>
 
-        <div className="mt-6 rounded-2xl bg-[#EFECE5] p-4 text-[13px] text-mute">
+        <p className="mt-6 px-1 text-[13px] text-mute leading-snug">
           Both values get hashed on the next screen, before they leave your device.
-        </div>
+        </p>
       </div>
 
       <div className="px-6 pb-8 pt-4">
@@ -85,21 +88,67 @@ function ConfirmAdd() {
   );
 }
 
-function FieldRow({ label, value, onEdit }: { label: string; value: string; onEdit: () => void }) {
+function FieldRow({
+  icon, label, value, muted, onEdit,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  muted?: boolean;
+  onEdit: () => void;
+}) {
   return (
     <button
       onClick={onEdit}
-      className="w-full text-left rounded-2xl bg-surface border border-line p-4 flex items-center justify-between gap-4 hover:border-[#D8D5D0]"
+      className="group w-full text-left rounded-2xl bg-surface border border-line p-4 flex items-center gap-4 hover:border-[#D8D5D0] transition-colors"
     >
-      <div className="min-w-0">
-        <Eyebrow>{label}</Eyebrow>
-        <div className="mt-1 font-serif text-[20px] leading-tight truncate">{value}</div>
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="w-10 h-10 rounded-full bg-paper border border-line flex items-center justify-center">
+          {icon}
+        </div>
+        <span
+          className="font-mono text-[10px] uppercase text-mute group-hover:text-ink transition-colors"
+          style={{ letterSpacing: "0.22em" }}
+        >
+          Edit
+        </span>
       </div>
-      <span className="text-mute text-[12px] font-mono uppercase"
-        style={{ letterSpacing: "0.22em" }}
-      >
-        Edit
-      </span>
+      <div className="flex-1 min-w-0 text-right">
+        <div
+          className="font-mono text-[10px] uppercase text-mute"
+          style={{ letterSpacing: "0.22em" }}
+        >
+          {label}
+        </div>
+        <div
+          className={`mt-1 font-serif italic text-[20px] leading-tight truncate ${
+            muted ? "text-mute" : "text-ink"
+          }`}
+        >
+          {value}
+        </div>
+      </div>
     </button>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M5 4.5c0-.83.67-1.5 1.5-1.5h2.1c.66 0 1.24.43 1.43 1.07l1 3.3a1.5 1.5 0 0 1-.4 1.52L9.3 10.2a13 13 0 0 0 4.5 4.5l1.31-1.33a1.5 1.5 0 0 1 1.52-.4l3.3 1a1.5 1.5 0 0 1 1.07 1.43V17.5c0 .83-.67 1.5-1.5 1.5C11.4 19 5 12.6 5 4.5Z"
+        fill="#1F8A52"
+      />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke="#1A1A1A" strokeWidth="1.6" />
+      <circle cx="12" cy="12" r="4" stroke="#1A1A1A" strokeWidth="1.6" />
+      <circle cx="17.3" cy="6.7" r="1.1" fill="#1A1A1A" />
+    </svg>
   );
 }
