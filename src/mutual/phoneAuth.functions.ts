@@ -192,7 +192,13 @@ export const verifyPhoneCode = createServerFn({ method: "POST" })
         user_metadata: { synthetic_sms_test: true },
       });
       if (createErr || !created.user) {
-        throw new Error(createErr?.message || "Could not create account for this phone number.");
+        // Scrub any provider-leaked "email" wording — this flow is phone-only
+        // from the user's perspective. Surface a phone-friendly message.
+        const raw = (createErr?.message || "").toLowerCase();
+        if (raw.includes("already") || raw.includes("registered") || raw.includes("exists") || raw.includes("email")) {
+          throw new Error("This phone number is already registered. Try signing in again.");
+        }
+        throw new Error("Could not create account for this phone number.");
       }
       userId = created.user.id;
       const { error: identityErr } = await supabaseAdmin.from("phone_auth_identities").insert({

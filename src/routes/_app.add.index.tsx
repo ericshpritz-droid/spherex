@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 
 import { Sheet, GhostButton, Eyebrow } from "@/sphere/ui";
@@ -22,6 +22,12 @@ function AddSheetRoute() {
   const navigate = useNavigate();
   const { matches, pending } = useApp();
   const [open, setOpen] = useState(true);
+
+  // Clear any stale add-flow draft whenever the user enters the add menu,
+  // so /add/manual starts from a blank state instead of reusing a prior entry.
+  useEffect(() => {
+    try { sessionStorage.removeItem("sphere.addDraft"); } catch {}
+  }, []);
 
   const slotsUsed = matches.length + pending.length;
   const slotN = Math.min(slotsUsed + 1, FREE_LIMIT);
