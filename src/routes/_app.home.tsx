@@ -66,12 +66,20 @@ function HomeRoute() {
 
   // Per-user private labels (device-only), shared with /contacts page.
   const [labels, setLabels] = useState<Labels>({});
+  const [blocked, setBlocked] = useState<string[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
-  useEffect(() => { setLabels(loadLabels(user?.id)); }, [user?.id]);
+  useEffect(() => {
+    setLabels(loadLabels(user?.id));
+    setBlocked(loadBlocked(user?.id));
+  }, [user?.id]);
   const persistLabels = useCallback((next: Labels) => {
     setLabels(next);
     writeLabels(user?.id, next);
+  }, [user?.id]);
+  const persistBlocked = useCallback((next: string[]) => {
+    setBlocked(next);
+    writeBlocked(user?.id, next);
   }, [user?.id]);
 
   // Surface the most-recent received compliment as a "push-style" modal once.
