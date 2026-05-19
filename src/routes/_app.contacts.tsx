@@ -160,7 +160,7 @@ function ContactsManageRoute() {
               </p>
               <div className="mt-6 flex flex-col items-center gap-3">
                 <button
-                  onClick={() => navigate({ to: "/add" })}
+                  onClick={() => navigate({ to: "/add/manual" })}
                   className="rounded-full text-[12px] font-semibold cursor-pointer bg-ink text-paper border-0"
                   style={{ padding: "10px 20px" }}
                 >
