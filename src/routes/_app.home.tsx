@@ -42,6 +42,18 @@ function writeLabels(uid: string | undefined, l: Labels) {
   try { localStorage.setItem(labelKey(uid), JSON.stringify(l)); } catch {}
 }
 
+// Device-only block list: blocked hashes can be silently re-added later but
+// won't show in the sphere until the user unblocks. Stored per-account.
+const blockKey = (uid: string | undefined) => `mutual.blocked.${uid ?? "anon"}`;
+function loadBlocked(uid: string | undefined): string[] {
+  if (typeof window === "undefined") return [];
+  try { return JSON.parse(localStorage.getItem(blockKey(uid)) || "[]"); } catch { return []; }
+}
+function writeBlocked(uid: string | undefined, list: string[]) {
+  if (typeof window === "undefined") return;
+  try { localStorage.setItem(blockKey(uid), JSON.stringify(list)); } catch {}
+}
+
 function HomeRoute() {
   const {
     matches, pending, dataLoading, dataError, refresh, markMatchesSeen, removePending, user,
