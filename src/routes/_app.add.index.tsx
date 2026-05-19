@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 
 import { Sheet, GhostButton, Eyebrow } from "@/sphere/ui";
