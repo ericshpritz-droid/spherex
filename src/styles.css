@@ -337,6 +337,21 @@
   to   { transform: translate3d(100%, 0, 0); }
 }
 
+/* Cross-fade mode (used for login / onboarding flow) — no slide, no parallax,
+   so the previous screen never reads as "still visible" during the swap. */
+.ios-stack[data-mode="fade"] > [data-route].is-enter,
+.ios-stack[data-mode="fade"] > [data-route].is-exit {
+  animation: none;
+}
+.ios-stack[data-mode="fade"] > [data-route].is-enter {
+  animation: routeFadeIn 220ms ease-out both;
+}
+.ios-stack[data-mode="fade"] > [data-route].is-exit {
+  animation: routeFadeOut 180ms ease-out both;
+}
+@keyframes routeFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes routeFadeOut { from { opacity: 1; } to { opacity: 0; } }
+
 /* Tab bar blur (iOS-style frosted) */
 .ios-tabbar {
   background: color-mix(in srgb, var(--paper) 78%, transparent);

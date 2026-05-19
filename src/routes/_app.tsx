@@ -123,7 +123,7 @@ function PhoneFrame() {
           </div>
         ) : (
           <AppShell path={path} showTabBar={!!session && !isPublic && path !== "/"}>
-            <RouteStack>
+            <RouteStack mode={isPublic || path === "/instagram" ? "fade" : "stack"}>
               <Outlet />
             </RouteStack>
           </AppShell>
@@ -152,7 +152,7 @@ function AppShell({ path, showTabBar, children }: { path: string; showTabBar: bo
  * supports edge-swipe-back. Renders the previous route alongside the new one
  * during the transition window so the animation can cross-fade them.
  */
-function RouteStack({ children }: { children: React.ReactNode }) {
+function RouteStack({ children, mode = "stack" }: { children: React.ReactNode; mode?: "stack" | "fade" }) {
   useKeyboardInset();
   const { dir, key } = useRouteDirection();
   const swipeRef = useEdgeSwipeBack(true);
@@ -160,6 +160,8 @@ function RouteStack({ children }: { children: React.ReactNode }) {
     () => [{ key, node: children, phase: "stay" }],
   );
   const prevKey = useRef(key);
+
+  const transitionMs = mode === "fade" ? 220 : 360;
 
   useEffect(() => {
     if (prevKey.current === key) {
@@ -174,12 +176,12 @@ function RouteStack({ children }: { children: React.ReactNode }) {
     });
     const t = window.setTimeout(() => {
       setLayers((curr) => curr.filter((l) => l.key === key).map((l) => ({ ...l, phase: "stay" as const })));
-    }, 360);
+    }, transitionMs);
     return () => window.clearTimeout(t);
-  }, [key, children]);
+  }, [key, children, transitionMs]);
 
   return (
-    <div ref={swipeRef} className="ios-stack" data-dir={dir}>
+    <div ref={swipeRef} className="ios-stack" data-dir={dir} data-mode={mode}>
       {layers.map((l) => (
         <div
           key={l.key}
