@@ -377,16 +377,6 @@ function HomeRoute() {
           </p>
         )}
 
-        {/* Manage contacts link — always available */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => navigate({ to: "/contacts" })}
-            className="font-mono text-[10px] uppercase text-mute bg-transparent border-0 cursor-pointer underline-offset-4 hover:underline"
-            style={{ letterSpacing: "0.22em" }}
-          >
-            Manage contacts →
-          </button>
-        </div>
 
         {blocked.length > 0 && (
           <div className="mt-3 text-center">
