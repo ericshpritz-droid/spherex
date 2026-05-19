@@ -24,6 +24,7 @@ function IntentRoute() {
   const [draft, setDraft] = useState<{ phone: string; ig: string } | null>(null);
   const [intent, setIntent] = useState<Intent>("both");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -41,6 +42,7 @@ function IntentRoute() {
   async function commit() {
     if (!draft || busy) return;
     setBusy(true);
+    setError(null);
     try {
       // Compliment / both paths defer the add until after preview.
       if (intent === "compliment" || intent === "both") {
@@ -53,11 +55,17 @@ function IntentRoute() {
         navigate({ to: "/add/compose" as any, replace: true });
         return;
       }
+      if (!draft.phone) {
+        throw new Error("Missing phone number. Please go back and re-enter it.");
+      }
       await addOne(draft.phone, intent);
       try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
       navigate({ to: "/add/patience" as any, replace: true });
     } catch (e: any) {
-      toast(e?.message || "Could not save your pick.");
+      const msg = e?.message || "Couldn't save your pick. Please try again.";
+      console.error("[add/intent] commit failed:", e);
+      setError(msg);
+      toast(msg);
       setBusy(false);
     }
   }
@@ -114,9 +122,24 @@ function IntentRoute() {
         </div>
       </div>
 
-      <div className="px-6 pb-8 pt-4">
+      <div className="px-6 pb-8 pt-4 space-y-3">
+        {error && (
+          <div
+            className="rounded-2xl border p-3 text-[13px] leading-snug"
+            style={{ background: "#FBEBE6", borderColor: "#E8C7BD", color: "#7A2E1C" }}
+            role="alert"
+          >
+            {error}
+          </div>
+        )}
         <PrimaryButton onClick={commit} disabled={busy}>
-          {busy ? "Saving…" : intent === "romantic" ? "Continue" : "Compose compliment"}
+          {busy
+            ? "Saving…"
+            : error
+              ? "Try again"
+              : intent === "romantic"
+                ? "Continue"
+                : "Compose compliment"}
         </PrimaryButton>
       </div>
     </SphereScreen>
