@@ -122,9 +122,24 @@ function IntentRoute() {
         </div>
       </div>
 
-      <div className="px-6 pb-8 pt-4">
+      <div className="px-6 pb-8 pt-4 space-y-3">
+        {error && (
+          <div
+            className="rounded-2xl border p-3 text-[13px] leading-snug"
+            style={{ background: "#FBEBE6", borderColor: "#E8C7BD", color: "#7A2E1C" }}
+            role="alert"
+          >
+            {error}
+          </div>
+        )}
         <PrimaryButton onClick={commit} disabled={busy}>
-          {busy ? "Saving…" : intent === "romantic" ? "Continue" : "Compose compliment"}
+          {busy
+            ? "Saving…"
+            : error
+              ? "Try again"
+              : intent === "romantic"
+                ? "Continue"
+                : "Compose compliment"}
         </PrimaryButton>
       </div>
     </SphereScreen>
