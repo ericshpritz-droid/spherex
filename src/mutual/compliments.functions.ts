@@ -56,6 +56,10 @@ export const sendComplimentServer = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { hashPhone } = await import("@/integrations/phone/hash.server");
+    const { ensurePhonePepperBootstrapped } = await import(
+      "@/integrations/phone/pepper-bootstrap.server"
+    );
+    await ensurePhonePepperBootstrapped();
     const { supabase, userId, claims } = context as {
       supabase: any;
       userId: string;
