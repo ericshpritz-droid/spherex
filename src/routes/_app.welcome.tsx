@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, Chip, Eyebrow } from "@/sphere/ui";
+import { WelcomeCarousel } from "@/sphere/components/WelcomeCarousel";
 import { useTestMode } from "@/mutual/testmode/useTestMode";
 import { TestLogin } from "@/mutual/testmode/TestLogin";
 
