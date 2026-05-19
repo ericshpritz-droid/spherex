@@ -40,6 +40,10 @@ export const addPhonesServer = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const { hashPhone, hashPhones } = await import("@/integrations/phone/hash.server");
+    const { ensurePhonePepperBootstrapped } = await import(
+      "@/integrations/phone/pepper-bootstrap.server"
+    );
+    await ensurePhonePepperBootstrapped();
     const { userId, claims } = context as {
       userId: string;
       claims: { phone?: string };
