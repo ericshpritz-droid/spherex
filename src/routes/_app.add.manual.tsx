@@ -71,7 +71,10 @@ function ManualAdd() {
         </button>
         <div className="font-serif italic text-[18px]">sphere</div>
         <button
-          onClick={() => navigate({ to: "/home" })}
+          onClick={() => {
+            try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
+            navigate({ to: "/home" });
+          }}
           className="text-mute text-[14px]"
         >
           Cancel
