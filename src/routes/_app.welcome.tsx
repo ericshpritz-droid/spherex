@@ -57,6 +57,8 @@ function WelcomeRoute() {
             <Chip key={c} as="span">{c}</Chip>
           ))}
         </div>
+
+        <WelcomeCarousel />
       </div>
 
       {/* Footer */}
