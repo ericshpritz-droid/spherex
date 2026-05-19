@@ -136,20 +136,46 @@ function ContactsManageRoute() {
         </p>
 
         {all.length === 0 ? (
-          <div className="mt-8 rounded-2xl border border-[#D8D5D0] p-6 text-center">
-            <div className="font-serif italic text-[20px] text-ink/80">
-              {dataLoading ? "Loading…" : "No contacts yet."}
+          dataLoading ? (
+            <div className="mt-8 rounded-2xl border border-[#D8D5D0] p-6 text-center">
+              <div className="font-serif italic text-[20px] text-ink/80">
+                Loading…
+              </div>
             </div>
-            {!dataLoading && (
-              <button
-                onClick={() => navigate({ to: "/add" })}
-                className="mt-4 rounded-full text-[12px] font-semibold cursor-pointer bg-ink text-paper border-0"
-                style={{ padding: "8px 16px" }}
+          ) : (
+            <div className="mt-8 rounded-2xl border border-[#D8D5D0] p-8 text-center">
+              <div
+                className="font-mono text-[10px] uppercase text-mute"
+                style={{ letterSpacing: "0.22em" }}
               >
-                Add someone →
-              </button>
-            )}
-          </div>
+                Your sphere
+              </div>
+              <h2 className="mt-3 font-serif italic text-[26px] leading-[1.1] text-ink">
+                No one in here yet.
+              </h2>
+              <p className="mt-3 text-[14px] text-mute leading-snug">
+                You haven't added anyone, and no one's matched you back.
+                Add a person by number, contact, or Instagram — they'll never
+                know unless they pick you too.
+              </p>
+              <div className="mt-6 flex flex-col items-center gap-3">
+                <button
+                  onClick={() => navigate({ to: "/add" })}
+                  className="rounded-full text-[12px] font-semibold cursor-pointer bg-ink text-paper border-0"
+                  style={{ padding: "10px 20px" }}
+                >
+                  Add someone →
+                </button>
+                <button
+                  onClick={() => navigate({ to: "/home" })}
+                  className="font-mono text-[10px] uppercase text-mute bg-transparent border-0 cursor-pointer underline-offset-4 hover:underline"
+                  style={{ letterSpacing: "0.22em" }}
+                >
+                  Back to home
+                </button>
+              </div>
+            </div>
+          )
         ) : (
           <div className="mt-7 space-y-3">
             {all.map((p) => {
