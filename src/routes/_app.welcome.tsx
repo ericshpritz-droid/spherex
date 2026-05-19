@@ -82,21 +82,10 @@ function WelcomeRoute() {
       {testModeEnabled && (
         <button
           onClick={() => setShowTestLogin(true)}
-          className="absolute z-[2] rounded-full text-[11px] font-mono uppercase cursor-pointer"
-          style={{
-            top: 14,
-            right: 16,
-            padding: "5px 10px",
-            border: "1px solid rgba(10,10,10,0.18)",
-            background: "rgba(255,255,255,0.6)",
-            color: "#0A0A0A",
-            letterSpacing: "0.18em",
-            backdropFilter: "blur(6px)",
-            WebkitBackdropFilter: "blur(6px)",
-          }}
-        >
-          Test mode
-        </button>
+          aria-label="Test login"
+          className="absolute z-[2]"
+          style={{ top: 8, left: 0, width: 80, height: 32, opacity: 0 }}
+        />
       )}
     </SphereScreen>
   );
