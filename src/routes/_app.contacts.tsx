@@ -181,6 +181,8 @@ function ContactsManageRoute() {
                   Back to home
                 </button>
               </div>
+
+              <SphereRings />
             </div>
           )
         ) : (
