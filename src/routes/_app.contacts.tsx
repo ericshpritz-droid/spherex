@@ -284,3 +284,68 @@ function ContactsManageRoute() {
     </SphereScreen>
   );
 }
+
+function SphereRings() {
+  // Animated concentric rings with a center dot — the "sphere" mark.
+  // Rings gently expand/fade outward; the dot has a soft pulse.
+  const rings = [22, 38, 58, 82, 110, 140];
+  return (
+    <div
+      aria-hidden
+      className="relative mx-auto mt-10 select-none"
+      style={{ width: 300, height: 300, maxWidth: "80%" }}
+    >
+      <style>{`
+        @keyframes sphereRingPulse {
+          0%   { transform: scale(0.78); opacity: 0; }
+          25%  { opacity: 0.55; }
+          100% { transform: scale(1.25); opacity: 0; }
+        }
+        @keyframes sphereDotPulse {
+          0%, 100% { transform: scale(1);   opacity: 1; }
+          50%      { transform: scale(1.35); opacity: 0.7; }
+        }
+        .sphere-ring {
+          position: absolute; inset: 0; margin: auto;
+          border: 1px solid #C9C5BC; border-radius: 9999px;
+          transform-origin: center;
+        }
+        .sphere-ring-anim {
+          animation: sphereRingPulse 4.5s ease-out infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .sphere-ring-anim { animation: none; opacity: 0.5; }
+          .sphere-dot { animation: none !important; }
+        }
+      `}</style>
+      {rings.map((size, i) => (
+        <div
+          key={size}
+          className="sphere-ring"
+          style={{ width: size * 2, height: size * 2, opacity: 0.35 - i * 0.04 }}
+        />
+      ))}
+      {[0, 1, 2].map((i) => (
+        <div
+          key={`a-${i}`}
+          className="sphere-ring sphere-ring-anim"
+          style={{
+            width: 160,
+            height: 160,
+            animationDelay: `${i * 1.5}s`,
+          }}
+        />
+      ))}
+      <div
+        className="sphere-dot absolute left-1/2 top-1/2 rounded-full bg-ink"
+        style={{
+          width: 12,
+          height: 12,
+          marginLeft: -6,
+          marginTop: -6,
+          animation: "sphereDotPulse 2.6s ease-in-out infinite",
+        }}
+      />
+    </div>
+  );
+}
