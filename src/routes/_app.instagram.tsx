@@ -102,7 +102,7 @@ function InstagramRoute() {
             />
           </div>
           <p className="mt-3 text-[13px] text-mute leading-snug">
-            Hashed on this device. We never post, never DM, and never see your handle in plain text.
+            Kept private on your device. We never post, never DM, and never see your handle in plain text.
           </p>
           {handle && !valid && (
             <div className="mt-2 text-[12px] text-danger">
