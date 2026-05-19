@@ -68,13 +68,14 @@ function InviteRoute() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pt-8 pb-4" data-scroll>
-        <Eyebrow>Invite</Eyebrow>
+        <Eyebrow>Sphere works better with them on it</Eyebrow>
         <h1 className="mt-2 font-serif italic text-[36px] leading-[1.04] tracking-tight">
-          Pull someone in.
+          Know someone you'd pick? Tell them.
         </h1>
         <p className="mt-4 text-[14px] text-mute leading-relaxed">
-          Sphere only matches when both sides are here. Inviting one person
-          you'd pick is the simplest way to make your sphere actually work.
+          Sphere only matches when both sides are here. Sharing your link is the
+          simplest way to make your sphere actually work — they'll get a private
+          invite, nothing about who you picked.
         </p>
 
         <div className="mt-7 rounded-2xl bg-[#EFECE5] p-5">

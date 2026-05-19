@@ -42,6 +42,18 @@ function writeLabels(uid: string | undefined, l: Labels) {
   try { localStorage.setItem(labelKey(uid), JSON.stringify(l)); } catch {}
 }
 
+// Device-only block list: blocked hashes can be silently re-added later but
+// won't show in the sphere until the user unblocks. Stored per-account.
+const blockKey = (uid: string | undefined) => `mutual.blocked.${uid ?? "anon"}`;
+function loadBlocked(uid: string | undefined): string[] {
+  if (typeof window === "undefined") return [];
+  try { return JSON.parse(localStorage.getItem(blockKey(uid)) || "[]"); } catch { return []; }
+}
+function writeBlocked(uid: string | undefined, list: string[]) {
+  if (typeof window === "undefined") return;
+  try { localStorage.setItem(blockKey(uid), JSON.stringify(list)); } catch {}
+}
+
 function HomeRoute() {
   const {
     matches, pending, dataLoading, dataError, refresh, markMatchesSeen, removePending, user,
@@ -54,12 +66,20 @@ function HomeRoute() {
 
   // Per-user private labels (device-only), shared with /contacts page.
   const [labels, setLabels] = useState<Labels>({});
+  const [blocked, setBlocked] = useState<string[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
-  useEffect(() => { setLabels(loadLabels(user?.id)); }, [user?.id]);
+  useEffect(() => {
+    setLabels(loadLabels(user?.id));
+    setBlocked(loadBlocked(user?.id));
+  }, [user?.id]);
   const persistLabels = useCallback((next: Labels) => {
     setLabels(next);
     writeLabels(user?.id, next);
+  }, [user?.id]);
+  const persistBlocked = useCallback((next: string[]) => {
+    setBlocked(next);
+    writeBlocked(user?.id, next);
   }, [user?.id]);
 
   // Surface the most-recent received compliment as a "push-style" modal once.
@@ -131,6 +151,30 @@ function HomeRoute() {
       toast("Removed");
     } catch (e: any) {
       toast(e?.message || "Couldn't remove");
+    }
+  }
+
+  async function blockFromHome(id: string, matched: boolean) {
+    if (typeof window !== "undefined") {
+      const ok = window.confirm(
+        matched
+          ? "Block this person? You'll unmatch and they won't show in your sphere again."
+          : "Block this person? They won't show in your sphere again.",
+      );
+      if (!ok) return;
+    }
+    try {
+      await removePending(id);
+      if (labels[id]) {
+        const next = { ...labels };
+        delete next[id];
+        persistLabels(next);
+      }
+      if (!blocked.includes(id)) persistBlocked([...blocked, id]);
+      setExpandedId(null);
+      toast("Blocked");
+    } catch (e: any) {
+      toast(e?.message || "Couldn't block");
     }
   }
 
@@ -260,13 +304,23 @@ function HomeRoute() {
                         Stored on this device only. Never uploaded.
                       </p>
                       <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
-                        <button
-                          onClick={() => removeFromHome(id, matched)}
-                          className="rounded-full text-[12px] font-semibold cursor-pointer bg-danger text-paper border-0"
-                          style={{ padding: "8px 14px" }}
-                        >
-                          Remove
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => removeFromHome(id, matched)}
+                            className="rounded-full text-[12px] font-semibold cursor-pointer bg-danger text-paper border-0"
+                            style={{ padding: "8px 14px" }}
+                          >
+                            Remove
+                          </button>
+                          <button
+                            onClick={() => blockFromHome(id, matched)}
+                            className="rounded-full text-[12px] font-semibold cursor-pointer bg-transparent text-danger border border-danger"
+                            style={{ padding: "8px 14px" }}
+                            title="Remove and stop them from showing up again"
+                          >
+                            Block
+                          </button>
+                        </div>
                         <div className="flex items-center gap-2 ml-auto">
                           <button
                             onClick={() => { setExpandedId(null); setDraft(""); }}
@@ -333,6 +387,27 @@ function HomeRoute() {
             Manage contacts →
           </button>
         </div>
+
+        {blocked.length > 0 && (
+          <div className="mt-3 text-center">
+            <button
+              onClick={() => {
+                if (typeof window === "undefined") return;
+                const ok = window.confirm(
+                  `Unblock all ${blocked.length} blocked ${blocked.length === 1 ? "person" : "people"}?`,
+                );
+                if (ok) {
+                  persistBlocked([]);
+                  toast("Block list cleared");
+                }
+              }}
+              className="font-mono text-[10px] uppercase text-mute bg-transparent border-0 cursor-pointer underline-offset-4 hover:underline"
+              style={{ letterSpacing: "0.22em" }}
+            >
+              {blocked.length} blocked · tap to clear
+            </button>
+          </div>
+        )}
 
 
         {/* Sphere+ card (always shown when at limit, soft prompt when not) */}
