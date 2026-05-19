@@ -367,18 +367,17 @@ export function SphereContacts({
                   {found.length === 0 ? "Paste at least one number" : `Review ${found.length}`}
                 </PrimaryButton>
               </div>
-              <div className="mt-2">
-                <GhostButton
-                  onPointerUp={(e) => { e.stopPropagation(); setOpenSheet(null); }}
-                  onClick={(e) => { e.stopPropagation(); setOpenSheet(null); }}
-                >
-                  Cancel
-                </GhostButton>
-              </div>
-
             </>
           );
         })()}
+        <div className="mt-2">
+          <GhostButton
+            type="button"
+            onClick={() => { setPasteText(""); setOpenSheet(null); }}
+          >
+            Cancel
+          </GhostButton>
+        </div>
       </Sheet>
 
       {/* Confirm list sheet (from device picker / paste / vcf) */}
