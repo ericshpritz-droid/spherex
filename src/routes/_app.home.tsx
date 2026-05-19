@@ -388,6 +388,27 @@ function HomeRoute() {
           </button>
         </div>
 
+        {blocked.length > 0 && (
+          <div className="mt-3 text-center">
+            <button
+              onClick={() => {
+                if (typeof window === "undefined") return;
+                const ok = window.confirm(
+                  `Unblock all ${blocked.length} blocked ${blocked.length === 1 ? "person" : "people"}?`,
+                );
+                if (ok) {
+                  persistBlocked([]);
+                  toast("Block list cleared");
+                }
+              }}
+              className="font-mono text-[10px] uppercase text-mute bg-transparent border-0 cursor-pointer underline-offset-4 hover:underline"
+              style={{ letterSpacing: "0.22em" }}
+            >
+              {blocked.length} blocked · tap to clear
+            </button>
+          </div>
+        )}
+
 
         {/* Sphere+ card (always shown when at limit, soft prompt when not) */}
         {slotsUsed >= slotLimit && !isPlus && (
