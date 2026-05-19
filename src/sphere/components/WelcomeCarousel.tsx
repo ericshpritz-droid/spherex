@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import avatar1 from "@/assets/avatar-mutual-1.png";
+import avatar2 from "@/assets/avatar-mutual-2.png";
 
 type Slide = {
   eyebrow: string;
@@ -12,8 +14,22 @@ const SLIDES: Slide[] = [
     body: (
       <div className="flex flex-col items-center">
         <div className="flex -space-x-3">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F4C6B7] to-[#C97B5E] border-2 border-ink" />
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#D9D2C5] to-[#7A6F5E] border-2 border-ink" />
+          <img
+            src={avatar1}
+            alt=""
+            width={56}
+            height={56}
+            loading="lazy"
+            className="w-14 h-14 rounded-full object-cover bg-paper border-2 border-ink"
+          />
+          <img
+            src={avatar2}
+            alt=""
+            width={56}
+            height={56}
+            loading="lazy"
+            className="w-14 h-14 rounded-full object-cover bg-paper border-2 border-ink"
+          />
         </div>
         <div className="mt-4 font-serif italic text-paper text-[20px] leading-[1.15] text-center">
           You both<br />picked each other.
