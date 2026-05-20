@@ -38,7 +38,6 @@ import { Route as AppProfileInviteRouteImport } from './routes/_app.profile.invi
 import { Route as AppProfileDeleteRouteImport } from './routes/_app.profile.delete'
 import { Route as AppAddPatienceRouteImport } from './routes/_app.add.patience'
 import { Route as AppAddManualRouteImport } from './routes/_app.add.manual'
-import { Route as AppAddIntentRouteImport } from './routes/_app.add.intent'
 import { Route as AppAddContactsRouteImport } from './routes/_app.add.contacts'
 import { Route as AppAddConfirmRouteImport } from './routes/_app.add.confirm'
 import { Route as AppAddComposeRouteImport } from './routes/_app.add.compose'
@@ -187,11 +186,6 @@ const AppAddManualRoute = AppAddManualRouteImport.update({
   path: '/manual',
   getParentRoute: () => AppAddRoute,
 } as any)
-const AppAddIntentRoute = AppAddIntentRouteImport.update({
-  id: '/intent',
-  path: '/intent',
-  getParentRoute: () => AppAddRoute,
-} as any)
 const AppAddContactsRoute = AppAddContactsRouteImport.update({
   id: '/contacts',
   path: '/contacts',
@@ -234,7 +228,6 @@ export interface FileRoutesByFullPath {
   '/add/compose': typeof AppAddComposeRoute
   '/add/confirm': typeof AppAddConfirmRoute
   '/add/contacts': typeof AppAddContactsRoute
-  '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
   '/profile/delete': typeof AppProfileDeleteRoute
@@ -267,7 +260,6 @@ export interface FileRoutesByTo {
   '/add/compose': typeof AppAddComposeRoute
   '/add/confirm': typeof AppAddConfirmRoute
   '/add/contacts': typeof AppAddContactsRoute
-  '/add/intent': typeof AppAddIntentRoute
   '/add/manual': typeof AppAddManualRoute
   '/add/patience': typeof AppAddPatienceRoute
   '/profile/delete': typeof AppProfileDeleteRoute
@@ -303,7 +295,6 @@ export interface FileRoutesById {
   '/_app/add/compose': typeof AppAddComposeRoute
   '/_app/add/confirm': typeof AppAddConfirmRoute
   '/_app/add/contacts': typeof AppAddContactsRoute
-  '/_app/add/intent': typeof AppAddIntentRoute
   '/_app/add/manual': typeof AppAddManualRoute
   '/_app/add/patience': typeof AppAddPatienceRoute
   '/_app/profile/delete': typeof AppProfileDeleteRoute
@@ -339,7 +330,6 @@ export interface FileRouteTypes {
     | '/add/compose'
     | '/add/confirm'
     | '/add/contacts'
-    | '/add/intent'
     | '/add/manual'
     | '/add/patience'
     | '/profile/delete'
@@ -372,7 +362,6 @@ export interface FileRouteTypes {
     | '/add/compose'
     | '/add/confirm'
     | '/add/contacts'
-    | '/add/intent'
     | '/add/manual'
     | '/add/patience'
     | '/profile/delete'
@@ -407,7 +396,6 @@ export interface FileRouteTypes {
     | '/_app/add/compose'
     | '/_app/add/confirm'
     | '/_app/add/contacts'
-    | '/_app/add/intent'
     | '/_app/add/manual'
     | '/_app/add/patience'
     | '/_app/profile/delete'
@@ -630,13 +618,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAddManualRouteImport
       parentRoute: typeof AppAddRoute
     }
-    '/_app/add/intent': {
-      id: '/_app/add/intent'
-      path: '/intent'
-      fullPath: '/add/intent'
-      preLoaderRoute: typeof AppAddIntentRouteImport
-      parentRoute: typeof AppAddRoute
-    }
     '/_app/add/contacts': {
       id: '/_app/add/contacts'
       path: '/contacts'
@@ -665,7 +646,6 @@ interface AppAddRouteChildren {
   AppAddComposeRoute: typeof AppAddComposeRoute
   AppAddConfirmRoute: typeof AppAddConfirmRoute
   AppAddContactsRoute: typeof AppAddContactsRoute
-  AppAddIntentRoute: typeof AppAddIntentRoute
   AppAddManualRoute: typeof AppAddManualRoute
   AppAddPatienceRoute: typeof AppAddPatienceRoute
   AppAddIndexRoute: typeof AppAddIndexRoute
@@ -675,7 +655,6 @@ const AppAddRouteChildren: AppAddRouteChildren = {
   AppAddComposeRoute: AppAddComposeRoute,
   AppAddConfirmRoute: AppAddConfirmRoute,
   AppAddContactsRoute: AppAddContactsRoute,
-  AppAddIntentRoute: AppAddIntentRoute,
   AppAddManualRoute: AppAddManualRoute,
   AppAddPatienceRoute: AppAddPatienceRoute,
   AppAddIndexRoute: AppAddIndexRoute,
@@ -753,3 +732,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
