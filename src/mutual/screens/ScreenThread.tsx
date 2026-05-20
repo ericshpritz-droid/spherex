@@ -229,7 +229,19 @@ export function ScreenThread({ accent, match, onBack, onSendCompliment }: Props)
           <div className="font-bold text-[16px] truncate">{match.name}</div>
           <div className="text-[12px] text-fg-55">Mutual · emoji only</div>
         </div>
+        {onSendCompliment && (
+          <button
+            onClick={onSendCompliment}
+            className="rounded-full border-0 bg-glass-08 text-white text-[12px] font-semibold cursor-pointer shrink-0"
+            style={{ padding: "8px 12px", letterSpacing: 0.2 }}
+            aria-label="Send a compliment"
+            title="Send a compliment"
+          >
+            ✨ Compliment
+          </button>
+        )}
       </div>
+
 
       {/* Message list */}
       <div
