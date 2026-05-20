@@ -22,9 +22,10 @@ export const Route = createFileRoute("/_app/add/patience")({
 const POINTS = [
   {
     n: "01",
-    title: "They get a quiet nudge.",
-    body: "Anonymous text — no names, no pressure. They never know it was you.",
+    title: "Your pick stays sealed.",
+    body: "Nothing is sent to them. They never know it was you.",
   },
+
   {
     n: "02",
     title: "We'll notify you — no need to check every day.",
