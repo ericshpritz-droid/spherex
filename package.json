@@ -14,7 +14,9 @@
     "test:e2e:visual:update": "playwright test screens-visual --update-snapshots",
     "test:e2e:install": "playwright install --with-deps chromium webkit",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@capacitor-community/contacts": "^7.1.0",
