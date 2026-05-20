@@ -1,0 +1,70 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit:
+    name: Unit tests (vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run test
+
+  e2e-waiting-room:
+    name: E2E — waiting-room (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Start dev server
+        run: |
+          bun run dev > dev-server.log 2>&1 &
+          echo $! > dev-server.pid
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:5173 > /dev/null; then
+              echo "Dev server is up"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Dev server failed to start"
+          cat dev-server.log
+          exit 1
+
+      - name: Run waiting-room e2e
+        run: bunx playwright test waiting-room
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+
+      - name: Stop dev server
+        if: always()
+        run: |
+          if [ -f dev-server.pid ]; then
+            kill "$(cat dev-server.pid)" 2>/dev/null || true
+          fi
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
