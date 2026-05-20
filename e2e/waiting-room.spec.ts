@@ -1,5 +1,11 @@
 import { test, expect } from "@playwright/test";
-import { STORAGE_STATE } from "./auth.setup";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const STORAGE_STATE = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  ".auth/state.json",
+);
 
 /**
  * E2E for the redesigned waiting room and upgrade sheet.
