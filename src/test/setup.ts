@@ -6,12 +6,10 @@ afterEach(() => cleanup());
 
 // jsdom doesn't implement pointer capture / matchMedia / ResizeObserver.
 if (typeof window !== "undefined") {
-  // @ts-expect-error - test shim
-  HTMLElement.prototype.setPointerCapture ??= () => {};
-  // @ts-expect-error - test shim
-  HTMLElement.prototype.releasePointerCapture ??= () => {};
-  // @ts-expect-error - test shim
-  HTMLElement.prototype.hasPointerCapture ??= () => false;
+  const proto = HTMLElement.prototype as unknown as Record<string, unknown>;
+  proto.setPointerCapture ??= () => {};
+  proto.releasePointerCapture ??= () => {};
+  proto.hasPointerCapture ??= () => false;
 
   if (!window.matchMedia) {
     window.matchMedia = vi.fn().mockImplementation((q: string) => ({
