@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { SphereScreen } from "@/sphere/components/SphereScreen";
 import { PrimaryButton, Eyebrow } from "@/sphere/ui";
 import { formatPhone } from "@/mutual/brand.js";
+import { useApp } from "@/mutual/AppContext";
+import { toast } from "@/mutual/toast";
 
 export const Route = createFileRoute("/_app/add/confirm")({
   head: () => ({
@@ -18,7 +20,10 @@ const DRAFT_KEY = "sphere.addDraft";
 
 function ConfirmAdd() {
   const navigate = useNavigate();
+  const { addOne } = useApp();
   const [draft, setDraft] = useState<{ phone: string; ig: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -32,6 +37,23 @@ function ConfirmAdd() {
       navigate({ to: "/add/manual" as any, replace: true });
     }
   }, [navigate]);
+
+  async function commit() {
+    if (!draft || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      if (!draft.phone) throw new Error("Missing phone number.");
+      await addOne(draft.phone, "romantic");
+      try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
+      navigate({ to: "/add/patience" as any, replace: true });
+    } catch (e: any) {
+      const msg = e?.message || "Couldn't save your pick. Please try again.";
+      setError(msg);
+      toast(msg);
+      setBusy(false);
+    }
+  }
 
   if (!draft) return <SphereScreen>{null}</SphereScreen>;
 
@@ -55,7 +77,7 @@ function ConfirmAdd() {
           Double-check.
         </h1>
         <p className="mt-3 text-[14px] text-mute">
-          Tap a field to edit. Nothing is sent until the next screen.
+          A sealed pick. Nothing is sent. If they pick you back, it's a mutual.
         </p>
 
         <div className="mt-7 space-y-3">
@@ -75,13 +97,23 @@ function ConfirmAdd() {
         </div>
 
         <p className="mt-6 px-1 text-[13px] text-mute leading-snug">
-          Both values get hashed on the next screen, before they leave your device.
+          Both values get hashed before they leave your device. You can send a
+          compliment once you're mutually matched.
         </p>
       </div>
 
-      <div className="px-6 pb-8 pt-4">
-        <PrimaryButton onClick={() => navigate({ to: "/add/intent" as any })}>
-          Looks right — continue
+      <div className="px-6 pb-8 pt-4 space-y-3">
+        {error && (
+          <div
+            className="rounded-2xl border p-3 text-[13px] leading-snug"
+            style={{ background: "#FBEBE6", borderColor: "#E8C7BD", color: "#7A2E1C" }}
+            role="alert"
+          >
+            {error}
+          </div>
+        )}
+        <PrimaryButton onClick={commit} disabled={busy}>
+          {busy ? "Sealing…" : error ? "Try again" : "Seal pick"}
         </PrimaryButton>
       </div>
     </SphereScreen>
