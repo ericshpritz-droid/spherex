@@ -269,16 +269,13 @@ function HomeRoute() {
                       </span>
                     ) : (
                       <span
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toast("Nudge sent. They'll get a fresh ping.");
-                        }}
-                        className="rounded-full border border-ink h-9 px-4 text-[12px] font-medium inline-flex items-center"
+                        className="rounded-full border border-line h-9 px-4 text-[12px] font-medium text-mute inline-flex items-center"
                       >
-                        Nudge
+                        Sealed
                       </span>
                     )}
                   </button>
+
 
                   {isExpanded && (
                     <div className="mt-4 pt-4 border-t border-line">
