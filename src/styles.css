@@ -33,6 +33,8 @@
   --color-line: var(--line);
   --color-mute: var(--mute);
   --color-danger: var(--danger);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
 
   /* Sphere typography */
   --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
