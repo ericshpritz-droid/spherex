@@ -49,6 +49,21 @@ function ThreadRoute() {
       accent={accent}
       match={match}
       onBack={() => navigate({ to: "/home" })}
+      onSendCompliment={() => {
+        try {
+          sessionStorage.setItem(
+            "sphere.addDraft",
+            JSON.stringify({
+              phoneHash: match.id,
+              recipientName: match.name,
+              intent: "compliment",
+              returnTo: `/thread/${match.id}`,
+            }),
+          );
+        } catch {}
+        navigate({ to: "/add/compose" as any });
+      }}
     />
   );
+
 }
