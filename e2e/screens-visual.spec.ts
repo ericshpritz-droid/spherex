@@ -29,7 +29,6 @@ const SCREENS: Screen[] = [
   { path: "/onboarding-import" },
   { path: "/contacts" },
   { path: "/add" },
-  { path: "/add/intent" },
   { path: "/add/compose" },
   { path: "/add/manual" },
   { path: "/add/confirm" },
