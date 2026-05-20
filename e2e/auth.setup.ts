@@ -1,11 +1,13 @@
 import { test as setup, expect } from "@playwright/test";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 /**
  * Sign in once via test mode and persist the storage state. Every other spec
  * reuses this state via `use: { storageState: STORAGE_STATE }` (set in
  * playwright.config.ts), so we only walk /phone → /code one time per run.
  */
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const STORAGE_STATE = path.join(__dirname, ".auth/state.json");
 
 setup("authenticate via test mode", async ({ page }) => {
