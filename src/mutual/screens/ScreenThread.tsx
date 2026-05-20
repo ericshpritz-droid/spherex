@@ -36,7 +36,9 @@ type Props = {
     avatar: "pink" | "lavender" | "blue";
   };
   onBack: () => void;
+  onSendCompliment?: () => void;
 };
+
 
 export function ScreenThread({ accent, match, onBack }: Props) {
   const send = useServerFn(sendMessageServer);
