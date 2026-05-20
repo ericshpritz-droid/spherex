@@ -33,6 +33,8 @@
   --color-line: var(--line);
   --color-mute: var(--mute);
   --color-danger: var(--danger);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
 
   /* Sphere typography */
   --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
@@ -114,6 +116,8 @@
   --surface: #FFFFFF;     /* card fill on paper */
   --surface-2: #FAF8F4;   /* hover/pressed card fill */
   --danger: #7A1F1F;
+  --gold: #E6C46A;
+  --gold-soft: #F0DCA0;
 
   /* Static dark accent surfaces — intentionally do NOT flip in dark mode.
      Used by PrimaryButton chrome, the explainer hero, native shell bg, etc. */
