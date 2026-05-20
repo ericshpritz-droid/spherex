@@ -26,7 +26,14 @@ export const Route = createFileRoute("/_app/add/compose")({
   component: ComposeRoute,
 });
 
-type AddDraft = { phone: string; ig: string; intent?: "romantic" | "compliment" | "both" };
+type AddDraft = {
+  phone?: string;
+  phoneHash?: string;
+  ig?: string;
+  intent?: "romantic" | "compliment" | "both";
+  recipientName?: string;
+  returnTo?: string;
+};
 
 function ComposeRoute() {
   const navigate = useNavigate();
@@ -40,10 +47,15 @@ function ComposeRoute() {
     try {
       const raw = sessionStorage.getItem(DRAFT_KEY);
       if (!raw) {
-        navigate({ to: "/add/manual" as any, replace: true });
+        navigate({ to: "/home" as any, replace: true });
         return;
       }
-      setDraft(JSON.parse(raw));
+      const parsed = JSON.parse(raw) as AddDraft;
+      if (!parsed.phone && !parsed.phoneHash) {
+        navigate({ to: "/home" as any, replace: true });
+        return;
+      }
+      setDraft(parsed);
       const prior = sessionStorage.getItem(COMPLIMENT_KEY);
       if (prior) {
         const d = JSON.parse(prior) as ComplimentDraft;
@@ -51,7 +63,7 @@ function ComposeRoute() {
         if (ADJECTIVES.includes(d.adjective)) setAdjective(d.adjective);
       }
     } catch {
-      navigate({ to: "/add/manual" as any, replace: true });
+      navigate({ to: "/home" as any, replace: true });
     }
   }, [navigate]);
 
@@ -60,27 +72,42 @@ function ComposeRoute() {
     [adverb, adjective],
   );
 
+  const goBack = () => {
+    if (draft?.returnTo) {
+      navigate({ to: draft.returnTo as any });
+    } else {
+      navigate({ to: "/home" as any });
+    }
+  };
+
   async function send() {
     if (!draft || busy) return;
     setBusy(true);
     try {
-      const intent = (draft.intent ?? "both") as "compliment" | "both";
-      // For "both", record the romantic add first so a mutual match can ignite later.
-      if (intent === "both") {
+      const intent = (draft.intent ?? "compliment") as "compliment" | "both";
+      // For "both" (pre-match legacy), record the romantic add first.
+      if (intent === "both" && draft.phone) {
         try { await addOne(draft.phone, "both"); } catch { /* non-fatal */ }
       }
       await callSendCompliment({
         recipientPhone: draft.phone,
+        recipientPhoneHash: draft.phoneHash,
         adverb,
         adjective,
         body,
         intent,
       });
+      const returnTo = draft.returnTo;
       try {
         sessionStorage.removeItem(DRAFT_KEY);
         sessionStorage.removeItem(COMPLIMENT_KEY);
       } catch {}
-      navigate({ to: "/add/patience" as any, replace: true });
+      toast("Compliment sent ✨");
+      if (returnTo) {
+        navigate({ to: returnTo as any, replace: true });
+      } else {
+        navigate({ to: "/home" as any, replace: true });
+      }
     } catch (e: any) {
       toast(e?.message || "Could not send.");
       setBusy(false);
@@ -93,7 +120,7 @@ function ComposeRoute() {
     <SphereScreen>
       <div className="flex items-center justify-between px-6 pt-12 pb-2">
         <button
-          onClick={() => navigate({ to: "/add/intent" as any })}
+          onClick={goBack}
           className="text-ink/80 text-[18px] -ml-1 px-2"
           aria-label="Back"
         >
@@ -102,6 +129,7 @@ function ComposeRoute() {
         <div className="font-serif italic text-[18px]">sphere</div>
         <div className="w-6" />
       </div>
+
 
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4" data-scroll>
         <Eyebrow>Compose a compliment</Eyebrow>
@@ -137,9 +165,10 @@ function ComposeRoute() {
         <PrimaryButton onClick={send} disabled={busy}>
           {busy ? "Sending…" : "Send anonymously"}
         </PrimaryButton>
-        <GhostButton onClick={() => navigate({ to: "/add/intent" as any })}>
+        <GhostButton onClick={goBack}>
           Back
         </GhostButton>
+
       </div>
     </SphereScreen>
   );
