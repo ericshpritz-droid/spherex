@@ -77,13 +77,8 @@ function AddSheetRoute() {
             sub="If you remember it, that counts."
             onClick={() => navigate({ to: "/add/manual" as any })}
           />
-          <SheetOption
-            initials="@"
-            title="Add their @handle"
-            sub="Instagram. Doubles match odds."
-            onClick={() => navigate({ to: "/add/manual" as any, search: { ig: 1 } as any })}
-          />
         </div>
+
 
         <div className="mt-3">
           <GhostButton onClick={close}>Cancel</GhostButton>
