@@ -165,9 +165,10 @@ function ComposeRoute() {
         <PrimaryButton onClick={send} disabled={busy}>
           {busy ? "Sending…" : "Send anonymously"}
         </PrimaryButton>
-        <GhostButton onClick={() => navigate({ to: "/add/intent" as any })}>
+        <GhostButton onClick={goBack}>
           Back
         </GhostButton>
+
       </div>
     </SphereScreen>
   );
