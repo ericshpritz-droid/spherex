@@ -17,11 +17,15 @@ export function SphereScreen({ children, className, dark }: SphereScreenProps) {
   return (
     <div
       className={cn(
-        "h-full w-full flex flex-col overflow-hidden",
-        dark ? "bg-ink text-paper" : "bg-paper text-ink",
-        "font-sans",
+        "h-full w-full flex flex-col overflow-hidden font-sans",
+        dark ? "text-paper" : "bg-paper text-ink",
         className,
       )}
+      style={
+        dark
+          ? { backgroundColor: "#0A0A0A", color: "#F5F3EE" }
+          : undefined
+      }
     >
       {children}
     </div>
