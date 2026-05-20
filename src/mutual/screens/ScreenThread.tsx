@@ -40,7 +40,7 @@ type Props = {
 };
 
 
-export function ScreenThread({ accent, match, onBack }: Props) {
+export function ScreenThread({ accent, match, onBack, onSendCompliment }: Props) {
   const send = useServerFn(sendMessageServer);
   const load = useServerFn(loadThreadServer);
   const unsend = useServerFn(unsendMessageServer);
