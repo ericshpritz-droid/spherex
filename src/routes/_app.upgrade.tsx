@@ -52,7 +52,7 @@ function UpgradeRoute() {
           <ul className="mt-5 space-y-3 text-[14px] text-ink/80">
             <Bullet>Three picks instead of one</Bullet>
             <Bullet>Send up to three compliments at a time</Bullet>
-            <Bullet>Nudge a sealed pick once a week</Bullet>
+            <Bullet>Priority match notifications</Bullet>
             <Bullet>Cancel anytime, keep the matches</Bullet>
           </ul>
         </div>
